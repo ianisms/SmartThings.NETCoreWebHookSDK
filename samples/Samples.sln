@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29306.81
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FirstWHFunctionApp", "AzureFunctionsApp\AzureFunctionsApp.csproj", "{58E4383F-0D6F-4E9A-888E-3B280779CF4B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzureFunctionsApp", "AzureFunctionsApp\AzureFunctionsApp.csproj", "{58E4383F-0D6F-4E9A-888E-3B280779CF4B}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SmartThings.NETCoreWebHookSDK", "..\src\SmartThings.NETCoreWebHookSDK.csproj", "{9341D23D-460A-43DF-9A92-F0C305CA8938}"
 EndProject
