@@ -2,7 +2,7 @@
 
 ### UPDATE
 
-**Nuget Package Published!!!!**: SmartThings.NETCoreWebHookSDK
+**Nuget Package Published!!!!**: [SmartThings.NETCoreWebHookSDK](https://www.nuget.org/packages/SmartThings.NETCoreWebHookSDK)
 
 ***
 
