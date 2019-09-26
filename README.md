@@ -1,8 +1,10 @@
 # SmartThings.NETCoreWebHookSDK
 
-## UPDATE
+### UPDATE
 
 **Nuget Package Published!!!!**: SmartThings.NETCoreWebHookSDK
+
+***
 
 Currently just a first pass with 2 samples, one for ASP NET Core Web API and one for an Azure Functions HttpTrigger.  Both samples allow for a very basic WebHook based SmartApp that uses a single-page configuration to display a single section with a boolean toggle.
 
