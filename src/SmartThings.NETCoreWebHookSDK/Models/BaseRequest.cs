@@ -49,27 +49,4 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Models
         [JsonProperty("componentId", Required = Required.Always)]
         public string ComponentId { get; set; }
     }
-
-    public static class Serialize
-    {
-        public static string ToJson(this BaseRequest self) => JsonConvert.SerializeObject(self, ianisms.SmartThings.NETCoreWebHookSDK.Models.Converter.Settings);
-    }
-
-    internal static class Converter
-    {
-        public static readonly JsonSerializerSettings Settings = new JsonSerializerSettings
-        {
-            NullValueHandling = NullValueHandling.Ignore,
-            ContractResolver = new DefaultContractResolver
-            {
-                NamingStrategy = new CamelCaseNamingStrategy()
-            },
-            MetadataPropertyHandling = MetadataPropertyHandling.Ignore,
-            DateParseHandling = DateParseHandling.None,
-            Converters =
-            {
-                new IsoDateTimeConverter { DateTimeStyles = DateTimeStyles.AssumeUniversal }
-            },
-        };
-    }
 }
