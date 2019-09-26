@@ -1,5 +1,11 @@
 # SmartThings.NETCoreWebHookSDK
 
+### UPDATE
+
+**Nuget Package Published!!!!**: [SmartThings.NETCoreWebHookSDK](https://www.nuget.org/packages/SmartThings.NETCoreWebHookSDK)
+
+***
+
 Currently just a first pass with 2 samples, one for ASP NET Core Web API and one for an Azure Functions HttpTrigger.  Both samples allow for a very basic WebHook based SmartApp that uses a single-page configuration to display a single section with a boolean toggle.
 
 I will expand on the README and tune the functionality once I port my favorite groovy based SmartApp using this SDK.  Of course I am also happy to take on contributors.  Please use the [issues feature in the repo](https://github.com/ianisms/SmartThings.NETCoreWebHookSDK/issues) to report any issues.
@@ -18,8 +24,8 @@ This SDK utilizes ```Microsoft.Extensions.DependencyInjection``` for DI as it ma
 
 To add the SDK WebHook functionality to your app there are 3 steps all involving DI:
 
-1. Add an instance of ```CryptoUtilsConfig``` via ```Services.Configure``` like so: ```.Configure<CryptoUtilsConfig>(config.GetSection(nameof(CryptoUtilsConfig)))```.  The details on the properties of ```CryptoUtilsConfig``` can be found below.
-2. Add an instance of your implementation of ```ConfigWebhookHandler``` via ```Services.Configure``` like so: ```.AddSingleton<ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers.IConfigWebhookHandler, AzureFunctionsApp.WebhookHandlers.ConfigWebhookHandler>()```.  Details on the implementation of ```ConfigWebhookHandler``` can be found below.
+1. Add an instance of ```CryptoUtilsConfig``` via ```Services.Configure``` like so: ```.Configure<CryptoUtilsConfig>(config.GetSection(nameof(CryptoUtilsConfig)))```.  The details on the properties of ```CryptoUtilsConfig``` can be found [below](https://github.com/ianisms/SmartThings.NETCoreWebHookSDK/blob/master/README.md#cryptoutilsconfig).
+2. Add an instance of your implementation of ```ConfigWebhookHandler``` via ```Services.Configure``` like so: ```.AddSingleton<ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers.IConfigWebhookHandler, AzureFunctionsApp.WebhookHandlers.ConfigWebhookHandler>()```.  Details on the implementation of ```ConfigWebhookHandler``` can be found [below](https://github.com/ianisms/SmartThings.NETCoreWebHookSDK/blob/master/README.md#configwebhookhandler-implementation).
 3. Add the rmaining handlers via the ```ianisms.SmartThings.NETCoreWebHookSDK.Extensions.AddWebhookHandlers``` extension method like so ```.AddWebhookHandlers()```.
 
 A full example:
