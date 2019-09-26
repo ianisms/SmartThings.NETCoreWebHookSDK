@@ -18,14 +18,4 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Models
         [JsonProperty("installedApp", Required = Required.Always)]
         public InstalledApp InstalledApp { get; set; }
     }
-
-    public class UninstallResponseData
-    {
-    }
-
-    public class UninstallResponse
-    {
-        [JsonProperty("uninstallData", Required = Required.Always)]
-        public UninstallResponseData UninstallData { get; set; }
-    }
 }

@@ -24,14 +24,4 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Models
         [JsonProperty("installedApp", Required = Required.Always)]
         public InstalledApp InstalledApp { get; set; }
     }
-
-    public class UpdateResponseData
-    {
-    }
-
-    public class UpdateResponse
-    {
-        [JsonProperty("updateData", Required = Required.Always)]
-        public UpdateResponseData UpdateData { get; set; }
-    }
 }

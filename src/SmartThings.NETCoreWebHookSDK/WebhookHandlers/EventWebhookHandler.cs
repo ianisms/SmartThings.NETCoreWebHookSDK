@@ -4,24 +4,33 @@ using System;
 
 namespace ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers
 {
-    public class PingWebhookHandler
+    public interface IEventWebhookHandler
     {
-        private ILogger<ConfigWebhookHandler> logger;
+        EventResponse HandleRequest(EventRequest request);
+    }
 
-        public PingWebhookHandler(ILogger<ConfigWebhookHandler> logger)
+    public class EventWebhookHandler : IEventWebhookHandler
+    {
+        private ILogger<EventWebhookHandler> logger;
+
+        public EventWebhookHandler(ILogger<EventWebhookHandler> logger)
         {
             this.logger = logger;
         }
 
-        public PingResponse HandleRequest(PingRequest request)
+        public EventResponse HandleRequest(EventRequest request)
         {
             _ = request ?? throw new ArgumentNullException(nameof(request));
 
             logger.LogDebug($"{this.GetType().Name} handling request: {request.ToJson()}");
 
-            var response = PingResponse.FromPingRequest(request);
+            var response = new EventResponse()
+            {
+                EventData = new EventResponseData()
+            };
 
             logger.LogDebug($"response: {response}");
+
             return response;
         }
     }

@@ -1,9 +1,11 @@
-﻿using ianisms.SmartThings.NETCoreWebHookSDK.Extensions;
+﻿using ianisms.SmartThings.NETCoreWebHookSDK.Crypto;
+using ianisms.SmartThings.NETCoreWebHookSDK.Extensions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using System;
 
 namespace ASPNetCoreWebAPI
 {
@@ -22,10 +24,13 @@ namespace ASPNetCoreWebAPI
             services
                 .AddMvc()
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+
             services
                 .AddLogging()
-                .AddWebhookHandlers()
-                .AddSingleton<ASPNetCoreWebAPI.WebhookHandlers.ConfigWebhookHandler>();
+                .Configure<CryptoUtilsConfig>(Configuration.GetSection(nameof(CryptoUtilsConfig)))
+                .AddSingleton<ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers.IConfigWebhookHandler,
+                    ASPNetCoreWebAPI.WebhookHandlers.ConfigWebhookHandler>()
+                .AddWebhookHandlers();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

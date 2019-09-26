@@ -4,7 +4,12 @@ using System;
 
 namespace ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers
 {
-    public class UninstallWebhookHandler
+    public interface IUninstallWebhookHandler
+    {
+        UninstallResponse HandleRequest(UninstallRequest request);
+    }
+
+    public class UninstallWebhookHandler : IUninstallWebhookHandler
     {
         private ILogger<UninstallWebhookHandler> logger;
 

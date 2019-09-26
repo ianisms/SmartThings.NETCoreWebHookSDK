@@ -4,28 +4,29 @@ using System;
 
 namespace ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers
 {
-    public class InstallWebhookHandler
+    public interface IPingWebhookHandler
+    {
+        PingResponse HandleRequest(PingRequest request);
+    }
+
+    public class PingWebhookHandler : IPingWebhookHandler
     {
         private ILogger<ConfigWebhookHandler> logger;
 
-        public InstallWebhookHandler(ILogger<ConfigWebhookHandler> logger)
+        public PingWebhookHandler(ILogger<ConfigWebhookHandler> logger)
         {
             this.logger = logger;
         }
 
-        public InstallResponse HandleRequest(InstallRequest request)
+        public PingResponse HandleRequest(PingRequest request)
         {
             _ = request ?? throw new ArgumentNullException(nameof(request));
 
             logger.LogDebug($"{this.GetType().Name} handling request: {request.ToJson()}");
 
-            var response = new InstallResponse()
-            {
-                InstallData = new InstallResponseData()
-            };
+            var response = PingResponse.FromPingRequest(request);
 
             logger.LogDebug($"response: {response}");
-
             return response;
         }
     }

@@ -4,7 +4,16 @@ using System;
 
 namespace ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers
 {
-    public abstract class ConfigWebhookHandler
+    public interface IConfigWebhookHandler
+    {
+        ILogger<ConfigWebhookHandler> Logger { get; }
+
+        ConfigResponse HandleRequest(ConfigRequest request);
+        ConfigResponse Initialize();
+        ConfigResponse Page();
+    }
+
+    public abstract class ConfigWebhookHandler : IConfigWebhookHandler
     {
         public ILogger<ConfigWebhookHandler> Logger { get; private set; }
 

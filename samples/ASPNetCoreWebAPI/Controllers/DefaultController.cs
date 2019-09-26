@@ -1,5 +1,6 @@
 ﻿using ianisms.SmartThings.NETCoreWebHookSDK.Models;
 using ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -14,32 +15,18 @@ namespace ASPNetCoreWebAPI.Controllers
     public class DefaultController : ControllerBase
     {
         private readonly ILogger<DefaultController> logger;
-        private readonly PingWebhookHandler pingHandler;
-        private readonly ASPNetCoreWebAPI.WebhookHandlers.ConfigWebhookHandler configHandler;
-        private readonly InstallWebhookHandler installHandler;
-        private readonly UpdateWebhookHandler updateHandler;
-        private readonly EventWebhookHandler eventHandler;
-        private readonly OAuthWebhookHandler oauthHandler;
-        private readonly UninstallWebhookHandler uninstallHandler;
+        private readonly IRootWebhookHandler rootHandler;
 
         public DefaultController(ILogger<DefaultController> logger,
-            PingWebhookHandler pingHandler,
-            ASPNetCoreWebAPI.WebhookHandlers.ConfigWebhookHandler configHandler,
-            InstallWebhookHandler installHandler,
-            UpdateWebhookHandler updateHandler,
-            EventWebhookHandler eventHandler,
-            OAuthWebhookHandler oauthHandler,
-            UninstallWebhookHandler uninstallHandler)
+            IRootWebhookHandler rootHandler)
         {
+            _ = logger ?? throw new ArgumentNullException(nameof(logger));
+            _ = rootHandler ?? throw new ArgumentNullException(nameof(rootHandler));
+
             this.logger = logger;
-            this.pingHandler = pingHandler;
-            this.configHandler = configHandler;
-            this.installHandler = installHandler;
-            this.updateHandler = updateHandler;
-            this.eventHandler = eventHandler;
-            this.oauthHandler = oauthHandler;
-            this.uninstallHandler = uninstallHandler;
+            this.rootHandler = rootHandler;
         }
+
 
         // GET api/FirstWH
         [HttpGet]
@@ -52,44 +39,15 @@ namespace ASPNetCoreWebAPI.Controllers
         [HttpPost]
         public async Task<IActionResult> Post()
         {
-            using (var reader = new StreamReader(Request.Body))
+            var responseObj = await rootHandler.HandleRequestAsync(Request).ConfigureAwait(true);
+            if (responseObj != null)
             {
-                var requestBody = await reader.ReadToEndAsync().ConfigureAwait(true);
-                dynamic data = JsonConvert.DeserializeObject(requestBody);
-
-                RequestLifecycle lifeCycle;
-                if (Enum.TryParse<RequestLifecycle>(data.lifecycle.Value, true, out lifeCycle))
-                {
-                    switch (lifeCycle)
-                    {
-                        case RequestLifecycle.Ping:
-                            var pingRequest = PingRequest.FromJson(requestBody);
-                            return new OkObjectResult(pingHandler.HandleRequest(pingRequest));
-                        case RequestLifecycle.Configuration:
-                            var configRequest = ConfigRequest.FromJson(requestBody);
-                            return new OkObjectResult(configHandler.HandleRequest(configRequest));
-                        case RequestLifecycle.Install:
-                            var installRequest = InstallRequest.FromJson(requestBody);
-                            return new OkObjectResult(installHandler.HandleRequest(installRequest));
-                        case RequestLifecycle.Update:
-                            var updateRequest = UpdateRequest.FromJson(requestBody);
-                            return new OkObjectResult(updateHandler.HandleRequest(updateRequest));
-                        case RequestLifecycle.Event:
-                            var eventRequest = EventRequest.FromJson(requestBody);
-                            return new OkObjectResult(eventHandler.HandleRequest(eventRequest));
-                        case RequestLifecycle.Uninstall:
-                            var uninstallRequest = UninstallRequest.FromJson(requestBody);
-                            return new OkObjectResult(uninstallHandler.HandleRequest(uninstallRequest));
-                        case RequestLifecycle.OAuthCallback:
-                            var oauthRequest = OAuthCallbackRequest.FromJson(requestBody);
-                            return new OkObjectResult(oauthHandler.HandleRequest(oauthRequest));
-                        default:
-                            break;
-                    }
-                }
+                return new OkObjectResult(responseObj);
             }
-
-            throw new InvalidOperationException();
+            else
+            {
+                return new StatusCodeResult(StatusCodes.Status500InternalServerError);
+            }
         }
     }
 }

@@ -12,7 +12,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\SmartThings.NETCoreWebHookSDK.csproj" />
+    <ProjectReference Include="..\..\src\SmartThings.NETCoreWebHookSDK\SmartThings.NETCoreWebHookSDK.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Keys\GWPubKey.PEM">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

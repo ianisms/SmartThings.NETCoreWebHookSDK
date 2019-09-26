@@ -84,14 +84,4 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Models
         [JsonProperty("events", Required = Required.Always)]
         public IEnumerable<RaisedEvent> Events { get; set; }
     }
-
-    public class EventResponseData
-    {
-    }
-
-    public class EventResponse
-    {
-        [JsonProperty("eventData", Required = Required.Always)]
-        public EventResponseData EventData { get; set; }
-    }
 }

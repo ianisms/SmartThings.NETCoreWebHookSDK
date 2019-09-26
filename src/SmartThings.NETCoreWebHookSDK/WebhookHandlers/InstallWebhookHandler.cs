@@ -4,24 +4,29 @@ using System;
 
 namespace ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers
 {
-    public class OAuthWebhookHandler
+    public interface IInstallWebhookHandler
     {
-        private ILogger<OAuthWebhookHandler> logger;
+        InstallResponse HandleRequest(InstallRequest request);
+    }
 
-        public OAuthWebhookHandler(ILogger<OAuthWebhookHandler> logger)
+    public class InstallWebhookHandler : IInstallWebhookHandler
+    {
+        private ILogger<ConfigWebhookHandler> logger;
+
+        public InstallWebhookHandler(ILogger<ConfigWebhookHandler> logger)
         {
             this.logger = logger;
         }
 
-        public OAuthCallbackResponse HandleRequest(OAuthCallbackRequest request)
+        public InstallResponse HandleRequest(InstallRequest request)
         {
             _ = request ?? throw new ArgumentNullException(nameof(request));
 
             logger.LogDebug($"{this.GetType().Name} handling request: {request.ToJson()}");
 
-            var response = new OAuthCallbackResponse()
+            var response = new InstallResponse()
             {
-                OauthData = new OAuthCallbackResponseData()
+                InstallData = new InstallResponseData()
             };
 
             logger.LogDebug($"response: {response}");

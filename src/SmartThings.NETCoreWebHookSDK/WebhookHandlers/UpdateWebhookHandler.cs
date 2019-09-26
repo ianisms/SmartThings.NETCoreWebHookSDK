@@ -4,7 +4,12 @@ using System;
 
 namespace ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers
 {
-    public class UpdateWebhookHandler
+    public interface IUpdateWebhookHandler
+    {
+        UpdateResponse HandleRequest(UpdateRequest request);
+    }
+
+    public class UpdateWebhookHandler : IUpdateWebhookHandler
     {
         private ILogger<UpdateWebhookHandler> logger;
 
