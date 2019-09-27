@@ -16,7 +16,7 @@ namespace ASPNetCoreWebAPI.WebhookHandlers
                 'configurationData': {
                     'initialize': {
                         'id': 'app',
-                        'name': 'The Great Welcomer',
+                        'name': 'My App',
                         'permissions': ['r:devices:*'],
                         'firstPageId': '1'
                     }
@@ -32,7 +32,7 @@ namespace ASPNetCoreWebAPI.WebhookHandlers
                 'configurationData': {
                     'page': {
                         'pageId': '1',
-                        'name': 'Configure The Great Welcomer',
+                        'name': 'Configure My App',
                         'nextPageId': null,
                         'previousPageId': null,
                         'complete': true,
