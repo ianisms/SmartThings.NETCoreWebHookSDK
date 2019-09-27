@@ -480,6 +480,16 @@ Example of configuraion via object model:
                                   IsRequired = true,
                                   IsMultiple = false,
                                   DefaultValue = "true"
+                              },                              
+                              new ConfigSetting()
+                              {
+                                  Id = "Switches",
+                                  Name = "Light Switches",
+                                  Type = ConfigSetting.SettingsType.Device,
+                                  IsRequired = true,
+                                  IsMultiple = true,
+                                  Capabilities = new string[] { "swicth" },
+                                  Permissions = new string[] { "r", "x" }
                               }
                           }
                       }
