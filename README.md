@@ -28,7 +28,7 @@ This SDK utilizes ```Microsoft.Extensions.DependencyInjection``` for DI as it ma
 To add the SDK WebHook functionality to your app there are 3 steps all involving DI:
 
 1. Add an instance of ```CryptoUtilsConfig``` via ```Services.Configure``` like so: ```.Configure<CryptoUtilsConfig>(config.GetSection(nameof(CryptoUtilsConfig)))```.  The details on the properties of ```CryptoUtilsConfig``` can be found [below](https://github.com/ianisms/SmartThings.NETCoreWebHookSDK/blob/master/README.md#cryptoutilsconfig).
-2. Add an instance of your implementation of ```ConfigWebhookHandler```, ```InstallWebhookHandler```, ```UpdateWebhookHandler```, ```UninstallWebhookHandler``` and ```EventWebhookHandler``` via ```Services.Configure``` like in the example below.  Details on the implementation classes can be foundas follows:
+2. Add an instance of your implementation of ```ConfigWebhookHandler```, ```InstallWebhookHandler```, ```UpdateWebhookHandler```, ```UninstallWebhookHandler``` and ```EventWebhookHandler``` via ```Services.Configure``` like in the example below.  Details on the implementation classes can be found as follows:
    - [```ConfigWebhookHandler```](https://github.com/ianisms/SmartThings.NETCoreWebHookSDK/blob/master/README.md#configwebhookhandler-implementation)
    - [```InstallWebhookHandler```](https://github.com/ianisms/SmartThings.NETCoreWebHookSDK/blob/master/README.md#installwebhookhandler-implementation)
    - [```UpdateWebhookHandler```](https://github.com/ianisms/SmartThings.NETCoreWebHookSDK/blob/master/README.md#updatewebhookhandler-implementation)
