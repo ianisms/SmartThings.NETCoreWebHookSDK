@@ -40,6 +40,9 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers
             }
             else
             {
+                _ = request.configurationData.pageId ?? throw new InvalidOperationException("request.configurationData.pageId is null!");
+                _ = request.configurationData.pageId.Value ?? throw new InvalidOperationException("request.configurationData.pageId is null!");
+
                 response = Page(request);
             }
 

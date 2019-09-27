@@ -1,12 +1,12 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 
-namespace ASPNetCoreWebAPI.WebhookHandlers
+namespace AzureFunctionsApp.WebhookHandlers
 {
-    public class ConfigWebhookHandler :
-        ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers.ConfigWebhookHandler
+    public class MyConfigWebhookHandler : ConfigWebhookHandler
     {
-        public ConfigWebhookHandler(ILogger<ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers.ConfigWebhookHandler> logger) : base(logger)
+        public MyConfigWebhookHandler(ILogger<ConfigWebhookHandler> logger) : base(logger)
         {
         }
 

@@ -28,8 +28,13 @@ This SDK utilizes ```Microsoft.Extensions.DependencyInjection``` for DI as it ma
 To add the SDK WebHook functionality to your app there are 3 steps all involving DI:
 
 1. Add an instance of ```CryptoUtilsConfig``` via ```Services.Configure``` like so: ```.Configure<CryptoUtilsConfig>(config.GetSection(nameof(CryptoUtilsConfig)))```.  The details on the properties of ```CryptoUtilsConfig``` can be found [below](https://github.com/ianisms/SmartThings.NETCoreWebHookSDK/blob/master/README.md#cryptoutilsconfig).
-2. Add an instance of your implementation of ```ConfigWebhookHandler``` via ```Services.Configure``` like so: ```.AddSingleton<ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers.IConfigWebhookHandler, AzureFunctionsApp.WebhookHandlers.ConfigWebhookHandler>()```.  Details on the implementation of ```ConfigWebhookHandler``` can be found [below](https://github.com/ianisms/SmartThings.NETCoreWebHookSDK/blob/master/README.md#configwebhookhandler-implementation).
-3. Add the rmaining handlers via the ```ianisms.SmartThings.NETCoreWebHookSDK.Extensions.AddWebhookHandlers``` extension method like so ```.AddWebhookHandlers()```.
+2. Add an instance of your implementation of ```ConfigWebhookHandler```, ```InstallWebhookHandler```, ```UpdateWebhookHandler```, ```UninstallWebhookHandler``` and ```EventWebhookHandler``` via ```Services.Configure``` like in the example below.  Details on the implementation classes can be foundas follows:
+   - [```ConfigWebhookHandler```](https://github.com/ianisms/SmartThings.NETCoreWebHookSDK/blob/master/README.md#configwebhookhandler-implementation)
+   - [```InstallWebhookHandler```](https://github.com/ianisms/SmartThings.NETCoreWebHookSDK/blob/master/README.md#installwebhookhandler-implementation)
+   - [```UpdateWebhookHandler```](https://github.com/ianisms/SmartThings.NETCoreWebHookSDK/blob/master/README.md#updatewebhookhandler-implementation)
+   - [```UninstallWebhookHandler```](https://github.com/ianisms/SmartThings.NETCoreWebHookSDK/blob/master/README.md#uninstallwebhookhandler-implementation)
+   - [```EventWebhookHandler```](https://github.com/ianisms/SmartThings.NETCoreWebHookSDK/blob/master/README.md#eventwebhookhandler-implementation)
+3. Add the remaining handlers via the ```ianisms.SmartThings.NETCoreWebHookSDK.Extensions.AddWebhookHandlers``` extension method like so ```.AddWebhookHandlers()```.
 
 A full example:
 
@@ -50,6 +55,10 @@ public class FunctionsAppStartup : FunctionsStartup
             .AddLogging()
             .Configure<CryptoUtilsConfig>(config.GetSection(nameof(CryptoUtilsConfig)))
             .AddSingleton<IConfigWebhookHandler, MyConfigWebhookHandler>()
+            .AddSingleton<IInstallWebhookHandler, MyInstallWebhookHandler>()
+            .AddSingleton<IUpdateWebhookHandler, MyUpdateWebhookHandler>()
+            .AddSingleton<IUninstallWebhookHandler, MyUninstallWebhookHandler>()
+            .AddSingleton<IEventWebhookHandler, MyEventWebhookHandler>()
             .AddWebhookHandlers();
     }
 }
@@ -128,6 +137,117 @@ dynamic response = JObject.Parse(@"{
 
 If you are using a multi-page confguration, you should look at the ```pageId``` property in thhe ```dynamic request``` parameter and return the request page configuration being sure to set ```'nextPageId'``` and ```'previousPageId'``` accordingly.  Set ```'complete'``` to ```true``` on the final page and ```false``` on all other pages.
 
+Multi-page example:
+
+```csharp
+private dynamic PageOne()
+{
+    dynamic response = JObject.Parse(@"{
+        'configurationData': {
+            'page': {
+                'pageId': '1',
+                'name': 'Basics',
+                'nextPageId': '2',
+                'previousPageId': null,
+                'complete': false,
+                'sections' : [
+                    {
+                        'name': 'Basics',
+                        'settings' : [
+                            {
+                                'id': 'isAppEnabled',
+                                'name': 'Enabled App?',
+                                'description': 'Easy toggle to enable/disable the app',
+                                'type': 'BOOLEAN',
+                                'required': true,
+                                'defaultValue': true,
+                                'multiple': false
+                            },
+                            {
+                                'id': 'locks',
+                                'name': 'Which Lock(s)?',
+                                'description': 'The lock(s) that will be unlocked after arrival.',
+                                'type': 'DEVICE',
+                                'required': false,
+                                'multiple': true,
+                                'capabilities': ['lock'],
+                                'permissions': ['r', 'x']
+                            },
+                        ]
+                    }
+                ]
+            }
+        }
+    }");
+
+    return response;
+}
+
+private dynamic PageTwo()
+{
+    dynamic response = JObject.Parse(@"{
+        'configurationData': {
+            'page': {
+                'pageId': '2',
+                'name': 'Motion and Switches',
+                'nextPageId': '3',
+                'previousPageId': '1',
+                'complete': false,
+                'sections' : [
+                    {
+                        'name': 'Motion',
+                        'settings' : [
+                            {
+                                'id': 'motionSensors',
+                                'name': 'Which Motion Sensor(s)?',
+                                'description': 'The motion sensor(s) that will trigger the app on presence + motion.  If empty, the presence sesnor alone will trigger the app.',
+                                'type': 'DEVICE',
+                                'required': false,
+                                'multiple': true,
+                                'capabilities': ['motionSensor'],
+                                'permissions': ['r']
+                            }
+                        ]
+                    },
+                    {
+                        'name': 'Switches',
+                        'settings' : [
+                            {
+                                'id': 'switches',
+                                'name': 'Which Light Switch(es)?',
+                                'description': 'The switch(es) to turn on/off on arrival.',
+                                'type': 'DEVICE',
+                                'required': false,
+                                'multiple': true,
+                                'capabilities': ['switch'],
+                                'permissions': ['r', 'x']
+                            }
+                        ],
+                    }
+                ]
+            }
+        }
+    }");
+
+    return response;
+}
+
+public override dynamic Page(dynamic request)
+{
+    var pageId = request.configurationData.pageId.Value;
+
+    switch (pageId)
+    {
+        case "1":
+            return PageOne();
+        case "2":
+            return PageTwo();
+        default:
+            throw new InvalidOperationException($"Unknown pageId: {request.configurationData.pageId.Value}");
+    }
+}
+```
+
 More details on the ```CONFIGURATION``` phase can be found [here](https://smartthings.developer.samsung.com/docs/smartapps/configuration.html#Configuration).
 
 Full Example:
@@ -203,6 +323,126 @@ namespace AzureFunctionsApp.WebhookHandlers
 
             return response;
         }
+    }
+}
+```
+
+### InstallWebhookHandler Implementation
+
+During the [INSTALL Lifecycle phase](https://smartthings.developer.samsung.com/docs/smartapps/lifecycles.html#INSTALL), the ```InstallWebhookHandler``` you add via DI will react to the handle the ```installData``` sent in the request.  This ```intsallData``` contains the ```installedApp.config``` you should use to create device subscriptions, etc.  Your ```InstallWebhookHandler``` implementation should extend the abstract class ```ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers.InstallWebhookHandler``` and override the abstract methods ```void HandleInstallData(dynamic installData)```.  You can also override ```void ValidateRequest(dynamic request)``` to perform additional config validation or the like.
+
+An example:
+
+```csharp
+public class MyInstallWebhookHandler : InstallWebhookHandler
+{
+    public MyInstallWebhookHandler(ILogger<InstallWebhookHandler> logger) : base(logger)
+    {
+    }
+
+    public override void ValidateRequest(dynamic request)
+    {
+        base.ValidateRequest((JObject)request);
+
+        _ = request.installData.installedApp.config.isAppEnabled ??
+            throw new InvalidOperationException("request.installData.installedApp.config.isAppEnabled is null");
+        _ = request.installData.installedApp.config.presenceSensors ??
+            throw new InvalidOperationException("request.installData.installedApp.config.presenceSensors is null");
+    }
+
+    public override void HandleInstallData(dynamic installData)
+    {
+        // TODO: Subscribe to device events, etc.
+    }
+}
+```
+
+### UpdateWebhookHandler Implementation
+
+During the [UPDATE Lifecycle phase](https://smartthings.developer.samsung.com/docs/smartapps/lifecycles.html#UPDATE), the ```UpdateWebhookHandler``` you add via DI will react to the handle the ```updateData``` sent in the request.  This ```updateData``` contains the ```installedApp.config``` you should use to create device subscriptions, etc.  Your ```UpdateWebhookHandler``` implementation should extend the abstract class ```ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers.UpdateWebhookHandler``` and override the abstract methods ```void HandleUpdateData(dynamic updateData)```.  You can also override ```void ValidateRequest(dynamic request)``` to perform additional config validation or the like.
+
+An example:
+
+```csharp
+public class MyUpdateWebhookHandler : UpdateWebhookHandler
+{
+    public MyUpdateWebhookHandler(ILogger<UpdateWebhookHandler> logger) : base(logger)
+    {
+    }
+
+    public override void ValidateRequest(dynamic request)
+    {
+        base.ValidateRequest((JObject)request);
+
+        _ = request.updateData.installedApp.config.isAppEnabled ??
+            throw new InvalidOperationException("request.updateData.installedApp.config.isAppEnabled is null");
+        _ = request.updateData.installedApp.config.presenceSensors ??
+            throw new InvalidOperationException("request.updateData.installedApp.config.presenceSensors is null");
+    }
+
+    public override void HandleUpdateData(dynamic updateData)
+    {
+        // TODO: Subscribe to device events, etc.
+    }
+}
+```
+
+### UninstallWebhookHandler Implementation
+
+During the [UNINSTALL Lifecycle phase](https://smartthings.developer.samsung.com/docs/smartapps/lifecycles.html#UNINSTALL), the ```UninstallWebhookHandler``` you add via DI will react to the handle the ```uninstallData``` sent in the request.  This ```intsallData``` contains the ```installedApp.config``` you should use to create device subscriptions, etc.  Your ```UninstallWebhookHandler``` implementation should extend the abstract class ```ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers.UninstallWebhookHandler``` and override the abstract methods ```void HandleUninstallData(dynamic uninstallData)```.  You can also override ```void ValidateRequest(dynamic request)``` to perform additional config validation or the like.
+
+An example:
+
+```csharp
+public class MyUninstallWebhookHandler : UninstallWebhookHandler
+{
+    public MyUninstallWebhookHandler(ILogger<UninstallWebhookHandler> logger) : base(logger)
+    {
+    }
+
+    public override void ValidateRequest(dynamic request)
+    {
+        base.ValidateRequest((JObject)request);
+
+        _ = request.uninstallData.installedApp.config.isAppEnabled ??
+            throw new InvalidOperationException("request.uninstallData.installedApp.config.isAppEnabled is null");
+        _ = request.installData.installedApp.config.presenceSensors ??
+            throw new InvalidOperationException("request.uninstallData.installedApp.config.presenceSensors is null");
+    }
+
+    public override void HandleUninstallData(dynamic uninstallData)
+    {
+        // TODO: Subscribe to device events, etc.
+    }
+}
+```
+
+### EventWebhookHandler Implementation
+
+During the [EVENT Lifecycle phase](https://smartthings.developer.samsung.com/docs/smartapps/lifecycles.html#EVENT), the ```EventWebhookHandler``` you add via DI will react to the handle the ```eventData``` sent in the request.  This ```eventData``` contains the ```installedApp.config``` and ```events``` you should use to respond to events.  Your ```EventWebhookHandler``` implementation should extend the abstract class ```ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers.EventWebhookHandler``` and override the abstract methods ```void HandleEventData(dynamic eventData)```.  You can also override ```void ValidateRequest(dynamic request)``` to perform additional config validation or the like.
+
+An example:
+
+```csharp
+public class MyEventWebhookHandler : EventWebhookHandler
+{
+    public MyEventWebhookHandler(ILogger<EventWebhookHandler> logger) : base(logger)
+    {
+    }
+
+    public override void ValidateRequest(dynamic request)
+    {
+        base.ValidateRequest((JObject)request);
+
+        _ = request.eventData.installedApp.config.isAppEnabled ??
+            throw new InvalidOperationException("request.eventData.installedApp.config.isAppEnabled is null");
+        _ = request.eventData.installedApp.config.presenceSensors ??
+            throw new InvalidOperationException("request.eventData.installedApp.config.presenceSensors is null");
+    }
+
+    public override void HandleEventData(dynamic installData)
+    {
+        // TODO: Subscribe to device events, etc.
     }
 }
 ```
