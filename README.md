@@ -450,3 +450,87 @@ public class MyEventWebhookHandler : EventWebhookHandler
 #### FYI: Why am I Using ```dynamic JObject```
 
 I initially published this with a strongly typed object model that was mapped from the [API documentation](https://smartthings.developer.samsung.com/docs/smartapps/lifecycles.html).  I found it to be quite convoluted so, I adopted  ```dynamic JObject``` to insualte developers from these complexities.  Happy to hear strong opinions either way.
+
+Example of configuraion via object model:
+
+```csharp
+  public override ConfigResponse Page()
+  {
+      var response = new ConfigPageResponse()
+      {
+          ConfigData = new ConfigPageResponseConfigData()
+          {
+              Page = new ConfigPage()
+              {
+                  PageId = "1",
+                  Name = "Configure My App",
+                  IsComplete = true,
+                  Sections = new ConfigSection[]
+                  {
+                      new ConfigSection()
+                      {
+                          Name = "Basics",
+                          Settings = new ConfigSetting[]
+                          {
+                              new ConfigSetting()
+                              {
+                                  Id = "AppEnabled",
+                                  Name = "Enable App?",
+                                  Type = ConfigSetting.SettingsType.Boolean,
+                                  IsRequired = true,
+                                  IsMultiple = false,
+                                  DefaultValue = "true"
+                              }
+                          }
+                      }
+                  }
+              }
+          }
+      };
+
+      return response;
+  }
+
+```
+
+Example using ```dynamic JObject```:
+
+```csharp
+dynamic response = JObject.Parse(@"{
+    'configurationData': {
+        'page': {
+            'pageId': '1',
+            'name': 'Configure My App',
+            'nextPageId': null,
+            'previousPageId': null,
+            'complete': true,
+            'sections' : [
+                {
+                    'name': 'basics',
+                    'settings' : [
+                        {
+                            'id': 'appEnabled',
+                            'name': 'Enabled App?',
+                            'description': 'Easy toggle to enable/disable the app',
+                            'type': 'BOOLEAN',
+                            'required': true,
+                            'defaultValue': true,
+                            'multiple': false
+                        },                                    
+                        {
+                            'id': 'switches',
+                            'name': 'Light Switches',
+                            'description': 'The switches for the app to turn on/off',
+                            'type': 'DEVICE',
+                            'required': true,
+                            'multiple': true,
+                            'capabilities': ['switch'],
+                            'permissions': ['r', 'x']
+                        }
+                    ]
+                }
+            ]
+        }
+    }
+}");
+```
