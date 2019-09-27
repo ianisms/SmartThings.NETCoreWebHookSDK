@@ -2,7 +2,7 @@
 
 ## UPDATES
 
-**Scrapped the object model and using ```dynamic JObject instead```.**  More info on  why.
+**Scrapped the object model and now using ```dynamic JObject``` instead.**  More info on  why.
 **Got ahead of myself, decided NuGet was a bit premature.**  Nuget Packages deprecated until I am ready to release a beta.
 
 ***
