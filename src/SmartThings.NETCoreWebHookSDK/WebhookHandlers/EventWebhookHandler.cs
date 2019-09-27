@@ -1,12 +1,12 @@
-﻿using ianisms.SmartThings.NETCoreWebHookSDK.Models;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
+using Newtonsoft.Json.Linq;
 using System;
 
 namespace ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers
 {
     public interface IEventWebhookHandler
     {
-        EventResponse HandleRequest(EventRequest request);
+        dynamic HandleRequest(dynamic request);
     }
 
     public class EventWebhookHandler : IEventWebhookHandler
@@ -18,16 +18,14 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers
             this.logger = logger;
         }
 
-        public EventResponse HandleRequest(EventRequest request)
+        public dynamic HandleRequest(dynamic request)
         {
             _ = request ?? throw new ArgumentNullException(nameof(request));
 
-            logger.LogDebug($"{this.GetType().Name} handling request: {request.ToJson()}");
+            logger.LogDebug($"{this.GetType().Name} handling request: {request}");
 
-            var response = new EventResponse()
-            {
-                EventData = new EventResponseData()
-            };
+            dynamic response = new JObject();
+            response.eventData = new JObject();
 
             logger.LogDebug($"response: {response}");
 

@@ -1,5 +1,5 @@
-﻿using ianisms.SmartThings.NETCoreWebHookSDK.Models;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
+using Newtonsoft.Json.Linq;
 
 namespace AzureFunctionsApp.WebhookHandlers
 {
@@ -10,61 +10,61 @@ namespace AzureFunctionsApp.WebhookHandlers
         {
         }
 
-        public override ConfigResponse Initialize()
+        public override dynamic Initialize(dynamic request)
         {
-            var response = new ConfigInitResponse()
-            {
-                ConfigData = new ConfigInitResponseConfigData()
-                {
-                    InitData = new ConfigInitResponseData
-                    {
-                        Name = "My App Name",
-                        Id = "app",
-                        Permissions = new string[]
-                        {
-                            "r:devices:*"
-                        },
-                        FirstPageId = "1"
+            dynamic response = JObject.Parse(@"{
+                'configurationData': {
+                    'initialize': {
+                        'id': 'app',
+                        'name': 'The Great Welcomer',
+                        'permissions': ['r:devices:*'],
+                        'firstPageId': '1'
                     }
                 }
-            };
+            }");
 
             return response;
         }
 
-        public override ConfigResponse Page()
+        public override dynamic Page(dynamic request)
         {
-            var response = new ConfigPageResponse()
-            {
-                ConfigData = new ConfigPageResponseConfigData()
-                {
-                    Page = new ConfigPage()
-                    {
-                        PageId = "1",
-                        Name = "Configure My App",
-                        IsComplete = true,
-                        Sections = new ConfigSection[]
-                        {
-                            new ConfigSection()
+            dynamic response = JObject.Parse(@"{
+                'configurationData': {
+                    'page': {
+                        'pageId': '1',
+                        'name': 'Configure The Great Welcomer',
+                        'nextPageId': null,
+                        'previousPageId': null,
+                        'complete': true,
+                        'sections' : [
                             {
-                                Name = "Basics",
-                                Settings = new ConfigSetting[]
-                                {
-                                    new ConfigSetting()
+                                'name': 'basics',
+                                'settings' : [
                                     {
-                                        Id = "AppEnabled",
-                                        Name = "Enable App?",
-                                        Type = ConfigSetting.SettingsType.Boolean,
-                                        IsRequired = true,
-                                        IsMultiple = false,
-                                        DefaultValue = "true"
+                                        'id': 'appEnabled',
+                                        'name': 'Enabled App?',
+                                        'description': 'Easy toggle to enable/disable the app',
+                                        'type': 'BOOLEAN',
+                                        'required': true,
+                                        'defaultValue': true,
+                                        'multiple': false
+                                    },                                    
+                                    {
+                                        'id': 'switches',
+                                        'name': 'Light Switches',
+                                        'description': 'The switches for the app to turn on/off',
+                                        'type': 'DEVICE',
+                                        'required': true,
+                                        'multiple': true,
+                                        'capabilities': ['switch'],
+                                        'permissions': ['r', 'x']
                                     }
-                                }
+                                ]
                             }
-                        }
+                        ]
                     }
                 }
-            };
+            }");
 
             return response;
         }

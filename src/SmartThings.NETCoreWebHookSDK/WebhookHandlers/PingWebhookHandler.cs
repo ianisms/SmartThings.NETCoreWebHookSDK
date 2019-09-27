@@ -1,12 +1,12 @@
-﻿using ianisms.SmartThings.NETCoreWebHookSDK.Models;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
+using Newtonsoft.Json.Linq;
 using System;
 
 namespace ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers
 {
     public interface IPingWebhookHandler
     {
-        PingResponse HandleRequest(PingRequest request);
+        dynamic HandleRequest(dynamic request);
     }
 
     public class PingWebhookHandler : IPingWebhookHandler
@@ -18,13 +18,14 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers
             this.logger = logger;
         }
 
-        public PingResponse HandleRequest(PingRequest request)
+        public dynamic HandleRequest(dynamic request)
         {
             _ = request ?? throw new ArgumentNullException(nameof(request));
 
-            logger.LogDebug($"{this.GetType().Name} handling request: {request.ToJson()}");
+            logger.LogDebug($"{this.GetType().Name} handling request: {request}");
 
-            var response = PingResponse.FromPingRequest(request);
+            dynamic response = new JObject();
+            response.pingData = request.pingData;
 
             logger.LogDebug($"response: {response}");
             return response;

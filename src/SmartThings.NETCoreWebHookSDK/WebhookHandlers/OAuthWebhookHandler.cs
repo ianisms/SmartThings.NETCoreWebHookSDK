@@ -1,12 +1,12 @@
-﻿using ianisms.SmartThings.NETCoreWebHookSDK.Models;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
+using Newtonsoft.Json.Linq;
 using System;
 
 namespace ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers
 {
     public interface IOAuthWebhookHandler
     {
-        OAuthCallbackResponse HandleRequest(OAuthCallbackRequest request);
+        dynamic HandleRequest(dynamic request);
     }
 
     public class OAuthWebhookHandler : IOAuthWebhookHandler
@@ -18,16 +18,14 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers
             this.logger = logger;
         }
 
-        public OAuthCallbackResponse HandleRequest(OAuthCallbackRequest request)
+        public dynamic HandleRequest(dynamic request)
         {
             _ = request ?? throw new ArgumentNullException(nameof(request));
 
-            logger.LogDebug($"{this.GetType().Name} handling request: {request.ToJson()}");
+            logger.LogDebug($"{this.GetType().Name} handling request: {request}");
 
-            var response = new OAuthCallbackResponse()
-            {
-                OauthData = new OAuthCallbackResponseData()
-            };
+            dynamic response = new JObject();
+            response.oAuthCallbackData = new JObject();
 
             logger.LogDebug($"response: {response}");
 

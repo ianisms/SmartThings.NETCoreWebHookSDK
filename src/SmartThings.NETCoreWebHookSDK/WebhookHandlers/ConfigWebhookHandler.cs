@@ -1,52 +1,55 @@
-﻿using ianisms.SmartThings.NETCoreWebHookSDK.Models;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
+using Newtonsoft.Json.Linq;
 using System;
 
 namespace ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers
 {
     public interface IConfigWebhookHandler
     {
-        ILogger<ConfigWebhookHandler> Logger { get; }
+        ILogger<ConfigWebhookHandler> logger { get; }
 
-        ConfigResponse HandleRequest(ConfigRequest request);
-        ConfigResponse Initialize();
-        ConfigResponse Page();
+        dynamic HandleRequest(dynamic request);
+        dynamic Initialize(dynamic request);
+        dynamic Page(dynamic request);
     }
 
     public abstract class ConfigWebhookHandler : IConfigWebhookHandler
     {
-        public ILogger<ConfigWebhookHandler> Logger { get; private set; }
+        public ILogger<ConfigWebhookHandler> logger { get; private set; }
 
         public ConfigWebhookHandler(ILogger<ConfigWebhookHandler> logger)
         {
-            this.Logger = logger;
+            this.logger = logger;
         }
 
-        public ConfigResponse HandleRequest(ConfigRequest request)
+        public dynamic HandleRequest(dynamic request)
         {
             _ = request ?? throw new ArgumentNullException(nameof(request));
+            _ = request.configurationData ?? throw new InvalidOperationException("Missing configurationData!");
+            _ = request.configurationData.phase ?? throw new InvalidOperationException("Missing configurationData.phase!");
 
-            Logger.LogDebug($"{this.GetType().Name} handling request: {request.ToJson()}");
+            logger.LogDebug($"{this.GetType().Name} handling request: {request}");
 
-            ConfigResponse configResp;
+            var phase = request.configurationData.phase.Value.ToLowerInvariant();
 
-            if (request.ConfigurationData.Phase ==
-                ConfigRequestData.RequestPhase.Initialize)
+            dynamic response;
+
+            if(phase == "initialize")
             {
-                configResp = Initialize();
+                response = Initialize(request);
             }
             else
             {
-                configResp = Page();
+                response = Page(request);
             }
 
-            Logger.LogDebug($"Response: {configResp}");
+            logger.LogDebug($"Response: {response}");
 
-            return configResp;
+            return response;
         }
 
-        public abstract ConfigResponse Initialize();
+        public abstract dynamic Initialize(dynamic request);
 
-        public abstract ConfigResponse Page();
+        public abstract dynamic Page(dynamic request);
     }
 }

@@ -1,5 +1,4 @@
 ﻿using ianisms.SmartThings.NETCoreWebHookSDK.Crypto;
-using ianisms.SmartThings.NETCoreWebHookSDK.Models;
 using ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
@@ -16,7 +15,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers
 {
     public interface IRootWebhookHandler
     {
-        Task<BaseResponse> HandleRequestAsync(HttpRequest request);
+        Task<dynamic> HandleRequestAsync(HttpRequest request);
     }
 
     public class RootWebhookHandler : IRootWebhookHandler
@@ -52,7 +51,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers
             this.cryptoUtils = cryptoUtils;
         }
 
-        public async Task<BaseResponse> HandleRequestAsync(HttpRequest request)
+        public async Task<dynamic> HandleRequestAsync(HttpRequest request)
         {
             _ = request ?? throw new ArgumentNullException(nameof(request));
 
@@ -61,41 +60,34 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers
                 var requestBody = await reader.ReadToEndAsync().ConfigureAwait(false);
                 dynamic data = JsonConvert.DeserializeObject(requestBody);
 
-                RequestLifecycle lifeCycle;
-                if (Enum.TryParse<RequestLifecycle>(data.lifecycle.Value, true, out lifeCycle))
+                _ = data.lifecycle ?? throw new InvalidOperationException("lifecycle missing from request body!");
+                _ = data.lifecycle.Value ?? throw new InvalidOperationException("lifecycle missing from request body!");
+
+                var lifecycle = data.lifecycle.Value.ToLowerInvariant().Replace("_", "");
+                switch (lifecycle)
                 {
-                    switch (lifeCycle)
-                    {
-                        case RequestLifecycle.Ping:
-                            var pingRequest = PingRequest.FromJson(requestBody);
-                            return pingHandler.HandleRequest(pingRequest);
-                        case RequestLifecycle.Configuration:
-                            await CheckAuthAsync(request).ConfigureAwait(false);
-                            var configRequest = ConfigRequest.FromJson(requestBody);
-                            return configHandler.HandleRequest(configRequest);
-                        case RequestLifecycle.Install:
-                            await CheckAuthAsync(request).ConfigureAwait(false);
-                            var installRequest = InstallRequest.FromJson(requestBody);
-                            return installHandler.HandleRequest(installRequest);
-                        case RequestLifecycle.Update:
-                            await CheckAuthAsync(request).ConfigureAwait(false);
-                            var updateRequest = UpdateRequest.FromJson(requestBody);
-                            return updateHandler.HandleRequest(updateRequest);
-                        case RequestLifecycle.Event:
-                            await CheckAuthAsync(request).ConfigureAwait(false);
-                            var eventRequest = EventRequest.FromJson(requestBody);
-                            return eventHandler.HandleRequest(eventRequest);
-                        case RequestLifecycle.Uninstall:
-                            await CheckAuthAsync(request).ConfigureAwait(false);
-                            var uninstallRequest = UninstallRequest.FromJson(requestBody);
-                            return uninstallHandler.HandleRequest(uninstallRequest);
-                        case RequestLifecycle.OAuthCallback:
-                            await CheckAuthAsync(request).ConfigureAwait(false);
-                            var oauthRequest = OAuthCallbackRequest.FromJson(requestBody);
-                            return oauthHandler.HandleRequest(oauthRequest);
-                        default:
-                            break;
-                    }
+                    case "ping":
+                        return pingHandler.HandleRequest(data);
+                    case "configuration":
+                        await CheckAuthAsync(request).ConfigureAwait(false);
+                        return configHandler.HandleRequest(data);
+                    case "install":
+                        await CheckAuthAsync(request).ConfigureAwait(false);
+                        return installHandler.HandleRequest(data);
+                    case "update":
+                        await CheckAuthAsync(request).ConfigureAwait(false);
+                        return updateHandler.HandleRequest(data);
+                    case "event":
+                        await CheckAuthAsync(request).ConfigureAwait(false);
+                        return eventHandler.HandleRequest(data);
+                    case "uninstall":
+                        await CheckAuthAsync(request).ConfigureAwait(false);
+                        return uninstallHandler.HandleRequest(data);
+                    case "oauthcallback":
+                        await CheckAuthAsync(request).ConfigureAwait(false);
+                        return oauthHandler.HandleRequest(data);
+                    default:
+                        break;
                 }
             }
 

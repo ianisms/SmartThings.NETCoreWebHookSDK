@@ -1,10 +1,13 @@
 # SmartThings.NETCoreWebHookSDK
 
-### UPDATE
+## UPDATES
 
-**Nuget Package Published!!!!**: [SmartThings.NETCoreWebHookSDK](https://www.nuget.org/packages/SmartThings.NETCoreWebHookSDK)
+**Scrapped the object model and using ```dynamic JObject instead```.**  More info on  why.
+**Got ahead of myself, decided NuGet was a bit premature.**  Nuget Packages deprecated until I am ready to release a beta.
 
 ***
+
+## Description
 
 Currently just a first pass with 2 samples, one for ASP NET Core Web API and one for an Azure Functions HttpTrigger.  Both samples allow for a very basic WebHook based SmartApp that uses a single-page configuration to display a single section with a boolean toggle.
 
@@ -64,13 +67,74 @@ The properties it expects are as follows:
 
 ### ConfigWebhookHandler Implementation
 
-During the [CONFIG Lifecycle phase](https://smartthings.developer.samsung.com/docs/smartapps/configuration.html), the ```ConfigWebhookHandler``` you add via DI will send desired config screens to the UI to allow for app configuration.  The rest of this section is a big TODO for documentation.
+During the [CONFIGURATION Lifecycle phase](https://smartthings.developer.samsung.com/docs/smartapps/configuration.html), the ```ConfigWebhookHandler``` you add via DI will send desired config screens to the UI to allow for app configuration.  Your ```ConfigWebhookHandler``` implementation should extend the abstract class ```ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers.ConfigWebhookHandler``` and override the two abstract methods ```dynamic Initialize(dynamic request)``` and ```dynamic Page(dynamic request)```.
 
-Example:
+For ```Initialize``` you should return a ```Newtonsoft.Json.Linq dynamic JObject``` like so:
 
 ```csharp
-using ianisms.SmartThings.NETCoreWebHookSDK.Models;
+dynamic response = JObject.Parse(@"{
+    'configurationData': {
+        'initialize': {
+            'id': 'app',
+            'name': 'The Great Welcomer',
+            'permissions': ['r:devices:*'],
+            'firstPageId': '1'
+        }
+    }
+}");
+```
+
+For ```Page``` you should return a ```Newtonsoft.Json.Linq dynamic JObject``` respresenting your desired conguration screens like so for a single-page configuration:
+
+```csharp
+dynamic response = JObject.Parse(@"{
+    'configurationData': {
+        'page': {
+            'pageId': '1',
+            'name': 'Configure The Great Welcomer',
+            'nextPageId': null,
+            'previousPageId': null,
+            'complete': true,
+            'sections' : [
+                {
+                    'name': 'basics',
+                    'settings' : [
+                        {
+                            'id': 'appEnabled',
+                            'name': 'Enabled App?',
+                            'description': 'Easy toggle to enable/disable the app',
+                            'type': 'BOOLEAN',
+                            'required': true,
+                            'defaultValue': true,
+                            'multiple': false
+                        },
+                        {
+                            'id': 'switches',
+                            'name': 'Light Switches',
+                            'description': 'The switches for the app to turn on/off',
+                            'type': 'DEVICE',
+                            'required': true,
+                            'multiple': true,
+                            'capabilities': ['switch'],
+                            'permissions': ['r', 'x']
+                        }
+                    ]
+                }
+            ]
+        }
+    }
+}");
+```
+
+If you are using a multi-page confguration, you should look at the ```pageId``` property in thhe ```dynamic request``` parameter and return the request page configuration being sure to set ```'nextPageId'``` and ```'previousPageId'``` accordingly.  Set ```'complete'``` to ```true``` on the final page and ```false``` on all other pages.
+
+More details on the ```CONFIGURATION``` phase can be found [here](https://smartthings.developer.samsung.com/docs/smartapps/configuration.html#Configuration).
+
+Full Example:
+
+```csharp
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json.Linq;
 
 namespace AzureFunctionsApp.WebhookHandlers
 {
@@ -81,64 +145,68 @@ namespace AzureFunctionsApp.WebhookHandlers
         {
         }
 
-        public override ConfigResponse Initialize()
+        public override dynamic Initialize(dynamic request)
         {
-            var response = new ConfigInitResponse()
-            {
-                ConfigData = new ConfigInitResponseConfigData()
-                {
-                    InitData = new ConfigInitResponseData
-                    {
-                        Name = "My App Name",
-                        Id = "app",
-                        Permissions = new string[]
-                        {
-                            "r:devices:*"
-                        },
-                        FirstPageId = "1"
+            dynamic response = JObject.Parse(@"{
+                'configurationData': {
+                    'initialize': {
+                        'id': 'app',
+                        'name': 'The Great Welcomer',
+                        'permissions': ['r:devices:*'],
+                        'firstPageId': '1'
                     }
                 }
-            };
+            }");
 
             return response;
         }
 
-        public override ConfigResponse Page()
+        public override dynamic Page(dynamic request)
         {
-            var response = new ConfigPageResponse()
-            {
-                ConfigData = new ConfigPageResponseConfigData()
-                {
-                    Page = new ConfigPage()
-                    {
-                        PageId = "1",
-                        Name = "Configure My App",
-                        IsComplete = true,
-                        Sections = new ConfigSection[]
-                        {
-                            new ConfigSection()
+            dynamic response = JObject.Parse(@"{
+                'configurationData': {
+                    'page': {
+                        'pageId': '1',
+                        'name': 'Configure The Great Welcomer',
+                        'nextPageId': null,
+                        'previousPageId': null,
+                        'complete': true,
+                        'sections' : [
                             {
-                                Name = "Basics",
-                                Settings = new ConfigSetting[]
-                                {
-                                    new ConfigSetting()
+                                'name': 'basics',
+                                'settings' : [
                                     {
-                                        Id = "AppEnabled",
-                                        Name = "Enable App?",
-                                        Type = ConfigSetting.SettingsType.Boolean,
-                                        IsRequired = true,
-                                        IsMultiple = false,
-                                        DefaultValue = "true"
+                                        'id': 'appEnabled',
+                                        'name': 'Enabled App?',
+                                        'description': 'Easy toggle to enable/disable the app',
+                                        'type': 'BOOLEAN',
+                                        'required': true,
+                                        'defaultValue': true,
+                                        'multiple': false
+                                    },
+                                    {
+                                        'id': 'switches',
+                                        'name': 'Light Switches',
+                                        'description': 'The switches for the app to turn on/off',
+                                        'type': 'DEVICE',
+                                        'required': true,
+                                        'multiple': true,
+                                        'capabilities': ['switch'],
+                                        'permissions': ['r', 'x']
                                     }
-                                }
+                                ]
                             }
-                        }
+                        ]
                     }
                 }
-            };
+            }");
 
             return response;
         }
     }
 }
 ```
+
+#### FYI: Why am I Using ```dynamic JObject```
+
+I initially published this with a strongly typed object model that was mapped from the [API documentation](https://smartthings.developer.samsung.com/docs/smartapps/lifecycles.html).  I found it to be quite convoluted so, I adopted  ```dynamic JObject``` to insualte developers from these complexities.  Happy to hear strong opinions either way.

@@ -1,12 +1,12 @@
-﻿using ianisms.SmartThings.NETCoreWebHookSDK.Models;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
+using Newtonsoft.Json.Linq;
 using System;
 
 namespace ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers
 {
     public interface IUninstallWebhookHandler
     {
-        UninstallResponse HandleRequest(UninstallRequest request);
+        dynamic HandleRequest(dynamic request);
     }
 
     public class UninstallWebhookHandler : IUninstallWebhookHandler
@@ -18,16 +18,14 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers
             this.logger = logger;
         }
 
-        public UninstallResponse HandleRequest(UninstallRequest request)
+        public dynamic HandleRequest(dynamic request)
         {
             _ = request ?? throw new ArgumentNullException(nameof(request));
 
-            logger.LogDebug($"{this.GetType().Name} handling request: {request.ToJson()}");
+            logger.LogDebug($"{this.GetType().Name} handling request: {request}");
 
-            var response = new UninstallResponse()
-            {
-                UninstallData = new UninstallResponseData()
-            };
+            dynamic response = new JObject();
+            response.uninstallData = new JObject();
 
             logger.LogDebug($"response: {response}");
 
