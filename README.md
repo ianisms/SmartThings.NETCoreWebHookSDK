@@ -2,7 +2,7 @@
 
 #### UPDATES
 
-- 6 October 2019:  Massive updates after working on a SmartApp that I do not want to chance losing.  Will update the samples and README ASAP.
+- 6 October 2019:  Massive updates after working on a SmartApp that I do not want to chance losing.  Will update the samples and README ASAP.  Apologies in advance for not being able to hit the README and smaples at the same time as the code changes.
 
 ***
 
