@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Net.Http;
 using System.Text;
 
 namespace ianisms.SmartThings.NETCoreWebHookSDK.Extensions
@@ -20,6 +22,12 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Extensions
                 Query = request.QueryString.ToString()
             };
             return uriBuilder.Uri;
+        }
+
+        public static StringContent ToStringContent(this JObject payload)
+        {
+            _ = payload ?? throw new ArgumentNullException(nameof(payload));
+            return new StringContent(payload.ToString());
         }
     }
 }

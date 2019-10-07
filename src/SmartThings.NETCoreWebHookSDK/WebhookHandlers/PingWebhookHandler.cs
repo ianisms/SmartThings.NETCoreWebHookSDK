@@ -6,14 +6,15 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers
 {
     public interface IPingWebhookHandler
     {
+        ILogger<IPingWebhookHandler> logger { get; }
         dynamic HandleRequest(dynamic request);
     }
 
     public class PingWebhookHandler : IPingWebhookHandler
     {
-        private ILogger<ConfigWebhookHandler> logger;
+        public ILogger<IPingWebhookHandler> logger { get; private set; }
 
-        public PingWebhookHandler(ILogger<ConfigWebhookHandler> logger)
+        public PingWebhookHandler(ILogger<IPingWebhookHandler> logger)
         {
             this.logger = logger;
         }
@@ -22,7 +23,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers
         {
             _ = request ?? throw new ArgumentNullException(nameof(request));
 
-            logger.LogDebug($"{this.GetType().Name} handling request: {request}");
+            logger.LogDebug($"handling request: {request}");
 
             dynamic response = new JObject();
             response.pingData = request.pingData;

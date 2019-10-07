@@ -1,10 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Runtime.InteropServices;
-using System.Security;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace ianisms.SmartThings.NETCoreWebHookSDK.Crypto
@@ -20,7 +16,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Crypto
 
             using (var reader = File.OpenText(PublicKeyFilePath))
             {
-                return await reader.ReadToEndAsync().ConfigureAwait(false);
+                return await reader.ReadToEndAsync();
             }
         }
     }

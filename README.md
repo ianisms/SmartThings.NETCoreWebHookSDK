@@ -2,8 +2,7 @@
 
 #### UPDATES
 
-- Scrapped the object model and now using ```dynamic JObject``` instead.  [More info on  why](https://github.com/ianisms/SmartThings.NETCoreWebHookSDK#fyi-why-am-i-using-dynamic-jobject).
-- Got ahead of myself, decided NuGet was a bit premature.  Nuget Packages deprecated until I am ready to release a beta.
+- 6 October 2019:  Massive updates after working on a SmartApp that I do not want to chance losing.  Will update the samples and README ASAP.
 
 ***
 

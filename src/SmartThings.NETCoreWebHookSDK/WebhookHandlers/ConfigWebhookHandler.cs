@@ -6,8 +6,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers
 {
     public interface IConfigWebhookHandler
     {
-        ILogger<ConfigWebhookHandler> logger { get; }
-
+        ILogger<IConfigWebhookHandler> logger { get; }
         dynamic HandleRequest(dynamic request);
         dynamic Initialize(dynamic request);
         dynamic Page(dynamic request);
@@ -15,22 +14,32 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers
 
     public abstract class ConfigWebhookHandler : IConfigWebhookHandler
     {
-        public ILogger<ConfigWebhookHandler> logger { get; private set; }
+        public ILogger<IConfigWebhookHandler> logger { get; private set; }
 
-        public ConfigWebhookHandler(ILogger<ConfigWebhookHandler> logger)
+        public ConfigWebhookHandler(ILogger<IConfigWebhookHandler> logger)
         {
             this.logger = logger;
         }
 
-        public dynamic HandleRequest(dynamic request)
+        public virtual void ValidateRequest(dynamic request)
         {
+            logger.LogDebug($"validating request: {request}");
+
             _ = request ?? throw new ArgumentNullException(nameof(request));
             _ = request.configurationData ?? throw new InvalidOperationException("Missing configurationData!");
             _ = request.configurationData.phase ?? throw new InvalidOperationException("Missing configurationData.phase!");
+        }
 
-            logger.LogDebug($"{this.GetType().Name} handling request: {request}");
+        public dynamic HandleRequest(dynamic request)
+        {
+            ValidateRequest(request);
+
+            logger.LogInformation("Handling config request...");
+            logger.LogDebug($"Handling request: {request}");
 
             var phase = request.configurationData.phase.Value.ToLowerInvariant();
+
+            logger.LogDebug($"Config phase: {phase}");
 
             dynamic response;
 

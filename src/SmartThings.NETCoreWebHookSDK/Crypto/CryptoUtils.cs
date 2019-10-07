@@ -94,7 +94,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Crypto
 
         private async Task InitializeRSAProviderAsync()
         {
-            var pubKeyContent = await this.config.GetPublicKeyContentAsync().ConfigureAwait(false);
+            var pubKeyContent = await this.config.GetPublicKeyContentAsync();
             this.publicKeyProvider = GetRSAProviderFromPem(pubKeyContent);
         }
 
@@ -104,7 +104,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Crypto
 
             if (publicKeyProvider == null)
             {
-                await InitializeRSAProviderAsync().ConfigureAwait(false);
+                await InitializeRSAProviderAsync();
             }
 
             var sig = RequestSignature.ParseFromHeaderVal(request.Headers["Authorization"].FirstOrDefault());
