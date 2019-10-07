@@ -27,7 +27,7 @@ This SDK utilizes ```Microsoft.Extensions.DependencyInjection``` for DI as it ma
 To add the SDK WebHook functionality to your app there are 3 steps all involving DI:
 
 1. Add an instance of ```CryptoUtilsConfig``` via ```Services.Configure``` like so: ```.Configure<CryptoUtilsConfig>(config.GetSection(nameof(CryptoUtilsConfig)))```.  The details on the properties of ```CryptoUtilsConfig``` can be found [below](https://github.com/ianisms/SmartThings.NETCoreWebHookSDK/blob/master/README.md#cryptoutilsconfig).
-2. Add an instance of your implementation of ```ConfigWebhookHandler```, ```InstallWebhookHandler```, ```UpdateWebhookHandler```, ```UninstallWebhookHandler``` and ```EventWebhookHandler``` via ```Services.Configure``` like in the example below.  Details on the implementation classes can be foundas follows:
+2. Add an instance of your implementation of ```ConfigWebhookHandler```, ```InstallWebhookHandler```, ```UpdateWebhookHandler```, ```UninstallWebhookHandler``` and ```EventWebhookHandler``` via ```Services.Configure``` like in the example below.  Details on the implementation classes can be found as follows:
    - [```ConfigWebhookHandler```](https://github.com/ianisms/SmartThings.NETCoreWebHookSDK/blob/master/README.md#configwebhookhandler-implementation)
    - [```InstallWebhookHandler```](https://github.com/ianisms/SmartThings.NETCoreWebHookSDK/blob/master/README.md#installwebhookhandler-implementation)
    - [```UpdateWebhookHandler```](https://github.com/ianisms/SmartThings.NETCoreWebHookSDK/blob/master/README.md#updatewebhookhandler-implementation)
@@ -449,3 +449,97 @@ public class MyEventWebhookHandler : EventWebhookHandler
 #### FYI: Why am I Using ```dynamic JObject```
 
 I initially published this with a strongly typed object model that was mapped from the [API documentation](https://smartthings.developer.samsung.com/docs/smartapps/lifecycles.html).  I found it to be quite convoluted so, I adopted  ```dynamic JObject``` to insualte developers from these complexities.  Happy to hear strong opinions either way.
+
+Example of configuraion via object model:
+
+```csharp
+  public override ConfigResponse Page()
+  {
+      var response = new ConfigPageResponse()
+      {
+          ConfigData = new ConfigPageResponseConfigData()
+          {
+              Page = new ConfigPage()
+              {
+                  PageId = "1",
+                  Name = "Configure My App",
+                  IsComplete = true,
+                  Sections = new ConfigSection[]
+                  {
+                      new ConfigSection()
+                      {
+                          Name = "Basics",
+                          Settings = new ConfigSetting[]
+                          {
+                              new ConfigSetting()
+                              {
+                                  Id = "AppEnabled",
+                                  Name = "Enable App?",
+                                  Type = ConfigSetting.SettingsType.Boolean,
+                                  IsRequired = true,
+                                  IsMultiple = false,
+                                  DefaultValue = "true"
+                              },                              
+                              new ConfigSetting()
+                              {
+                                  Id = "Switches",
+                                  Name = "Light Switches",
+                                  Type = ConfigSetting.SettingsType.Device,
+                                  IsRequired = true,
+                                  IsMultiple = true,
+                                  Capabilities = new string[] { "swicth" },
+                                  Permissions = new string[] { "r", "x" }
+                              }
+                          }
+                      }
+                  }
+              }
+          }
+      };
+
+      return response;
+  }
+
+```
+
+Example using ```dynamic JObject```:
+
+```csharp
+dynamic response = JObject.Parse(@"{
+    'configurationData': {
+        'page': {
+            'pageId': '1',
+            'name': 'Configure My App',
+            'nextPageId': null,
+            'previousPageId': null,
+            'complete': true,
+            'sections' : [
+                {
+                    'name': 'basics',
+                    'settings' : [
+                        {
+                            'id': 'appEnabled',
+                            'name': 'Enabled App?',
+                            'description': 'Easy toggle to enable/disable the app',
+                            'type': 'BOOLEAN',
+                            'required': true,
+                            'defaultValue': true,
+                            'multiple': false
+                        },                                    
+                        {
+                            'id': 'switches',
+                            'name': 'Light Switches',
+                            'description': 'The switches for the app to turn on/off',
+                            'type': 'DEVICE',
+                            'required': true,
+                            'multiple': true,
+                            'capabilities': ['switch'],
+                            'permissions': ['r', 'x']
+                        }
+                    ]
+                }
+            ]
+        }
+    }
+}");
+```
