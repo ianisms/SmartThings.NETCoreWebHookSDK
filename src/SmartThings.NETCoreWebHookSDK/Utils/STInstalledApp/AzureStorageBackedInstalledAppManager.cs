@@ -147,7 +147,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.STInstalledApp
 
             if (shouldRefreshTokens)
             {
-                await RefreshTokensAsync(installedApp);
+                //await RefreshTokensAsync(installedApp);
             }
 
             logger.LogInformation($"Adding installedApp to cache: {installedApp.InstalledAppId}...");

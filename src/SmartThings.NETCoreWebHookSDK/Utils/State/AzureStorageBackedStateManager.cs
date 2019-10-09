@@ -17,17 +17,19 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.State
         private readonly CloudStorageAccount storageAccount;
         private Dictionary<string, T> stateCache { get; set; }
 
+        public bool LoadedCacheFromStorage { get; set; } = false;
+
         public AzureStorageBackedStateManager(ILogger<IStateManager<T>> logger,
             IOptions<AzureStorageBackedConfig<AzureStorageBackedStateManager<T>>> options)
-            : base (logger)
+            : base(logger)
         {
             _ = options ?? throw new ArgumentNullException(nameof(options));
 
             this.storageBackedConfig = options.Value;
 
-            _ = this.storageBackedConfig.ConnectionString ?? 
+            _ = this.storageBackedConfig.ConnectionString ??
                 throw new InvalidOperationException("storageBackedConfig.ConnectionString is null");
-            _ = this.storageBackedConfig.ContainerName ?? 
+            _ = this.storageBackedConfig.ContainerName ??
                 throw new InvalidOperationException("storageBackedConfig.ContainerName is null");
             _ = this.storageBackedConfig.CacheBlobName ??
                 throw new InvalidOperationException("storageBackedConfig.CacheBlobName is null");
@@ -38,51 +40,71 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.State
             }
         }
 
-        private async Task LoadCacheAsync()
+        public async Task LoadCacheAsync()
         {
             logger.LogInformation("Loading state cache...");
 
-            if (stateCache == null)
+            LoadedCacheFromStorage = false;
+
+            try
+            {
+                if (stateCache == null)
+                {
+                    var storageClient = storageAccount.CreateCloudBlobClient();
+                    var container = storageClient.GetContainerReference(storageBackedConfig.ContainerName);
+                    await container.CreateIfNotExistsAsync();
+                    var cacheBlob = container.GetBlockBlobReference(storageBackedConfig.CacheBlobName);
+
+                    if (!await cacheBlob.ExistsAsync())
+                    {
+                        logger.LogDebug("Backing blob does not exist, initializing cache...");
+
+                        stateCache = new Dictionary<string, T>();
+                    }
+                    else
+                    {
+                        logger.LogDebug("Backing blob exists, loading cache from blob...");
+
+                        var json = await cacheBlob.DownloadTextAsync();
+                        stateCache = JsonConvert.DeserializeObject<Dictionary<string, T>>(json,
+                            Common.JsonSerializerSettings);
+
+                        logger.LogInformation("Loaded state cache from blob...");
+                        LoadedCacheFromStorage = true;
+
+                    }
+                }
+            }
+            catch (StorageException stEx)
+            {
+                logger.LogError(stEx, "Exception trying to load cache from blob...");
+                throw;
+            }
+        }
+
+        public async Task PersistCacheAsync()
+        {
+            logger.LogInformation("Saving state cache...");
+
+            try
             {
                 var storageClient = storageAccount.CreateCloudBlobClient();
                 var container = storageClient.GetContainerReference(storageBackedConfig.ContainerName);
                 await container.CreateIfNotExistsAsync();
                 var cacheBlob = container.GetBlockBlobReference(storageBackedConfig.CacheBlobName);
+                await cacheBlob.DeleteIfExistsAsync();
 
-                if (!await cacheBlob.ExistsAsync())
-                {
-                    logger.LogDebug("Backing blob does not exist, initializing cache...");
+                var json = JsonConvert.SerializeObject(stateCache,
+                    Common.JsonSerializerSettings);
+                await cacheBlob.UploadTextAsync(json);
 
-                    stateCache = new Dictionary<string, T>();
-                }
-                else
-                {
-                    logger.LogDebug("Backing blob exists, loading cache from blob...");
-
-                    var json = await cacheBlob.DownloadTextAsync();
-                    stateCache = JsonConvert.DeserializeObject<Dictionary<string, T>>(json,
-                        Common.JsonSerializerSettings);
-
-                    logger.LogInformation("Loaded state cache from blob...");
-
-                }
+                logger.LogInformation("Saved state cache...");
             }
-        }
-
-        private async Task PersistCacheAsync()
-        {
-            logger.LogInformation("Saving state cache...");
-
-            var storageClient = storageAccount.CreateCloudBlobClient();
-            var container = storageClient.GetContainerReference(storageBackedConfig.ContainerName);
-            await container.CreateIfNotExistsAsync();
-            var cacheBlob = container.GetBlockBlobReference(storageBackedConfig.CacheBlobName);
-
-            var json = JsonConvert.SerializeObject(stateCache,
-                Common.JsonSerializerSettings);
-            await cacheBlob.UploadTextAsync(json);
-
-            logger.LogInformation("Saved state cache...");
+            catch (StorageException stEx)
+            {
+                logger.LogError(stEx, "Exception trying to save cache to blob...");
+                throw;
+            }
         }
 
         public override async Task<T> GetStateAsync(string installedAppId)

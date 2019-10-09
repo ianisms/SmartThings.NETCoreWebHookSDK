@@ -41,9 +41,10 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Crypto
 
         private static RSACryptoServiceProvider GetRSAProviderFromPem(String key)
         {
-            CspParameters cspParameters = new CspParameters();
-            cspParameters.KeyContainerName = "MyKeyContainer";
-            RSACryptoServiceProvider rsaKey = new RSACryptoServiceProvider(cspParameters);
+            CspParameters csp = new CspParameters();
+            csp.KeyContainerName = "MyKeyContainer";
+            csp.Flags = CspProviderFlags.CreateEphemeralKey;
+            RSACryptoServiceProvider rsaKey = new RSACryptoServiceProvider(csp);
 
             var reader = new StringReader(key);
             var pem = new PemReader(reader);

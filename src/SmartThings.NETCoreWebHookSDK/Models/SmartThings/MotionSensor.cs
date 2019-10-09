@@ -8,9 +8,17 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Models.SmartThings
     {
         public MotionState CurrentState { get; set; } = MotionState.Unknown;
 
-        public static MotionState MotionStateFromDynamic(dynamic status)
+        public static MotionState MotionStateFromDynamic(dynamic status,
+            bool isResponseStatus = false)
         {
             _ = status ?? throw new ArgumentNullException(nameof(status));
+
+            if (isResponseStatus)
+            {
+                _ = status.components.main.motionSensor.motion.value ??
+                    throw new ArgumentException("status.components.main.motionSensor.motion.value is null!", nameof(status));
+                status = status.components.main.motionSensor.motion.value;
+            }
 
             var val = status.Value.ToLowerInvariant();
 

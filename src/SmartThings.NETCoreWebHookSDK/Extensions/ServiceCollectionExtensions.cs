@@ -53,14 +53,14 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Extensions
             return services;
         }
 
-        public static IServiceCollection AddInMemoryStateManagerManager<T>(this IServiceCollection services)
+        public static IServiceCollection AddInMemoryStateManager<T>(this IServiceCollection services)
         {
             services
                 .AddSingleton<IStateManager<T>, InMemoryStateManager<T>>();
             return services;
         }
 
-        public static IServiceCollection AddFileBackedStateManagerManager<T>(this IServiceCollection services)
+        public static IServiceCollection AddFileBackedStateManager<T>(this IServiceCollection services)
         {
             services
                 .AddSingleton<IStateManager<T>, FileBackedStateManager<T>>();

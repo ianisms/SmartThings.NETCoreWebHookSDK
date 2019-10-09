@@ -8,9 +8,17 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Models.SmartThings
     {
         public ContactState CurrentState { get; set; } = ContactState.Unknown;
 
-        public static ContactState ContactStateFromDynamic(dynamic status)
+        public static ContactState ContactStateFromDynamic(dynamic status,
+            bool isResponseStatus = false)
         {
             _ = status ?? throw new ArgumentNullException(nameof(status));
+
+            if (isResponseStatus)
+            {
+                _ = status.components.main.contactSensor.contact.value ??
+                    throw new ArgumentException("status.components.main.contactSensor.contact.value is null!", nameof(status));
+                status = status.components.main.contactSensor.contact.value;
+            }
 
             var val = status.Value.ToLowerInvariant();
 

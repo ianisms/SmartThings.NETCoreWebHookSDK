@@ -101,7 +101,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers
 
             logger.LogInformation("Handling install/update request...");
 
-            logger.LogDebug($"Handling request: {request}");
+            logger.LogTrace($"Handling request: {request}");
 
             logger.LogDebug("Setting tokens...");
 

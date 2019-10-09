@@ -62,7 +62,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.SmartThings
 
             using (var request = new HttpRequestMessage(HttpMethod.Post, uri))
             {
-                var data = $"grant_type=refresh_token&client_id={appConfig.SmartAppClientId}&client_secret={appConfig.SmartAppClientSecret}&refresh_token={installedApp.RefreshToken}";
+                var data = $"grant_type=refresh_token&client_id={appConfig.SmartAppClientId}&client_secret={appConfig.SmartAppClientSecret}&refresh_token={installedApp.RefreshToken.TokenValue}";
                 request.Content = new StringContent(data, Encoding.UTF8, "application/x-www-form-urlencoded");
                 using (var httpClient = httpClientFactory.CreateClient())
                 {
@@ -72,7 +72,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.SmartThings
                     dynamic tokenDetails = JObject.Parse(body);
                     _ = tokenDetails.access_token ?? throw new InvalidOperationException("tokenDetails.access_token == null!");
                     _ = tokenDetails.refresh_token ?? throw new InvalidOperationException("tokenDetails.refresh_token == null!");
-                    //_ = tokenDetails.expires_in ?? throw new InvalidOperationException("tokenDetails.expires_in == null!");
+                    _ = tokenDetails.expires_in ?? throw new InvalidOperationException("tokenDetails.expires_in == null!");
 
                     logger.LogDebug($"Setting tokens for installedApp: {installedApp.InstalledAppId}...");
 

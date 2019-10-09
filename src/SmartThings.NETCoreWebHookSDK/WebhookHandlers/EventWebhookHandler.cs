@@ -68,7 +68,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers
             ValidateRequest(request);
 
             logger.LogInformation("Handling event request...");
-            logger.LogDebug($"Handling request: {request}");
+            logger.LogTrace($"Handling request: {request}");
 
             var installedAppId = request.eventData.installedApp.installedAppId.Value;
 
@@ -90,7 +90,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers
             dynamic response = new JObject();
             response.eventData = new JObject();
 
-            logger.LogDebug($"Response: {response}");
+            logger.LogTrace($"Response: {response}");
 
             return response;
         }

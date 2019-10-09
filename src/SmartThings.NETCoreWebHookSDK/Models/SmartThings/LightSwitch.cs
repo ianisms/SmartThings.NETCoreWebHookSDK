@@ -9,9 +9,17 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Models.SmartThings
     {
         public SwitchState CurrentState { get; set; } = SwitchState.Unknown;
 
-        public static SwitchState SwitchStateFromDynamic(dynamic status)
+        public static SwitchState SwitchStateFromDynamic(dynamic status,
+            bool isResponseStatus = false)
         {
             _ = status ?? throw new ArgumentNullException(nameof(status));
+
+            if (isResponseStatus)
+            {
+                _ = status.components.main["switch"]["switch"].value ??
+                    throw new ArgumentException("status.components.main.switch.switch.value is null!", nameof(status));
+                status = status.components.main["switch"]["switch"].value;
+            }
 
             var val = status.Value.ToLowerInvariant();
 

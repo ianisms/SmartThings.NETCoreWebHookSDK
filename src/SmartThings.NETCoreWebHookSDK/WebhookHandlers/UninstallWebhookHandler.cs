@@ -34,7 +34,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers
 
         public virtual void ValidateRequest(dynamic request)
         {
-            logger.LogDebug($"Validating request: {request}");
+            logger.LogTrace($"Validating request: {request}");
 
             _ = request ??
                 throw new ArgumentNullException(nameof(request));
@@ -65,7 +65,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers
         {
             ValidateRequest(request);
 
-            logger.LogDebug($"Handling request: {request}");
+            logger.LogTrace($"Handling request: {request}");
 
             await HandleUninstallDataAsync(request.uninstallData);
 
@@ -76,7 +76,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers
             dynamic response = new JObject();
             response.uninstallData = new JObject();
 
-            logger.LogDebug($"Response: {response}");
+            logger.LogTrace($"Response: {response}");
 
             return response;
         }

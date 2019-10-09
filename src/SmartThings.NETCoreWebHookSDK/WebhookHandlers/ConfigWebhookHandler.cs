@@ -23,7 +23,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers
 
         public virtual void ValidateRequest(dynamic request)
         {
-            logger.LogDebug($"validating request: {request}");
+            logger.LogTrace($"Validating request: {request}");
 
             _ = request ?? throw new ArgumentNullException(nameof(request));
             _ = request.configurationData ?? throw new InvalidOperationException("Missing configurationData!");
@@ -35,7 +35,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers
             ValidateRequest(request);
 
             logger.LogInformation("Handling config request...");
-            logger.LogDebug($"Handling request: {request}");
+            logger.LogTrace($"Handling request: {request}");
 
             var phase = request.configurationData.phase.Value.ToLowerInvariant();
 
@@ -55,7 +55,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers
                 response = Page(request);
             }
 
-            logger.LogDebug($"Response: {response}");
+            logger.LogTrace($"Response: {response}");
 
             return response;
         }

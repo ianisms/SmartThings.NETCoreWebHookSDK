@@ -9,9 +9,17 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Models.SmartThings
     {
         public LockState CurrentState { get; set; } = LockState.Unknown;
 
-        public static LockState LockStateFromDynamic(dynamic status)
+        public static LockState LockStateFromDynamic(dynamic status,
+            bool isResponseStatus = false)
         {
             _ = status ?? throw new ArgumentNullException(nameof(status));
+
+            if (isResponseStatus)
+            {
+                _ = status.components.main["lock"]["lock"].value ??
+                    throw new ArgumentException("status.components.main.lock.lock.value is null!", nameof(status));
+                status = status.components.main["lock"]["lock"].value;
+            }
 
             var val = status.Value.ToLowerInvariant();
 

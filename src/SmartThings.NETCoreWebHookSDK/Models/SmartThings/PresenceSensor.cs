@@ -9,16 +9,26 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Models.SmartThings
         public PresenceState CurrentState { get; set; } = PresenceState.Unknown;
         public string FriendlyName { get; set; }
 
-        public static PresenceState PresenceStateFromDynamic(dynamic status)
+        public static PresenceState PresenceStateFromDynamic(dynamic status,
+            bool isResponseStatus = false)
         {
             _ = status ?? throw new ArgumentNullException(nameof(status));
+
+            if(isResponseStatus)
+            {
+                _ = status.components.main.presenceSensor.presence.value ??
+                    throw new ArgumentException("status.components.main.presenceSensor.presence.value is null!",
+                    nameof(status));
+                status = status.components.main.presenceSensor.presence.value;
+            }
 
             var val = status.Value.ToLowerInvariant().Replace(" ", "");
 
             var state = PresenceState.Unknown;
             if(!Enum.TryParse<PresenceState>(val, true, out state))
             {
-                throw new ArgumentException($"PresenceSensor.PresenceStateFromDynamic status is an invalid value {status}", nameof(status));
+                throw new ArgumentException($"PresenceSensor.PresenceStateFromDynamic status is an invalid value {status}",
+                    nameof(status));
             }
             else
             {
