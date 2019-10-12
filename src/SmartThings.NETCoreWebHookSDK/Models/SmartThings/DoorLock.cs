@@ -58,7 +58,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Models.SmartThings
         {
             var cmd = value ? "lock" : "unlock";
 
-            dynamic deviceCommands = JObject.Parse($@"{{
+            var json = $@"{{
                 ""commands"": [
 		            {{
                         ""component"": ""main"",
@@ -67,7 +67,9 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Models.SmartThings
 			            ""arguments"": []
                     }}
                 ]
-            }}");
+            }}";
+
+            dynamic deviceCommands = JObject.Parse(json);
 
             return deviceCommands;
         }

@@ -43,7 +43,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Models.SmartThings
                 RefreshToken = new Token()
                 {
                     TokenType = Token.OAuthTokenType.RefreshToken,
-                    TokenValue = authToken,
+                    TokenValue = refreshToken,
                     ExpiresDT = rtExpiresDt
                 };
             }

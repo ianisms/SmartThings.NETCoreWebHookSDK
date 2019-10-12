@@ -58,15 +58,22 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.SmartThings
 
             logger.LogDebug($"Refreshing tokens for installedApp: {installedApp.InstalledAppId}...");
 
-            var uri = new Uri($"https://api.smartthings.com/oauth/token");
+            var uri = new Uri($"https://auth-global.api.smartthings.com/oauth/token");
 
             using (var request = new HttpRequestMessage(HttpMethod.Post, uri))
             {
+                request.SetBasicAuthHeader(appConfig.SmartAppClientId,
+                    appConfig.SmartAppClientSecret);
                 var data = $"grant_type=refresh_token&client_id={appConfig.SmartAppClientId}&client_secret={appConfig.SmartAppClientSecret}&refresh_token={installedApp.RefreshToken.TokenValue}";
                 request.Content = new StringContent(data, Encoding.UTF8, "application/x-www-form-urlencoded");
                 using (var httpClient = httpClientFactory.CreateClient())
                 {
                     var response = await httpClient.SendAsync(request);
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        var errorBody = await response.Content.ReadAsStringAsync();
+                        logger.LogError($"Error trying to refresh tokens...  Response details: {errorBody}");
+                    }
                     response.EnsureSuccessStatusCode();
                     var body = await response.Content.ReadAsStringAsync();
                     dynamic tokenDetails = JObject.Parse(body);
@@ -106,6 +113,12 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.SmartThings
                     using (var httpClient = httpClientFactory.CreateClient())
                     {
                         var response = await httpClient.SendAsync(request);
+                        if (!response.IsSuccessStatusCode)
+                        {
+                            var errorBody = await response.Content.ReadAsStringAsync();
+                            dynamic responseDetails = JObject.Parse(errorBody);
+                            logger.LogError($"Error trying to subscribe to device...  Response details: {errorBody}");
+                        }
                         response.EnsureSuccessStatusCode();
                         return response;
                     }
@@ -123,11 +136,17 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.SmartThings
 
             using (var request = new HttpRequestMessage(HttpMethod.Delete, uri))
             {
-                request.Headers.Authorization = 
-                    new AuthenticationHeaderValue("Bearer", installedApp.AccessToken.TokenValue);
+                request.SetBearerAuthHeader(installedApp.AccessToken.TokenValue);
+
                 using (var httpClient = httpClientFactory.CreateClient())
                 {
                     var response = await httpClient.SendAsync(request);
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        var errorBody = await response.Content.ReadAsStringAsync();
+                        dynamic responseDetails = JObject.Parse(errorBody);
+                        logger.LogError($"Error trying to clear subscriptions...  Response details: {errorBody}");
+                    }
                     response.EnsureSuccessStatusCode();
                     return response;
                 }
@@ -150,11 +169,16 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.SmartThings
 
             using (var request = new HttpRequestMessage(HttpMethod.Get, uri))
             {
-                request.Headers.Authorization = 
-                    new AuthenticationHeaderValue("Bearer", installedApp.AccessToken.TokenValue);
+                request.SetBearerAuthHeader(installedApp.AccessToken.TokenValue);
+
                 using (var httpClient = httpClientFactory.CreateClient())
                 {
                     var response = await httpClient.SendAsync(request);
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        var errorBody = await response.Content.ReadAsStringAsync();
+                        logger.LogError($"Error trying to get device details...  Response details: {errorBody}");
+                    }
                     response.EnsureSuccessStatusCode();
                     var body = await response.Content.ReadAsStringAsync();
                     dynamic device = JObject.Parse(body);
@@ -180,6 +204,12 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.SmartThings
                 using (var httpClient = httpClientFactory.CreateClient())
                 {
                     var response = await httpClient.SendAsync(request);
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        var errorBody = await response.Content.ReadAsStringAsync();
+                        dynamic responseDetails = JObject.Parse(errorBody);
+                        logger.LogError($"Error trying to get device status...  Response details: {errorBody}");
+                    }
                     response.EnsureSuccessStatusCode();
                     var body = await response.Content.ReadAsStringAsync();
                     dynamic device = JObject.Parse(body);
@@ -202,11 +232,19 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.SmartThings
 
             using (var request = new HttpRequestMessage(HttpMethod.Post, uri))
             {
-                request.Headers.Authorization = 
-                    new AuthenticationHeaderValue("Bearer", installedApp.AccessToken.TokenValue);
+                request.SetBearerAuthHeader(installedApp.AccessToken.TokenValue);
+
+                request.Content = ((JObject)command).ToStringContent();
+
                 using (var httpClient = httpClientFactory.CreateClient())
                 {
                     var response = await httpClient.SendAsync(request);
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        var errorBody = await response.Content.ReadAsStringAsync();
+                        dynamic responseDetails = JObject.Parse(errorBody);
+                        logger.LogError($"Error trying to exec command on device...  Response details: {errorBody}");
+                    }
                     response.EnsureSuccessStatusCode();
                 }
             }
@@ -224,11 +262,17 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.SmartThings
 
             using (var request = new HttpRequestMessage(HttpMethod.Get, uri))
             {
-                request.Headers.Authorization = 
-                    new AuthenticationHeaderValue("Bearer", installedApp.AccessToken.TokenValue);
+                request.SetBearerAuthHeader(installedApp.AccessToken.TokenValue);
+
                 using (var httpClient = httpClientFactory.CreateClient())
                 {
                     var response = await httpClient.SendAsync(request);
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        var errorBody = await response.Content.ReadAsStringAsync();
+                        dynamic responseDetails = JObject.Parse(errorBody);
+                        logger.LogError($"Error trying to get location...  Response details: {errorBody}");
+                    }
                     response.EnsureSuccessStatusCode();
                     var body = await response.Content.ReadAsStringAsync();
                     return JsonConvert.DeserializeObject<Location>(body,
