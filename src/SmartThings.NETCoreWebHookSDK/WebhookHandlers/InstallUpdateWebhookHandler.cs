@@ -2,7 +2,7 @@
 using ianisms.SmartThings.NETCoreWebHookSDK.Models.SmartThings;
 using ianisms.SmartThings.NETCoreWebHookSDK.Utils;
 using ianisms.SmartThings.NETCoreWebHookSDK.Utils.SmartThings;
-using ianisms.SmartThings.NETCoreWebHookSDK.Utils.STInstalledApp;
+using ianisms.SmartThings.NETCoreWebHookSDK.Utils.InstalledApp;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Linq;

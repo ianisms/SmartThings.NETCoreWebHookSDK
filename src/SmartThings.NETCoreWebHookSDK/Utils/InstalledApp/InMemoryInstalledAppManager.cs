@@ -5,12 +5,10 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.STInstalledApp
+namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.InstalledApp
 {
     public class InMemoryInstalledAppManager : InstalledAppManager
     {
-        private Dictionary<string, InstalledApp> installedAppCache;
-
         public InMemoryInstalledAppManager(ILogger<IInstalledAppManager> logger,
             ISmartThingsAPIHelper smartThingsAPIHelper)
             : base (logger, smartThingsAPIHelper)
@@ -19,7 +17,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.STInstalledApp
 
         public override async Task LoadCacheAsync()
         {
-            installedAppCache = new Dictionary<string, InstalledApp>();
+            InstalledAppCache = new Dictionary<string, Models.SmartThings.InstalledApp>();
         }
 
         public override async Task PersistCacheAsync()

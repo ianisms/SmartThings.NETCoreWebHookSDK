@@ -1,7 +1,7 @@
 ﻿using ianisms.SmartThings.NETCoreWebHookSDK.Crypto;
 using ianisms.SmartThings.NETCoreWebHookSDK.Utils.SmartThings;
 using ianisms.SmartThings.NETCoreWebHookSDK.Utils.State;
-using ianisms.SmartThings.NETCoreWebHookSDK.Utils.STInstalledApp;
+using ianisms.SmartThings.NETCoreWebHookSDK.Utils.InstalledApp;
 using ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -16,17 +16,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Extensions
                 .AddSingleton<IOAuthWebhookHandler, OAuthWebhookHandler>()
                 .AddSingleton<ICryptoUtils, CryptoUtils>()
                 .AddSingleton<ISmartThingsAPIHelper, SmartThingsAPIHelper>()
-                .AddSingleton<IRootWebhookHandler, RootWebhookHandler>()
-                .AddHttpClient();
-            return services;
-        }
-        public static IServiceCollection AddHandlers(this IServiceCollection services)
-        {
-            services
-                .AddSingleton<IPingWebhookHandler, PingWebhookHandler>()
-                .AddSingleton<IOAuthWebhookHandler, OAuthWebhookHandler>()
-                .AddSingleton<ICryptoUtils, CryptoUtils>()
-                .AddSingleton<ISmartThingsAPIHelper, SmartThingsAPIHelper>()
+                .AddHostedService<InstalledAppTokenManager>()
                 .AddSingleton<IRootWebhookHandler, RootWebhookHandler>()
                 .AddHttpClient();
             return services;

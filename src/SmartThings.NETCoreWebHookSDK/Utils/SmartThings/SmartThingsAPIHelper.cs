@@ -18,18 +18,18 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.SmartThings
         ILogger<ISmartThingsAPIHelper> logger { get; }
         SmartAppConfig appConfig { get; }
         IHttpClientFactory httpClientFactory { get; }
-        Task<InstalledApp> RefreshTokensAsync(InstalledApp installedApp);
-        Task<HttpResponseMessage> SubscribeToDeviceEventAsync(InstalledApp installedApp,
+        Task<Models.SmartThings.InstalledApp> RefreshTokensAsync(Models.SmartThings.InstalledApp installedApp);
+        Task<HttpResponseMessage> SubscribeToDeviceEventAsync(Models.SmartThings.InstalledApp installedApp,
             dynamic device);
-        Task<HttpResponseMessage> ClearSubscriptionsAsync(InstalledApp installedApp);
-        Task<dynamic> GetDeviceDetailsAsync(InstalledApp installedApp,
+        Task<HttpResponseMessage> ClearSubscriptionsAsync(Models.SmartThings.InstalledApp installedApp);
+        Task<dynamic> GetDeviceDetailsAsync(Models.SmartThings.InstalledApp installedApp,
             string deviceId);
-        Task<dynamic> GetDeviceStatusAsync(InstalledApp installedApp,
+        Task<dynamic> GetDeviceStatusAsync(Models.SmartThings.InstalledApp installedApp,
             string deviceId);
-        Task DeviceCommandAsync(InstalledApp installedApp,
+        Task DeviceCommandAsync(Models.SmartThings.InstalledApp installedApp,
             string deviceId,
             dynamic command);
-        Task<Location> GetLocationAsync(InstalledApp installedApp,
+        Task<Location> GetLocationAsync(Models.SmartThings.InstalledApp installedApp,
             string locationId);
     }
 
@@ -52,7 +52,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.SmartThings
             this.httpClientFactory = httpClientFactory;
         }
 
-        public async Task<InstalledApp> RefreshTokensAsync(InstalledApp installedApp)
+        public async Task<Models.SmartThings.InstalledApp> RefreshTokensAsync(Models.SmartThings.InstalledApp installedApp)
         {
             _ = installedApp ?? throw new ArgumentNullException(nameof(installedApp));
 
@@ -72,7 +72,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.SmartThings
                     if (!response.IsSuccessStatusCode)
                     {
                         var errorBody = await response.Content.ReadAsStringAsync();
-                        logger.LogError($"Error trying to refresh tokens...  Response details: {errorBody}");
+                        logger.LogError($"Error trying to refresh tokens...  Response body: {errorBody}");
                     }
                     response.EnsureSuccessStatusCode();
                     var body = await response.Content.ReadAsStringAsync();
@@ -91,7 +91,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.SmartThings
             }
         }
 
-        public async virtual Task<HttpResponseMessage> SubscribeToDeviceEventAsync(InstalledApp installedApp,
+        public async virtual Task<HttpResponseMessage> SubscribeToDeviceEventAsync(Models.SmartThings.InstalledApp installedApp,
             dynamic device)
         {
             _ = installedApp ?? throw new ArgumentNullException(nameof(installedApp));
@@ -117,8 +117,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.SmartThings
                         if (!response.IsSuccessStatusCode)
                         {
                             var errorBody = await response.Content.ReadAsStringAsync();
-                            dynamic responseDetails = JObject.Parse(errorBody);
-                            logger.LogError($"Error trying to subscribe to device...  Response details: {errorBody}");
+                            logger.LogError($"Error trying to subscribe to device...  Response body: {errorBody}");
                         }
                         response.EnsureSuccessStatusCode();
                         return response;
@@ -127,7 +126,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.SmartThings
             }
         }
 
-        public async virtual Task<HttpResponseMessage> ClearSubscriptionsAsync(InstalledApp installedApp)
+        public async virtual Task<HttpResponseMessage> ClearSubscriptionsAsync(Models.SmartThings.InstalledApp installedApp)
         {
             _ = installedApp ?? throw new ArgumentNullException(nameof(installedApp));
 
@@ -146,7 +145,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.SmartThings
                     {
                         var errorBody = await response.Content.ReadAsStringAsync();
                         dynamic responseDetails = JObject.Parse(errorBody);
-                        logger.LogError($"Error trying to clear subscriptions...  Response details: {errorBody}");
+                        logger.LogError($"Error trying to clear subscriptions...  Response body: {errorBody}");
                     }
                     response.EnsureSuccessStatusCode();
                     return response;
@@ -154,7 +153,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.SmartThings
             }
         }
 
-        public async virtual Task<dynamic> GetDeviceDetailsAsync(InstalledApp installedApp,
+        public async virtual Task<dynamic> GetDeviceDetailsAsync(Models.SmartThings.InstalledApp installedApp,
             string deviceId)
         {
             _ = installedApp ?? 
@@ -178,7 +177,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.SmartThings
                     if (!response.IsSuccessStatusCode)
                     {
                         var errorBody = await response.Content.ReadAsStringAsync();
-                        logger.LogError($"Error trying to get device details...  Response details: {errorBody}");
+                        logger.LogError($"Error trying to get device details...  Response body: {errorBody}");
                     }
                     response.EnsureSuccessStatusCode();
                     var body = await response.Content.ReadAsStringAsync();
@@ -188,7 +187,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.SmartThings
             }
         }
 
-        public async virtual Task<dynamic> GetDeviceStatusAsync(InstalledApp installedApp,
+        public async virtual Task<dynamic> GetDeviceStatusAsync(Models.SmartThings.InstalledApp installedApp,
             string deviceId)
         {
             _ = installedApp ?? throw new ArgumentNullException(nameof(installedApp));
@@ -208,8 +207,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.SmartThings
                     if (!response.IsSuccessStatusCode)
                     {
                         var errorBody = await response.Content.ReadAsStringAsync();
-                        dynamic responseDetails = JObject.Parse(errorBody);
-                        logger.LogError($"Error trying to get device status...  Response details: {errorBody}");
+                        logger.LogError($"Error trying to get device status...  Response body: {errorBody}");
                     }
                     response.EnsureSuccessStatusCode();
                     var body = await response.Content.ReadAsStringAsync();
@@ -219,7 +217,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.SmartThings
             }
         }
 
-        public async virtual Task DeviceCommandAsync(InstalledApp installedApp,
+        public async virtual Task DeviceCommandAsync(Models.SmartThings.InstalledApp installedApp,
             string deviceId,
             dynamic command)
         {
@@ -243,15 +241,14 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.SmartThings
                     if (!response.IsSuccessStatusCode)
                     {
                         var errorBody = await response.Content.ReadAsStringAsync();
-                        dynamic responseDetails = JObject.Parse(errorBody);
-                        logger.LogError($"Error trying to exec command on device...  Response details: {errorBody}");
+                        logger.LogError($"Error trying to exec command on device...  Response body: {errorBody}");
                     }
                     response.EnsureSuccessStatusCode();
                 }
             }
         }
 
-        public async virtual Task<Location> GetLocationAsync(InstalledApp installedApp,
+        public async virtual Task<Location> GetLocationAsync(Models.SmartThings.InstalledApp installedApp,
             string locationId)
         {
             _ = installedApp ?? throw new ArgumentNullException(nameof(installedApp));
@@ -271,8 +268,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.SmartThings
                     if (!response.IsSuccessStatusCode)
                     {
                         var errorBody = await response.Content.ReadAsStringAsync();
-                        dynamic responseDetails = JObject.Parse(errorBody);
-                        logger.LogError($"Error trying to get location...  Response details: {errorBody}");
+                        logger.LogError($"Error trying to get location...  Response body: {errorBody}");
                     }
                     response.EnsureSuccessStatusCode();
                     var body = await response.Content.ReadAsStringAsync();

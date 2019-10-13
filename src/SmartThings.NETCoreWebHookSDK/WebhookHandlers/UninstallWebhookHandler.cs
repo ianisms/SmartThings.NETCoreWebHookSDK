@@ -1,4 +1,4 @@
-﻿using ianisms.SmartThings.NETCoreWebHookSDK.Utils.STInstalledApp;
+﻿using ianisms.SmartThings.NETCoreWebHookSDK.Utils.InstalledApp;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 using System;

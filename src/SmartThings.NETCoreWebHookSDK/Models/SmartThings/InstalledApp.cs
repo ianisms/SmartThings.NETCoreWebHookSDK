@@ -38,7 +38,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Models.SmartThings
 
             if (refreshToken != null)
             {
-                var rtExpiresDt = now.Add(Token.AccessTokenTTL);
+                var rtExpiresDt = now.Add(Token.RefreshTokenTTL);
 
                 RefreshToken = new Token()
                 {

@@ -10,7 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.STInstalledApp
+namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.InstalledApp
 {
     public class AzureStorageBackedInstalledAppManager : InstalledAppManager
     {
@@ -41,9 +41,9 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.STInstalledApp
 
         public override async Task LoadCacheAsync()
         {
-            logger.LogInformation("Loading installed app cache...");
+            Logger.LogInformation("Loading installed app cache...");
 
-            if (installedAppCache == null)
+            if (InstalledAppCache == null)
             {
                 var storageClient = storageAccount.CreateCloudBlobClient();
                 var container = storageClient.GetContainerReference(storageBackedConfig.ContainerName);
@@ -52,17 +52,18 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.STInstalledApp
 
                 if (!await cacheBlob.ExistsAsync())
                 {
-                    logger.LogDebug("Backing blob does not exist...");
+                    Logger.LogDebug("Backing blob does not exist...");
+                    InstalledAppCache = new Dictionary<string, Models.SmartThings.InstalledApp>();
                 }
                 else
                 {
-                    logger.LogDebug("Backing blob exists, loading installed app cache from blob...");
+                    Logger.LogDebug("Backing blob exists, loading installed app cache from blob...");
 
                     var json = await cacheBlob.DownloadTextAsync();
-                    installedAppCache = JsonConvert.DeserializeObject<Dictionary<string, InstalledApp>>(json,
+                    InstalledAppCache = JsonConvert.DeserializeObject<Dictionary<string, Models.SmartThings.InstalledApp>>(json,
                         Common.JsonSerializerSettings);
 
-                    logger.LogInformation("Loaded installed app cache from blob...");
+                    Logger.LogInformation("Loaded installed app cache from blob...");
 
                 }
             }
@@ -70,18 +71,18 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.STInstalledApp
 
         public override async Task PersistCacheAsync()
         {
-            logger.LogInformation("Saving installed app cache...");
+            Logger.LogInformation("Saving installed app cache...");
 
             var storageClient = storageAccount.CreateCloudBlobClient();
             var container = storageClient.GetContainerReference(storageBackedConfig.ContainerName);
             await container.CreateIfNotExistsAsync();
             var cacheBlob = container.GetBlockBlobReference(storageBackedConfig.CacheBlobName);
 
-            var json = JsonConvert.SerializeObject(installedAppCache,
+            var json = JsonConvert.SerializeObject(InstalledAppCache,
                 Common.JsonSerializerSettings);
             await cacheBlob.UploadTextAsync(json);
 
-            logger.LogInformation("Saved installed app cache...");
+            Logger.LogInformation("Saved installed app cache...");
         }
     }
 }
