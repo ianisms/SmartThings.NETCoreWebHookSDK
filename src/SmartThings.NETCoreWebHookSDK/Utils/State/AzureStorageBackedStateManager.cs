@@ -15,7 +15,6 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.State
     {
         private readonly AzureStorageBackedConfig<AzureStorageBackedStateManager<T>> storageBackedConfig;
         private readonly CloudStorageAccount storageAccount;
-        private Dictionary<string, T> stateCache { get; set; }
 
         public bool LoadedCacheFromStorage { get; set; } = false;
 
@@ -40,7 +39,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.State
             }
         }
 
-        public async Task LoadCacheAsync()
+        public override async Task LoadCacheAsync()
         {
             logger.LogInformation("Loading state cache...");
 
@@ -82,7 +81,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.State
             }
         }
 
-        public async Task PersistCacheAsync()
+        public override async Task PersistCacheAsync()
         {
             logger.LogInformation("Saving state cache...");
 
@@ -105,54 +104,6 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.State
                 logger.LogError(stEx, "Exception trying to save cache to blob...");
                 throw;
             }
-        }
-
-        public override async Task<T> GetStateAsync(string installedAppId)
-        {
-            _ = installedAppId ?? throw new ArgumentNullException(nameof(installedAppId));
-
-            await LoadCacheAsync();
-
-            logger.LogInformation($"Getting state from cache: {installedAppId}...");
-
-            T state = default(T);
-            if (stateCache.TryGetValue(installedAppId, out state))
-            {
-                logger.LogDebug($"Got state from cache: {installedAppId}...");
-            }
-            else
-            {
-                logger.LogInformation($"Unable to find state in cache: {installedAppId}...");
-            }
-
-            return state;
-        }
-
-        public override async Task StoreStateAsync(string installedAppId, T state)
-        {
-            _ = installedAppId ?? throw new ArgumentNullException(nameof(installedAppId));
-
-            await LoadCacheAsync();
-
-            logger.LogInformation($"Adding state to cache: {installedAppId}...");
-
-            stateCache.Remove(installedAppId);
-            stateCache.Add(installedAppId, state);
-
-            await PersistCacheAsync();
-        }
-
-        public override async Task RemoveStateAsync(string installedAppId)
-        {
-            _ = installedAppId ?? throw new ArgumentNullException(nameof(installedAppId));
-
-            await LoadCacheAsync();
-
-            logger.LogInformation($"Removing state from cache: {installedAppId}...");
-
-            stateCache.Remove(installedAppId);
-
-            await PersistCacheAsync();
         }
     }
 }

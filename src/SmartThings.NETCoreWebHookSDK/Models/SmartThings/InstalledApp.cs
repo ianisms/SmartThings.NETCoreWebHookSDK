@@ -19,7 +19,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Models.SmartThings
         {
             _ = authToken ?? throw new ArgumentNullException(nameof(authToken));
 
-            var rationalizedExpiresIn = TimeSpan.FromMinutes(4.5);
+            var rationalizedExpiresIn = Token.AccessTokenTTL;
             if (expiresIn != long.MinValue)
             {
                 rationalizedExpiresIn = new TimeSpan(expiresIn).Subtract(
@@ -31,18 +31,18 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Models.SmartThings
 
             AccessToken = new Token()
             {
-                TokenType = Token.OAuthTokenType.AccessToken,
+                TokenType = OAuthTokenType.AccessToken,
                 TokenValue = authToken,
                 ExpiresDT = atExpiresDt
             };
 
             if (refreshToken != null)
             {
-                var rtExpiresDt = now.Add(TimeSpan.FromDays(29));
+                var rtExpiresDt = now.Add(Token.AccessTokenTTL);
 
                 RefreshToken = new Token()
                 {
-                    TokenType = Token.OAuthTokenType.RefreshToken,
+                    TokenType = OAuthTokenType.RefreshToken,
                     TokenValue = refreshToken,
                     ExpiresDT = rtExpiresDt
                 };

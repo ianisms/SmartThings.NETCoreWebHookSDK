@@ -16,7 +16,6 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.STInstalledApp
     {
         private readonly AzureStorageBackedConfig<AzureStorageBackedInstalledAppManager> storageBackedConfig;
         private readonly CloudStorageAccount storageAccount;
-        private Dictionary<string, InstalledApp> installedAppCache { get; set; }
 
         public AzureStorageBackedInstalledAppManager(ILogger<IInstalledAppManager> logger,
             ISmartThingsAPIHelper smartThingsAPIHelper,
@@ -40,7 +39,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.STInstalledApp
             }
         }
 
-        private async Task LoadCacheAsync()
+        public override async Task LoadCacheAsync()
         {
             logger.LogInformation("Loading installed app cache...");
 
@@ -53,9 +52,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.STInstalledApp
 
                 if (!await cacheBlob.ExistsAsync())
                 {
-                    logger.LogDebug("Backing blob does not exist, initializing cache...");
-
-                    installedAppCache = new Dictionary<string, InstalledApp>();
+                    logger.LogDebug("Backing blob does not exist...");
                 }
                 else
                 {
@@ -71,7 +68,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.STInstalledApp
             }
         }
 
-        private async Task PersistCacheAsync()
+        public override async Task PersistCacheAsync()
         {
             logger.LogInformation("Saving installed app cache...");
 
@@ -85,88 +82,6 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.STInstalledApp
             await cacheBlob.UploadTextAsync(json);
 
             logger.LogInformation("Saved installed app cache...");
-        }
-
-        public override async Task RefreshTokensAsync(InstalledApp installedApp)
-        {
-            _ = installedApp ?? throw new ArgumentNullException(nameof(installedApp));
-            _ = installedApp.InstalledAppId ?? throw new ArgumentException($"installedApp.InstalledAppId is null", nameof(installedApp));
-            _ = installedApp.AccessToken ?? throw new ArgumentException($"installedApp.AccessToken is null", nameof(installedApp));
-
-            logger.LogInformation($"Refreshing tokens for installedApp: {installedApp.InstalledAppId}...");
-
-            if (installedApp.AccessToken.IsExpired ||
-                (installedApp.RefreshToken == null || installedApp.RefreshToken.IsExpired))
-            {
-                logger.LogDebug($"installedApp: {installedApp.InstalledAppId} has an expired AuthToken and/or a null or expired RefreshToken, attempting to refresh...");
-                installedApp = await smartThingsAPIHelper.RefreshTokenAsync(installedApp);
-
-                installedAppCache.Remove(installedApp.InstalledAppId);
-                installedAppCache.Add(installedApp.InstalledAppId, installedApp);
-                await PersistCacheAsync();
-            }
-        }
-
-        public override async Task<InstalledApp> GetInstalledAppAsync(string installedAppId,
-            bool shouldRefreshTokens = true)
-        {
-            _ = installedAppId ?? throw new ArgumentNullException(nameof(installedAppId));
-
-            await LoadCacheAsync();
-
-            logger.LogInformation($"Getting installedApp from cache: {installedAppId}...");
-
-            InstalledApp installedApp = null;
-            if (installedAppCache.TryGetValue(installedAppId, out installedApp))
-            {
-                logger.LogDebug($"Got installedApp from cache: {installedAppId}...");
-
-                if (shouldRefreshTokens)
-                {
-                    await RefreshTokensAsync(installedApp);
-                }
-            }
-            else
-            {
-                logger.LogInformation($"Unable to find installedApp in cache: {installedAppId}...");
-            }
-
-            return installedApp;
-        }
-
-        public override async Task StoreInstalledAppAsync(InstalledApp installedApp,
-            bool shouldRefreshTokens = true)
-        {
-            _ = installedApp ?? throw new ArgumentNullException(nameof(installedApp));
-            _ = installedApp.InstalledAppId ??
-                throw new ArgumentException($"installedApp.InstalledAppId is null", nameof(installedApp));
-            _ = installedApp.AccessToken ??
-                throw new ArgumentException($"installedApp.AccessToken is null", nameof(installedApp));
-
-            await LoadCacheAsync();
-
-            if (shouldRefreshTokens)
-            {
-                await RefreshTokensAsync(installedApp);
-            }
-
-            logger.LogInformation($"Adding installedApp to cache: {installedApp.InstalledAppId}...");
-
-            installedAppCache.Remove(installedApp.InstalledAppId);
-            installedAppCache.Add(installedApp.InstalledAppId, installedApp);
-
-            await PersistCacheAsync();
-        }
-
-        public override async Task RemoveInstalledAppAsync(string installedAppId)
-        {
-            _ = installedAppId ?? throw new ArgumentNullException(nameof(installedAppId));
-
-            logger.LogInformation($"Removing installedApp from cache: {installedAppId}...");
-
-            installedAppCache.Remove(installedAppId);
-
-            await PersistCacheAsync();
         }
     }
 }

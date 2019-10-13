@@ -18,7 +18,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.SmartThings
         ILogger<ISmartThingsAPIHelper> logger { get; }
         SmartAppConfig appConfig { get; }
         IHttpClientFactory httpClientFactory { get; }
-        Task<InstalledApp> RefreshTokenAsync(InstalledApp installedApp);
+        Task<InstalledApp> RefreshTokensAsync(InstalledApp installedApp);
         Task<HttpResponseMessage> SubscribeToDeviceEventAsync(InstalledApp installedApp,
             dynamic device);
         Task<HttpResponseMessage> ClearSubscriptionsAsync(InstalledApp installedApp);
@@ -52,7 +52,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.SmartThings
             this.httpClientFactory = httpClientFactory;
         }
 
-        public async Task<InstalledApp> RefreshTokenAsync(InstalledApp installedApp)
+        public async Task<InstalledApp> RefreshTokensAsync(InstalledApp installedApp)
         {
             _ = installedApp ?? throw new ArgumentNullException(nameof(installedApp));
 
@@ -84,7 +84,8 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.SmartThings
                     logger.LogDebug($"Setting tokens for installedApp: {installedApp.InstalledAppId}...");
 
                     installedApp.SetTokens(tokenDetails.access_token.Value,
-                        tokenDetails.refresh_token.Value);
+                        tokenDetails.refresh_token.Value,
+                        tokenDetails.expires_in.Value);
                     return installedApp;
                 }
             }

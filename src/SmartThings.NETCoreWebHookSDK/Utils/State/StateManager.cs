@@ -9,6 +9,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.State
     {
         ILogger<IStateManager<T>> logger { get; }
         IList<IObserver<string>> observers { get; }
+        IDictionary<string, T> stateCache { get; }
         Task<T> GetStateAsync(string installedAppId);
         Task StoreStateAsync(string installedAppId, T state);
         Task StoreStateAndNotifyAsync(string installedAppId, T state);
@@ -20,6 +21,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.State
     {
         public ILogger<IStateManager<T>> logger { get; private set; }
         public IList<IObserver<string>> observers { get; private set; }
+        public IDictionary<string, T> stateCache { get; set; }
 
         public StateManager(ILogger<IStateManager<T>> logger)
         {
@@ -38,17 +40,63 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.State
             }
         }
 
-        public abstract Task<T> GetStateAsync(string installedAppId);
+        public virtual async Task<T> GetStateAsync(string installedAppId)
+        {
+            _ = installedAppId ?? throw new ArgumentNullException(nameof(installedAppId));
 
-        public abstract Task StoreStateAsync(string installedAppId, T state);
+            await LoadCacheAsync();
+
+            logger.LogInformation($"Getting state from cache: {installedAppId}...");
+
+            T state = default(T);
+            if (stateCache.TryGetValue(installedAppId, out state))
+            {
+                logger.LogDebug($"Got state from cache: {installedAppId}...");
+            }
+            else
+            {
+                logger.LogInformation($"Unable to find state in cache: {installedAppId}...");
+            }
+
+            return state;
+        }
+
+        public virtual async Task StoreStateAsync(string installedAppId, T state)
+        {
+            _ = installedAppId ?? throw new ArgumentNullException(nameof(installedAppId));
+
+            await LoadCacheAsync();
+
+            logger.LogInformation($"Adding state to cache: {installedAppId}...");
+
+            stateCache.Remove(installedAppId);
+            stateCache.Add(installedAppId, state);
+
+            await PersistCacheAsync();
+        }
+
+        public virtual async Task RemoveStateAsync(string installedAppId)
+        {
+            _ = installedAppId ?? throw new ArgumentNullException(nameof(installedAppId));
+
+            await LoadCacheAsync();
+
+            logger.LogInformation($"Removing state from cache: {installedAppId}...");
+
+            stateCache.Remove(installedAppId);
+
+            await PersistCacheAsync();
+        }
+
+        public abstract Task PersistCacheAsync();
+
+        public abstract Task LoadCacheAsync();
 
         public virtual async Task StoreStateAndNotifyAsync(string installedAppId, T state)
         {
             await StoreStateAsync(installedAppId, state);
             NotifyObservers(installedAppId);
         }
-
-        public abstract Task RemoveStateAsync(string installedAppId);
 
         public virtual async Task RemoveStateAndNotifyAsync(string installedAppId)
         {
