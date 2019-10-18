@@ -1,4 +1,4 @@
-# SmartThings.NETCoreWebHookSDK
+# ianisms.SmartThings.NETCoreWebHookSDK
 
 #### UPDATES
 
