@@ -1,5 +1,4 @@
 ﻿using ianisms.SmartThings.NETCoreWebHookSDK.Models.SmartThings;
-using ianisms.SmartThings.NETCoreWebHookSDK.Utils;
 using ianisms.SmartThings.NETCoreWebHookSDK.Utils.InstalledApp;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
@@ -25,8 +24,10 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers
         public EventWebhookHandler(ILogger<IEventWebhookHandler> logger,
             IInstalledAppManager installedAppManager)
         {
-            _ = logger ?? throw new ArgumentNullException(nameof(logger));
-            _ = installedAppManager ?? throw new ArgumentNullException(nameof(installedAppManager));
+            _ = logger ??
+                throw new ArgumentNullException(nameof(logger));
+            _ = installedAppManager ??
+                throw new ArgumentNullException(nameof(installedAppManager));
 
             this.logger = logger;
             this.installedAppManager = installedAppManager;

@@ -35,6 +35,23 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers
             IUninstallWebhookHandler uninstallHandler,
             ICryptoUtils cryptoUtils)
         {
+            _ = logger ??
+                throw new ArgumentNullException(nameof(logger));
+            _ = pingHandler ??
+                throw new ArgumentNullException(nameof(pingHandler));
+            _ = configHandler ??
+                throw new ArgumentNullException(nameof(configHandler));
+            _ = installUpdateHandler ??
+                throw new ArgumentNullException(nameof(installUpdateHandler));
+            _ = eventHandler ??
+                throw new ArgumentNullException(nameof(eventHandler));
+            _ = oauthHandler ??
+                throw new ArgumentNullException(nameof(oauthHandler));
+            _ = uninstallHandler ??
+                throw new ArgumentNullException(nameof(uninstallHandler));
+            _ = cryptoUtils ??
+                throw new ArgumentNullException(nameof(cryptoUtils));
+
             this.logger = logger;
             this.pingHandler = pingHandler;
             this.configHandler = configHandler;

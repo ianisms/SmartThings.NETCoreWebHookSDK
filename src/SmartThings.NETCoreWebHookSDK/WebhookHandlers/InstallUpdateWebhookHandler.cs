@@ -40,10 +40,14 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers
             IInstalledAppManager installedAppManager,
             ISmartThingsAPIHelper smartThingsAPIHelper)
         {
-            _ = logger ?? throw new ArgumentNullException(nameof(logger));
-            _ = options ?? throw new ArgumentNullException(nameof(options));
-            _ = installedAppManager ?? throw new ArgumentNullException(nameof(installedAppManager));
-            _ = smartThingsAPIHelper ?? throw new ArgumentNullException(nameof(smartThingsAPIHelper));
+            _ = logger ??
+                throw new ArgumentNullException(nameof(logger));
+            _ = options ??
+                throw new ArgumentNullException(nameof(options));
+            _ = installedAppManager ??
+                throw new ArgumentNullException(nameof(installedAppManager));
+            _ = smartThingsAPIHelper ??
+                throw new ArgumentNullException(nameof(smartThingsAPIHelper));
 
             this.logger = logger;
             this.appConfig = options.Value;
@@ -103,8 +107,6 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers
 
             logger.LogTrace($"Handling request: {request}");
 
-            logger.LogDebug("Setting tokens...");
-
             var authToken = dataToken.authToken.Value;
             var refreshToken = dataToken.refreshToken.Value;
             var installedAppId = dataToken.installedApp.installedAppId.Value;
@@ -114,6 +116,8 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers
             {
                 InstalledAppId = installedAppId
             };
+
+            logger.LogDebug("Setting tokens...");
 
             installedApp.SetTokens(authToken, refreshToken);
 

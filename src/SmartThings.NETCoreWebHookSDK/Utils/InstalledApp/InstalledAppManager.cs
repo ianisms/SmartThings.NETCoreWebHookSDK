@@ -1,11 +1,7 @@
-﻿using ianisms.SmartThings.NETCoreWebHookSDK.Crypto;
-using ianisms.SmartThings.NETCoreWebHookSDK.Models.SmartThings;
-using ianisms.SmartThings.NETCoreWebHookSDK.Utils.SmartThings;
-using Microsoft.Extensions.Hosting;
+﻿using ianisms.SmartThings.NETCoreWebHookSDK.Utils.SmartThings;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -35,8 +31,10 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.InstalledApp
         public InstalledAppManager(ILogger<IInstalledAppManager> logger,
             ISmartThingsAPIHelper smartThingsAPIHelper)
         {
-            _ = logger ?? throw new ArgumentNullException(nameof(logger));
-            _ = smartThingsAPIHelper ?? throw new ArgumentNullException(nameof(smartThingsAPIHelper));
+            _ = logger ??
+                throw new ArgumentNullException(nameof(logger));
+            _ = smartThingsAPIHelper ??
+                throw new ArgumentNullException(nameof(smartThingsAPIHelper));
 
             this.Logger = logger;
             this.SmartThingsAPIHelper = smartThingsAPIHelper;
