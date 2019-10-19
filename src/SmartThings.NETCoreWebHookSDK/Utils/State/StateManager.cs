@@ -32,7 +32,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.State
 
         private void NotifyObservers(string installedAppId)
         {
-            logger.LogInformation($"Notifying obsersers of state change for: {installedAppId}");
+            logger.LogInformation($"Notifying observers of state change for: {installedAppId}");
 
             foreach (var observer in observers)
             {
