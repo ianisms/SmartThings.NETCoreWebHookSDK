@@ -86,7 +86,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers
 
             installedApp.SetTokens(request.eventData.authToken.Value);
 
-            await HandleEventDataAsync(installedApp, request.eventData);
+            Task.Run(() => HandleEventDataAsync(installedApp, request.eventData));
 
             dynamic response = new JObject();
             response.eventData = new JObject();

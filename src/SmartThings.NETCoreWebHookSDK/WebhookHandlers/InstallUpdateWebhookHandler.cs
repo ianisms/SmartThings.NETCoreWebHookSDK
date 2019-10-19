@@ -137,7 +137,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers
             {
                 logger.LogDebug("HandleInstallDataAsync...");
 
-                await HandleInstallDataAsync(installedApp, dataToken);
+                Task.Run(() => HandleInstallDataAsync(installedApp, dataToken));
             }
             else if (lifecycle == Lifecycle.Update)
             {
@@ -148,7 +148,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers
 
                 logger.LogDebug($"HandleUpdateDataAsync...");
 
-                await HandleUpdateDataAsync(installedApp, dataToken);
+                Task.Run(() => HandleUpdateDataAsync(installedApp, dataToken));
             }
             else
             {
