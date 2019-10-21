@@ -11,6 +11,7 @@ pool:
 
 steps:
 - task: DotNetCoreCLI@2
+  displayName: 'Build'
   inputs:
     command: 'build'
     projects: 'samples/SmartThings.NETCoreWebHookSDK.Samples.sln'
