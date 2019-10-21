@@ -4,6 +4,11 @@
 
 - 21 October 2019:  Massive updates after working on a SmartApp using the SDK.  README and samples completely updated.
 - 21 October 2019:  Looking at creating a version for .NET Core 3.0.  Support for 3.0 in Azure Functions is in alpha.  Will create a PoC soon.
+- 21 October 2019:  [NuGet package](https://www.nuget.org/packages/SmartThings.NETCoreWebHookSDK/2.2.0-alpha) created:
+  
+  ```
+  dotnet add package SmartThings.NETCoreWebHookSDK --version 2.2.0-alpha
+  ```
 
 ***
 
