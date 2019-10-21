@@ -14,4 +14,18 @@ steps:
   displayName: 'Build'
   inputs:
     command: 'build'
+    arguments: '--configuration Release'
     projects: 'samples/SmartThings.NETCoreWebHookSDK.Samples.sln'
+- task: DotNetCoreCLI@2
+  displayName: 'Test'
+  inputs:
+    command: 'test'
+    nobuild: true
+    projects: 'samples/SmartThings.NETCoreWebHookSDK.Samples.sln'
+- task: DotNetCoreCLI@2
+  displayName: 'Pack'
+  inputs:
+    command: 'pack'
+    nobuild: true
+    arguments: '--configuration Release'
+        packagesToPack: 'src/SmartThings.NETCoreWebHookSDK/SmartThings.NETCoreWebHookSDK.csproj'
