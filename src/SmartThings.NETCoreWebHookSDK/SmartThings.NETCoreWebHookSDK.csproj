@@ -13,9 +13,9 @@
     <PackageIconUrl>https://github.com/ianisms/SmartThings.NETCoreWebHookSDK/raw/master/icons/icon.png</PackageIconUrl>
     <RepositoryUrl>https://github.com/ianisms/SmartThings.NETCoreWebHookSDK</RepositoryUrl>
     <PackageTags>aspnetcore, smartthings, automation, azurefunctions</PackageTags>
-    <Version>2.2.0-alpha</Version>
-    <AssemblyVersion>2.2.0.0</AssemblyVersion>
-    <FileVersion>2.2.0.0</FileVersion>
+    <Version>2.2.1-alpha</Version>
+    <AssemblyVersion>2.2.1.0</AssemblyVersion>
+    <FileVersion>2.2.1.0</FileVersion>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="BouncyCastle" Version="1.8.5" />
