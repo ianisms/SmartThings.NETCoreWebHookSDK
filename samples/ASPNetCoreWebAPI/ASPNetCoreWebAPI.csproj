@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\SmartThings.NETCoreWebHookSDK\SmartThings.NETCoreWebHookSDK.csproj" />
+    <ProjectReference Include="..\MyWebhookLib\MyWebhookLib.csproj" />
   </ItemGroup>
 
   <ItemGroup>

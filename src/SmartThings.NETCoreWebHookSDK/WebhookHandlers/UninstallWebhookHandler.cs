@@ -67,13 +67,14 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers
 
             logger.LogTrace($"Handling request: {request}");
 
-Task.Run(() =>             HandleUninstallDataAsync(request.uninstallData));
+            await HandleUninstallDataAsync(request.uninstallData);
 
             var installedAppId = request.uninstallData.installedApp.installedAppId;
 
-Task.Run(() =>             installedAppManager.RemoveInstalledAppAsync(installedAppId));
+            await installedAppManager.RemoveInstalledAppAsync(installedAppId);
 
             dynamic response = new JObject();
+
             response.uninstallData = new JObject();
 
             logger.LogTrace($"Response: {response}");

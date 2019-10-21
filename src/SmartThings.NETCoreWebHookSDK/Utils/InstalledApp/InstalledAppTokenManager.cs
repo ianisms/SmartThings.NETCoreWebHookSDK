@@ -30,12 +30,12 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.InstalledApp
 
         private async Task RefreshAllTokensAsync()
         {
-            logger.LogInformation("Refreshing all tokens...");
+            logger.LogDebug("Refreshing all tokens...");
 
             try
             {
                 await installedAppManager.RefreshAllInstalledAppTokensAsync();
-                logger.LogInformation("All tokens refreshed...");
+                logger.LogDebug("All tokens refreshed...");
             }
             catch (Exception ex)
             {
@@ -53,13 +53,13 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.InstalledApp
             TimeSpan.Zero,
             TimeSpan.FromMinutes(4));
 
-            logger.LogInformation("InstalledAppTokenManager started...");
+            logger.LogDebug("InstalledAppTokenManager started...");
         }
 
         public async Task StopAsync(CancellationToken cancellationToken)
         {
             refreshTimer.Dispose();
-            logger.LogInformation("InstalledAppTokenManager stopped...");
+            logger.LogDebug("InstalledAppTokenManager stopped...");
         }
     }
 }

@@ -22,7 +22,8 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Models.SmartThings
 
         private void InitTimeZone()
         {
-            if(TimeZone == null)
+            if(TimeZone == null ||
+                solarTimes == null)
             {
                 TimeZone = TZConvert.GetTimeZoneInfo(TimeZoneId);
                 solarTimes = new SolarTimes(GetCurrentTime(), Latitude, Longitude);
@@ -31,47 +32,31 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Models.SmartThings
 
         public DateTime GetCurrentTime()
         {
-            if(TimeZone == null)
-            {
-                InitTimeZone();
-            }
             return TimeZoneInfo.ConvertTime(DateTime.Now, TimeZone);
         }
 
 
         public DateTime GetSunrise()
         {
-            if (TimeZone == null)
-            {
-                InitTimeZone();
-            }
+            InitTimeZone();
             return TimeZoneInfo.ConvertTimeFromUtc(solarTimes.Sunrise.ToUniversalTime(), TimeZone);
         }
 
         public DateTime GetSunset()
         {
-            if (TimeZone == null)
-            {
-                InitTimeZone();
-            }
+            InitTimeZone();
             return TimeZoneInfo.ConvertTimeFromUtc(solarTimes.Sunset.ToUniversalTime(), TimeZone);
         }
 
         public bool IsAfterSunrise()
         {
-            if (TimeZone == null)
-            {
-                InitTimeZone();
-            }
+            InitTimeZone();
             return (GetCurrentTime() > GetSunrise());
         }
 
         public bool IsAfterSunset()
         {
-            if (TimeZone == null)
-            {
-                InitTimeZone();
-            }
+            InitTimeZone();
             return (GetCurrentTime() > GetSunset());
         }
 

@@ -7,11 +7,12 @@ using System.Threading.Tasks;
 
 namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.InstalledApp
 {
-    public interface IInstalledAppManager
+    public interface IInstalledAppManager : IObservable<string>
     {
         ILogger<IInstalledAppManager> Logger { get; }
         ISmartThingsAPIHelper SmartThingsAPIHelper { get; }
         IDictionary<string, Models.SmartThings.InstalledApp> InstalledAppCache { get; }
+        IList<IObserver<string>> observers { get; }
         Task<Models.SmartThings.InstalledApp> GetInstalledAppAsync(string installedAppId);
         Task StoreInstalledAppAsync(Models.SmartThings.InstalledApp installedApp);
         Task RemoveInstalledAppAsync(string installedAppId);
@@ -26,7 +27,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.InstalledApp
         public ILogger<IInstalledAppManager> Logger { get; private set; }
         public ISmartThingsAPIHelper SmartThingsAPIHelper { get; private set; }
         public IDictionary<string, Models.SmartThings.InstalledApp> InstalledAppCache { get; set; }
-        public IDictionary<string, Timer> tokenRefreshTimers { get; private set; }
+        public IList<IObserver<string>> observers { get; private set; }
 
         public InstalledAppManager(ILogger<IInstalledAppManager> logger,
             ISmartThingsAPIHelper smartThingsAPIHelper)
@@ -38,7 +39,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.InstalledApp
 
             this.Logger = logger;
             this.SmartThingsAPIHelper = smartThingsAPIHelper;
-            this.tokenRefreshTimers = new Dictionary<string, Timer>();
+            this.observers = new List<IObserver<string>>();
         }
 
         public virtual async Task<Models.SmartThings.InstalledApp> GetInstalledAppAsync(string installedAppId)
@@ -47,7 +48,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.InstalledApp
 
             await LoadCacheAsync();
 
-            Logger.LogInformation($"Getting installedApp from cache: {installedAppId}...");
+            Logger.LogDebug($"Getting installedApp from cache: {installedAppId}...");
 
             Models.SmartThings.InstalledApp installedApp = null;
             if (InstalledAppCache.TryGetValue(installedAppId, out installedApp))
@@ -56,7 +57,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.InstalledApp
             }
             else
             {
-                Logger.LogInformation($"Unable to find installedApp in cache: {installedAppId}...");
+                Logger.LogDebug($"Unable to find installedApp in cache: {installedAppId}...");
             }
 
             return installedApp;
@@ -74,10 +75,11 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.InstalledApp
 
             await LoadCacheAsync();
 
-            Logger.LogInformation($"Adding installedApp to cache: {installedApp.InstalledAppId}...");
+            Logger.LogDebug($"Adding installedApp to cache: {installedApp.InstalledAppId}...");
 
             InstalledAppCache.Remove(installedApp.InstalledAppId);
             InstalledAppCache.Add(installedApp.InstalledAppId, installedApp);
+            NotifyObservers(installedApp.InstalledAppId);
 
             await PersistCacheAsync();
         }
@@ -86,10 +88,10 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.InstalledApp
         {
             _ = installedAppId ?? throw new ArgumentNullException(nameof(installedAppId));
 
-            Logger.LogInformation($"Removing installedApp from cache: {installedAppId}...");
+            Logger.LogDebug($"Removing installedApp from cache: {installedAppId}...");
 
             InstalledAppCache.Remove(installedAppId);
-            tokenRefreshTimers.Remove(installedAppId);
+            NotifyObservers(installedAppId);
 
             await PersistCacheAsync();
         }
@@ -113,7 +115,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.InstalledApp
                 throw new ArgumentException("installedApp.RefreshToken is expired!", nameof(installedApp));
             }
 
-            Logger.LogInformation($"Refreshing tokens for installedApp: {installedApp.InstalledAppId}...");
+            Logger.LogDebug($"Refreshing tokens for installedApp: {installedApp.InstalledAppId}...");
 
             if (installedApp.AccessToken.IsExpired)
             {
@@ -134,6 +136,54 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.InstalledApp
                 refreshTasks.Add(RefreshTokensAsync(installedApp));
             }
             Task.WaitAll(refreshTasks.ToArray());
+        }
+
+        public IDisposable Subscribe(IObserver<string> observer)
+        {
+            if (!observers.Contains(observer))
+            {
+                observers.Add(observer);
+            }
+
+            return new Unsubscriber(observers, observer);
+        }
+
+        public void UnSubscribe(IObserver<string> observer)
+        {
+            if (!observers.Contains(observer))
+            {
+                observers.Remove(observer);
+            }
+        }
+
+        private class Unsubscriber : IDisposable
+        {
+            private IList<IObserver<string>> observers;
+            private IObserver<string> observer;
+
+            public Unsubscriber(IList<IObserver<string>> observers, IObserver<string> observer)
+            {
+                this.observers = observers;
+                this.observer = observer;
+            }
+
+            public void Dispose()
+            {
+                if (observer != null && observers.Contains(observer))
+                {
+                    observers.Remove(observer);
+                }
+            }
+        }
+
+        private void NotifyObservers(string installedAppId)
+        {
+            Logger.LogDebug($"Notifying observers of state change for: {installedAppId}");
+
+            foreach (var observer in observers)
+            {
+                observer.OnNext(installedAppId);
+            }
         }
     }
 }

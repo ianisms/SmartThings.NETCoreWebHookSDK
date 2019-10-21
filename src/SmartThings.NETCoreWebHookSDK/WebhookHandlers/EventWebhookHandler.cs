@@ -37,7 +37,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers
 
         public virtual void ValidateRequest(dynamic request)
         {
-            logger.LogDebug($"validating request: {request}");
+            logger.LogTrace($"Validating request: {request}");
 
             _ = request ??
                 throw new ArgumentNullException(nameof(request));
@@ -68,7 +68,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers
         {
             ValidateRequest(request);
 
-            logger.LogInformation("Handling event request...");
+            logger.LogDebug("Handling event request...");
             logger.LogTrace($"Handling request: {request}");
 
             var installedAppId = request.eventData.installedApp.installedAppId.Value;

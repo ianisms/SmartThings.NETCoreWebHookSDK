@@ -1,12 +1,10 @@
-﻿using ASPNetCoreWebAPI.WebhookHandlers;
-using ianisms.SmartThings.NETCoreWebHookSDK.Crypto;
-using ianisms.SmartThings.NETCoreWebHookSDK.Extensions;
-using ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers;
+﻿using ianisms.SmartThings.NETCoreWebHookSDK.Extensions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using MyWebhookLib.Extensions;
 
 namespace ASPNetCoreWebAPI
 {
@@ -28,12 +26,7 @@ namespace ASPNetCoreWebAPI
 
             services
                 .AddLogging()
-                .Configure<CryptoUtilsConfig>(Configuration.GetSection(nameof(CryptoUtilsConfig)))
-                .AddSingleton<IConfigWebhookHandler, MyConfigWebhookHandler>()
-                .AddSingleton<IInstallWebhookHandler, MyInstallWebhookHandler>()
-                .AddSingleton<IUpdateWebhookHandler, MyUpdateWebhookHandler>()
-                .AddSingleton<IUninstallWebhookHandler, MyUninstallWebhookHandler>()
-                .AddSingleton<IEventWebhookHandler, MyEventWebhookHandler>()
+                .AddMyWebhookService(Configuration)
                 .AddWebhookHandlers();
         }
 

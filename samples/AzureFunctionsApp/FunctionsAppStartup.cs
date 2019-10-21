@@ -1,10 +1,7 @@
-﻿using AzureFunctionsApp.WebhookHandlers;
-using ianisms.SmartThings.NETCoreWebHookSDK.Crypto;
-using ianisms.SmartThings.NETCoreWebHookSDK.Extensions;
-using ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers;
-using Microsoft.Azure.Functions.Extensions.DependencyInjection;
+﻿using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using MyWebhookLib.Extensions;
 using System;
 
 [assembly: FunctionsStartup(typeof(AzureFunctionsApp.FunctionsAppStartup))]
@@ -25,13 +22,7 @@ namespace AzureFunctionsApp
 
             builder.Services
                 .AddLogging()
-                .Configure<CryptoUtilsConfig>(config.GetSection(nameof(CryptoUtilsConfig)))
-                .AddSingleton<IConfigWebhookHandler, MyConfigWebhookHandler>()
-                .AddSingleton<IInstallWebhookHandler, MyInstallWebhookHandler>()
-                .AddSingleton<IUpdateWebhookHandler, MyUpdateWebhookHandler>()
-                .AddSingleton<IUninstallWebhookHandler, MyUninstallWebhookHandler>()
-                .AddSingleton<IEventWebhookHandler, MyEventWebhookHandler>()
-                .AddWebhookHandlers();
+                .AddMyWebhookService(config);
         }
     }
 }

@@ -71,8 +71,10 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers
                 var requestBody = await reader.ReadToEndAsync();
                 dynamic data = JObject.Parse(requestBody);
 
-                _ = data.lifecycle ?? throw new ArgumentException("lifecycle missing from request body!", nameof(request));
-                _ = data.lifecycle.Value ?? throw new ArgumentException("lifecycle missing from request body!", nameof(request));
+                _ = data.lifecycle ??
+                    throw new ArgumentException("lifecycle missing from request body!", nameof(request));
+                _ = data.lifecycle.Value ??
+                    throw new ArgumentException("lifecycle missing from request body!", nameof(request));
 
                 var lifecycleVal = data.lifecycle.Value.ToLowerInvariant().Replace("_", "");
 

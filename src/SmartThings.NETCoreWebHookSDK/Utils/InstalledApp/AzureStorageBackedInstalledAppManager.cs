@@ -41,7 +41,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.InstalledApp
 
         public override async Task LoadCacheAsync()
         {
-            Logger.LogInformation("Loading installed app cache...");
+            Logger.LogDebug("Loading installed app cache...");
 
             if (InstalledAppCache == null)
             {
@@ -63,7 +63,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.InstalledApp
                     InstalledAppCache = JsonConvert.DeserializeObject<Dictionary<string, Models.SmartThings.InstalledApp>>(json,
                         Common.JsonSerializerSettings);
 
-                    Logger.LogInformation("Loaded installed app cache from blob...");
+                    Logger.LogDebug("Loaded installed app cache from blob...");
 
                 }
             }
@@ -71,7 +71,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.InstalledApp
 
         public override async Task PersistCacheAsync()
         {
-            Logger.LogInformation("Saving installed app cache...");
+            Logger.LogDebug("Saving installed app cache...");
 
             var storageClient = storageAccount.CreateCloudBlobClient();
             var container = storageClient.GetContainerReference(storageBackedConfig.ContainerName);
@@ -82,7 +82,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.InstalledApp
                 Common.JsonSerializerSettings);
             await cacheBlob.UploadTextAsync(json);
 
-            Logger.LogInformation("Saved installed app cache...");
+            Logger.LogDebug("Saved installed app cache...");
         }
     }
 }

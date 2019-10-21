@@ -29,7 +29,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.InstalledApp
 
         public override async Task LoadCacheAsync()
         {
-            Logger.LogInformation("Loading installed app cache...");
+            Logger.LogDebug("Loading installed app cache...");
 
             if (InstalledAppCache == null)
             {
@@ -52,7 +52,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.InstalledApp
                             Common.JsonSerializerSettings);
                     }
 
-                    Logger.LogInformation("Loaded installed app cache from file...");
+                    Logger.LogDebug("Loaded installed app cache from file...");
 
                 }
             }
@@ -60,7 +60,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.InstalledApp
 
         public override async Task PersistCacheAsync()
         {
-            Logger.LogInformation("Saving installed app cache...");
+            Logger.LogDebug("Saving installed app cache...");
 
             Directory.CreateDirectory(Path.GetDirectoryName(fileBackedConfig.BackingStorePath));
 
@@ -74,7 +74,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.InstalledApp
                 await writer.FlushAsync().ConfigureAwait(false);
             }
 
-            Logger.LogInformation("Saved installed app cache...");
+            Logger.LogDebug("Saved installed app cache...");
         }
     }
 }

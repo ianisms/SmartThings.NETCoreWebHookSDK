@@ -23,12 +23,13 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.State
 
             this.fileBackedConfig = options.Value;
 
-            _ = fileBackedConfig.BackingStorePath ?? throw new ArgumentException("fileBackedConfig.BackingStorePath is null", nameof(options));
+            _ = fileBackedConfig.BackingStorePath ??
+                throw new ArgumentException("fileBackedConfig.BackingStorePath is null", nameof(options));
         }
 
         public override async Task LoadCacheAsync()
         {
-            logger.LogInformation("Loading state cache...");
+            logger.LogDebug("Loading state cache...");
 
             if (stateCache == null)
             {
@@ -51,7 +52,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.State
                             Common.JsonSerializerSettings);
                     }
 
-                    logger.LogInformation("Loaded state cache from file...");
+                    logger.LogDebug("Loaded state cache from file...");
 
                 }
             }
@@ -59,7 +60,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.State
 
         public override async Task PersistCacheAsync()
         {
-            logger.LogInformation("Saving state cache...");
+            logger.LogDebug("Saving state cache...");
 
             Directory.CreateDirectory(Path.GetDirectoryName(fileBackedConfig.BackingStorePath));
 
@@ -72,7 +73,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.State
                 await writer.FlushAsync().ConfigureAwait(false);
             }
 
-            logger.LogInformation("Saved state cache...");
+            logger.LogDebug("Saved state cache...");
         }
     }
 }

@@ -103,7 +103,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers
         {
             dynamic dataToken = ValidateRequest(lifecycle, request);
 
-            logger.LogInformation("Handling install/update request...");
+            logger.LogDebug("Handling install/update request...");
 
             logger.LogTrace($"Handling request: {request}");
 

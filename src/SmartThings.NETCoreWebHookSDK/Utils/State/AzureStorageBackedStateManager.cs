@@ -41,7 +41,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.State
 
         public override async Task LoadCacheAsync()
         {
-            logger.LogInformation("Loading state cache...");
+            logger.LogDebug("Loading state cache...");
 
             LoadedCacheFromStorage = false;
 
@@ -68,7 +68,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.State
                         stateCache = JsonConvert.DeserializeObject<Dictionary<string, T>>(json,
                             Common.JsonSerializerSettings);
 
-                        logger.LogInformation("Loaded state cache from blob...");
+                        logger.LogDebug("Loaded state cache from blob...");
                         LoadedCacheFromStorage = true;
 
                     }
@@ -83,7 +83,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.State
 
         public override async Task PersistCacheAsync()
         {
-            logger.LogInformation("Saving state cache...");
+            logger.LogDebug("Saving state cache...");
 
             try
             {
@@ -97,7 +97,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.State
                     Common.JsonSerializerSettings);
                 await cacheBlob.UploadTextAsync(json);
 
-                logger.LogInformation("Saved state cache...");
+                logger.LogDebug("Saved state cache...");
             }
             catch (StorageException stEx)
             {

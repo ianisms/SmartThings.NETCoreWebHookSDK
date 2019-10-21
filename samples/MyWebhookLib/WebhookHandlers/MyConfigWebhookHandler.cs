@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 
-namespace ASPNetCoreWebAPI.WebhookHandlers
+namespace MyWebhookLib.WebhookHandlers
 {
     public class MyConfigWebhookHandler : ConfigWebhookHandler
     {

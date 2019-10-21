@@ -25,16 +25,19 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers
         {
             logger.LogTrace($"Validating request: {request}");
 
-            _ = request ?? throw new ArgumentNullException(nameof(request));
-            _ = request.configurationData ?? throw new InvalidOperationException("Missing configurationData!");
-            _ = request.configurationData.phase ?? throw new InvalidOperationException("Missing configurationData.phase!");
+            _ = request ??
+                throw new ArgumentNullException(nameof(request));
+            _ = request.configurationData ??
+                throw new InvalidOperationException("Missing configurationData!");
+            _ = request.configurationData.phase ??
+                throw new InvalidOperationException("Missing configurationData.phase!");
         }
 
         public dynamic HandleRequest(dynamic request)
         {
             ValidateRequest(request);
 
-            logger.LogInformation("Handling config request...");
+            logger.LogDebug("Handling config request...");
             logger.LogTrace($"Handling request: {request}");
 
             var phase = request.configurationData.phase.Value.ToLowerInvariant();
@@ -49,8 +52,10 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers
             }
             else
             {
-                _ = request.configurationData.pageId ?? throw new InvalidOperationException("request.configurationData.pageId is null!");
-                _ = request.configurationData.pageId.Value ?? throw new InvalidOperationException("request.configurationData.pageId is null!");
+                _ = request.configurationData.pageId ??
+                    throw new InvalidOperationException("request.configurationData.pageId is null!");
+                _ = request.configurationData.pageId.Value ??
+                    throw new InvalidOperationException("request.configurationData.pageId is null!");
 
                 response = Page(request);
             }

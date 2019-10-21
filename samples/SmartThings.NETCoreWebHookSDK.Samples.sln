@@ -18,6 +18,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scripts", "Scripts", "{08C2
 		scripts\startngrok.cmd = scripts\startngrok.cmd
 	EndProjectSection
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyWebhookLib", "MyWebhookLib\MyWebhookLib.csproj", "{EE042DE3-5EC7-426C-9F0F-341696437997}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -40,6 +42,10 @@ Global
 		{E96E5ED7-29F4-431C-9DF0-E0092CDE304E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E96E5ED7-29F4-431C-9DF0-E0092CDE304E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E96E5ED7-29F4-431C-9DF0-E0092CDE304E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EE042DE3-5EC7-426C-9F0F-341696437997}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EE042DE3-5EC7-426C-9F0F-341696437997}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EE042DE3-5EC7-426C-9F0F-341696437997}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EE042DE3-5EC7-426C-9F0F-341696437997}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
