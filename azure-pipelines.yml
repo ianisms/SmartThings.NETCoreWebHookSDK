@@ -28,4 +28,4 @@ steps:
     command: 'pack'
     nobuild: true
     arguments: '--configuration Release'
-        packagesToPack: 'src/SmartThings.NETCoreWebHookSDK/SmartThings.NETCoreWebHookSDK.csproj'
+    packagesToPack: 'src/SmartThings.NETCoreWebHookSDK/SmartThings.NETCoreWebHookSDK.csproj'
