@@ -42,8 +42,9 @@ To add the SDK WebHook functionality to your app there are 3 steps all involving
 4. Add an [```InstalledAppManager```](https://github.com/ianisms/SmartThings.NETCoreWebHookSDK/blob/master/README.md#installed-app-management-utils)
 5. Optionally add a [```StateManager```](https://github.com/ianisms/SmartThings.NETCoreWebHookSDK/blob/master/README.md#state-management-utils)
 6. Add the remaining handlers via the ```ianisms.SmartThings.NETCoreWebHookSDK.Extensions.AddWebhookHandlers``` extension method like so ```.AddWebhookHandlers()```.
+7. Pass the ```HttpRequest``` from your ASP.NET Core or FunctionsApp to the ```RootWebhookHandler```.
 
-A full example:
+A full example, DI:
 
 ```csharp
 public class FunctionsAppStartup : FunctionsStartup
@@ -70,6 +71,25 @@ public class FunctionsAppStartup : FunctionsStartup
             .AddSingleton<IStateManager<MyState>, InMemoryStateManager<MyState>>()
             .AddSingleton<IMyService, MyService>()
             .AddWebhookHandlers();
+    }
+}
+```
+
+A full example, pass ```HttpRequest``` to ```RootWebhookHandler```:
+
+```csharp
+public async Task<dynamic> HandleRequestAsync(HttpRequest request)
+{
+    _ = request ?? throw new ArgumentNullException(nameof(request));
+
+    try
+    {
+        return await rootHandler.HandleRequestAsync(request).ConfigureAwait(false);
+    }
+    catch (Exception ex)
+    {
+        logger.LogError(ex, "Exception calling rootHandler.HandleRequestAsync");
+        throw;
     }
 }
 ```
