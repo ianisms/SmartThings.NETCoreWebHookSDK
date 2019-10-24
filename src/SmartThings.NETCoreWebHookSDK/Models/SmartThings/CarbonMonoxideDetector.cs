@@ -38,7 +38,8 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Models.SmartThings
             if (isResponseStatus)
             {
                 _ = status.components.main.carbonMonoxideDetector.carbonMonoxide.value ??
-                    throw new ArgumentException("status.components.main.carbonMonoxideDetector.carbonMonoxide.value is null!", nameof(status));
+                    throw new ArgumentException("status.components.main.carbonMonoxideDetector.carbonMonoxide.value is null!",
+                    nameof(status));
                 status = status.components.main.carbonMonoxideDetector.carbonMonoxide.value;
             }
 
@@ -47,7 +48,8 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Models.SmartThings
             var state = CarbonMonoxideState.Unknown;
             if (!Enum.TryParse<CarbonMonoxideState>(val, true, out state))
             {
-                throw new ArgumentException($"CarbonMonoxideStateFromDynamic status is an invalid value {status}", nameof(status));
+                throw new ArgumentException($"CarbonMonoxideStateFromDynamic status is an invalid value {status}",
+                    nameof(status));
             }
             else
             {
@@ -63,7 +65,8 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Models.SmartThings
             if (status != null)
             {
                 _ = status.components.main.carbonMonoxideDetector.carbonMonoxide.value ??
-                    throw new ArgumentException("status.components.main.carbonMonoxideDetector.carbonMonoxide.value is null!", nameof(status));
+                    throw new ArgumentException("status.components.main.carbonMonoxideDetector.carbonMonoxide.value is null!",
+                    nameof(status));
                 deviceStatus = status.components.main.carbonMonoxideDetector.carbonMonoxide.value;
             }
 

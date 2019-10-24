@@ -23,7 +23,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace ianisms.SmartThings.NETCoreWebHookSDK.Crypto
 {
@@ -44,7 +43,8 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Crypto
 
             if (!headerVal.StartsWith(SIGHEADERSTART, StringComparison.Ordinal))
             {
-                throw new ArgumentException($"Invalid auth header!  Must start with {SIGHEADERSTART}", nameof(headerVal));
+                throw new ArgumentException($"Invalid auth header!  Must start with {SIGHEADERSTART}",
+                    nameof(headerVal));
             }
 
             headerVal = headerVal.Substring(SIGHEADERSTART.Length);
@@ -58,7 +58,8 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Crypto
             {
                 if (!sigMap.ContainsKey(mustHaveKey))
                 {
-                    throw new ArgumentException($"Invalid auth header!  Missing {mustHaveKey} param!", nameof(headerVal));
+                    throw new ArgumentException($"Invalid auth header!  Missing {mustHaveKey} param!",
+                        nameof(headerVal));
                 }
             }
 

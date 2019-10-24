@@ -22,7 +22,6 @@
 
 using ianisms.SmartThings.NETCoreWebHookSDK.Models.Config;
 using ianisms.SmartThings.NETCoreWebHookSDK.Models.SmartThings;
-using ianisms.SmartThings.NETCoreWebHookSDK.Utils;
 using ianisms.SmartThings.NETCoreWebHookSDK.Utils.SmartThings;
 using ianisms.SmartThings.NETCoreWebHookSDK.Utils.InstalledApp;
 using Microsoft.Extensions.Logging;
@@ -36,13 +35,13 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers
 {
     public interface IInstallUpdateWebhookHandler
     {
-        ILogger<IInstallUpdateWebhookHandler> logger { get; }
-        IInstalledAppManager installedAppManager { get; }
-        SmartAppConfig appConfig { get; }
-        Task HandleUpdateDataAsync(InstalledApp installedApp,
+        ILogger<IInstallUpdateWebhookHandler> Logger { get; }
+        IInstalledAppManager InstalledAppManager { get; }
+        SmartAppConfig AppConfig { get; }
+        Task HandleUpdateDataAsync(InstalledAppInstance installedApp,
             dynamic data,
             bool shouldSubscribeToEvents = true);
-        Task HandleInstallDataAsync(InstalledApp installedApp,
+        Task HandleInstallDataAsync(InstalledAppInstance installedApp,
             dynamic data,
             bool shouldSubscribeToEvents = true);
         Task<dynamic> HandleRequestAsync(Lifecycle lifecycle, dynamic request);
@@ -51,11 +50,11 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers
 
     public abstract class InstallUpdateWebhookHandler : IInstallUpdateWebhookHandler
     {
-        public ILogger<IInstallUpdateWebhookHandler> logger { get; private set; }
-        public SmartAppConfig appConfig { get; private set; }
-        public IInstalledAppManager installedAppManager { get; private set; }
-        public ISmartThingsAPIHelper smartThingsAPIHelper { get; private set; }
-        public HttpClient httpClient { get; private set; }
+        public ILogger<IInstallUpdateWebhookHandler> Logger { get; private set; }
+        public SmartAppConfig AppConfig { get; private set; }
+        public IInstalledAppManager InstalledAppManager { get; private set; }
+        public ISmartThingsAPIHelper SmartThingsAPIHelper { get; private set; }
+        public HttpClient HttpClient { get; private set; }
 
         public InstallUpdateWebhookHandler(ILogger<IInstallUpdateWebhookHandler> logger,
             IOptions<SmartAppConfig> options,
@@ -71,52 +70,60 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers
             _ = smartThingsAPIHelper ??
                 throw new ArgumentNullException(nameof(smartThingsAPIHelper));
 
-            this.logger = logger;
-            this.appConfig = options.Value;
-            this.installedAppManager = installedAppManager;
-            this.smartThingsAPIHelper = smartThingsAPIHelper;
+            this.Logger = logger;
+            this.AppConfig = options.Value;
+            this.InstalledAppManager = installedAppManager;
+            this.SmartThingsAPIHelper = smartThingsAPIHelper;
         }
 
         public virtual dynamic ValidateRequest(Lifecycle lifecycle, dynamic request)
         {
-            logger.LogDebug($"validating request: {request}");
+            Logger.LogDebug($"validating request: {request}");
 
             dynamic dataToken = null;
             if (lifecycle == Lifecycle.Install)
             {
                 dataToken = request.installData;
                 _ = dataToken ??
-                  throw new ArgumentException("request.installData is null", nameof(request));
+                  throw new ArgumentException("request.installData is null",
+                  nameof(request));
             }
             else if (lifecycle == Lifecycle.Update)
             {
                 dataToken = request.updateData;
                 _ = dataToken ??
-                  throw new ArgumentException("request.updateData is null", nameof(request));
+                  throw new ArgumentException("request.updateData is null",
+                  nameof(request));
 
             }
 
             _ = dataToken.authToken ??
-                throw new ArgumentException("request.updateData.authToken is null", nameof(request));
+                throw new ArgumentException("request.updateData.authToken is null",
+                nameof(request));
             _ = dataToken.refreshToken ??
-                throw new ArgumentException("request.updateData.refreshToken is null", nameof(request));
+                throw new ArgumentException("request.updateData.refreshToken is null",
+                nameof(request));
             _ = dataToken.installedApp ??
-                throw new ArgumentException("request.updateData.installedApp is null", nameof(request));
+                throw new ArgumentException("request.updateData.installedApp is null",
+                nameof(request));
             _ = dataToken.installedApp.installedAppId ??
-                throw new ArgumentException("request.updateData.installedApp.installedAppId is null", nameof(request));
+                throw new ArgumentException("request.updateData.installedApp.installedAppId is null",
+                nameof(request));
             _ = dataToken.installedApp.locationId ??
-                throw new ArgumentException("request.updateData.installedApp.locationId is null", nameof(request));
+                throw new ArgumentException("request.updateData.installedApp.locationId is null",
+                nameof(request));
             _ = dataToken.installedApp.config ??
-                throw new ArgumentException("request.updateData.installedApp.config is null", nameof(request));
+                throw new ArgumentException("request.updateData.installedApp.config is null",
+                nameof(request));
 
             return dataToken;
         }
 
-        public abstract Task HandleUpdateDataAsync(InstalledApp installedApp,
+        public abstract Task HandleUpdateDataAsync(InstalledAppInstance installedApp,
             dynamic data,
             bool shouldSubscribeToEvents = true);
 
-        public abstract Task HandleInstallDataAsync(InstalledApp installedApp,
+        public abstract Task HandleInstallDataAsync(InstalledAppInstance installedApp,
             dynamic data,
             bool shouldSubscribeToEvents = true);
 
@@ -125,62 +132,67 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers
         {
             dynamic dataToken = ValidateRequest(lifecycle, request);
 
-            logger.LogDebug("Handling install/update request...");
+            Logger.LogDebug("Handling install/update request...");
 
-            logger.LogTrace($"Handling request: {request}");
+            Logger.LogTrace($"Handling request: {request}");
 
             var authToken = dataToken.authToken.Value;
             var refreshToken = dataToken.refreshToken.Value;
             var installedAppId = dataToken.installedApp.installedAppId.Value;
             var locationId = dataToken.installedApp.locationId.Value;
 
-            InstalledApp installedApp = new InstalledApp()
+            InstalledAppInstance installedApp = new InstalledAppInstance()
             {
                 InstalledAppId = installedAppId
             };
 
-            logger.LogDebug("Setting tokens...");
+            Logger.LogDebug("Setting tokens...");
 
             installedApp.SetTokens(authToken, refreshToken);
 
-            logger.LogDebug("Setting location...");
+            Logger.LogDebug("Setting location...");
 
-            var location = await smartThingsAPIHelper.GetLocationAsync(
+            var location = await SmartThingsAPIHelper.GetLocationAsync(
                 installedApp,
                 locationId);
 
             installedApp.InstalledLocation = location;
 
-            logger.LogDebug("Storing installedApp...");
+            Logger.LogDebug("Storing installedApp...");
 
-            await installedAppManager.StoreInstalledAppAsync(installedApp);
+            await InstalledAppManager.StoreInstalledAppAsync(installedApp).ConfigureAwait(false);
 
-            if(lifecycle == Lifecycle.Install)
+            if (lifecycle == Lifecycle.Install)
             {
-                logger.LogDebug("HandleInstallDataAsync...");
+                Logger.LogDebug("HandleInstallDataAsync...");
 
-                Task.Run(() => HandleInstallDataAsync(installedApp, dataToken));
+#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
+                Task.Run(() => HandleInstallDataAsync(installedApp, dataToken).ConfigureAwait(false));
+#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
             }
             else if (lifecycle == Lifecycle.Update)
             {
 
-                logger.LogDebug("Clearing subscriptions...");
+                Logger.LogDebug("Clearing subscriptions...");
 
-                await smartThingsAPIHelper.ClearSubscriptionsAsync(installedApp);
+                await SmartThingsAPIHelper.ClearSubscriptionsAsync(installedApp).ConfigureAwait(false);
 
-                logger.LogDebug($"HandleUpdateDataAsync...");
+                Logger.LogDebug($"HandleUpdateDataAsync...");
 
-                Task.Run(() => HandleUpdateDataAsync(installedApp, dataToken));
+#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
+                Task.Run(() => HandleUpdateDataAsync(installedApp, dataToken).ConfigureAwait(false));
+#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
             }
             else
             {
-                throw new ArgumentException($"invalid lifecycle: {lifecycle}", nameof(lifecycle));
+                throw new ArgumentException($"invalid lifecycle: {lifecycle}",
+                    nameof(lifecycle));
             }
 
             dynamic response = new JObject();
             response.updateData = new JObject();
 
-            logger.LogDebug($"response: {response}");
+            Logger.LogDebug($"response: {response}");
 
             return response;
         }

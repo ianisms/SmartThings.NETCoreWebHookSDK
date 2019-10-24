@@ -20,7 +20,6 @@
 // </copyright>
 #endregion
 
-using ianisms.SmartThings.NETCoreWebHookSDK.Extensions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -48,8 +47,7 @@ namespace ASPNetCoreWebAPI
 
             services
                 .AddLogging()
-                .AddMyWebhookService(Configuration)
-                .AddWebhookHandlers();
+                .AddMyWebhookService(Configuration, false);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

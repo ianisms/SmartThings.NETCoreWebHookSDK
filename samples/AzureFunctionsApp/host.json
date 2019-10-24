@@ -1,3 +1,18 @@
 {
-    "version": "2.0"
+  "version": "2.0",
+  "logging": {
+    "fileLoggingMode": "debugOnly",
+    "logLevel": {
+      "default": "None",
+      "System": "Warning",
+      "Microsoft": "Warning",
+      "Host.Aggregator": "Warning",
+      "Host.Executor": "Warning",
+      "Host.Results": "Warning",
+      "Function": "Warning",
+      "Function.FirstWH": "Warning",
+      "ianisms": "Debug",
+      "MyWebhookLib": "Debug"
+    }
+  }
 }

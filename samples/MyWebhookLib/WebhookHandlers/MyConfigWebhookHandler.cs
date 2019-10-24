@@ -23,72 +23,82 @@
 using ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
+using System;
 
 namespace MyWebhookLib.WebhookHandlers
 {
     public class MyConfigWebhookHandler : ConfigWebhookHandler
     {
-        public MyConfigWebhookHandler(ILogger<ConfigWebhookHandler> logger) : base(logger)
+        public MyConfigWebhookHandler(ILogger<ConfigWebhookHandler> logger)
+            : base(logger)
         {
         }
 
+        private static readonly dynamic initResponse = JObject.Parse(@"
+        {
+            'configurationData': {
+                'initialize': {
+                    'id': 'app',
+                    'name': 'My App',
+                    'permissions': ['r:devices:*','r:locations:*'],
+                    'firstPageId': '1'
+                }
+            }
+        }");
+
+        private static readonly dynamic pageOne = JObject.Parse(@"
+        {
+            'configurationData': {
+                'page': {
+                    'pageId': '1',
+                    'name': 'Configure My App',
+                    'nextPageId': null,
+                    'previousPageId': null,
+                    'complete': true,
+                    'sections' : [
+                        {
+                            'name': 'basics',
+                            'settings' : [
+                                {
+                                    'id': 'isAppEnabled',
+                                    'name': 'Enabled App?',
+                                    'description': 'Easy toggle to enable/disable the app',
+                                    'type': 'BOOLEAN',
+                                    'required': true,
+                                    'defaultValue': true,
+                                    'multiple': false
+                                },                       
+                                {
+                                    'id': 'switches',
+                                    'name': 'Which Light Switch(es)?',
+                                    'description': 'The switch(es) to turn on/off on arrival.',
+                                    'type': 'DEVICE',
+                                    'required': false,
+                                    'multiple': true,
+                                    'capabilities': ['switch'],
+                                    'permissions': ['r', 'x']
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        }");
+
         public override dynamic Initialize(dynamic request)
         {
-            dynamic response = JObject.Parse(@"{
-                'configurationData': {
-                    'initialize': {
-                        'id': 'app',
-                        'name': 'My App',
-                        'permissions': ['r:devices:*'],
-                        'firstPageId': '1'
-                    }
-                }
-            }");
-
-            return response;
+            return initResponse;
         }
 
         public override dynamic Page(dynamic request)
         {
-            dynamic response = JObject.Parse(@"{
-                'configurationData': {
-                    'page': {
-                        'pageId': '1',
-                        'name': 'Configure My App',
-                        'nextPageId': null,
-                        'previousPageId': null,
-                        'complete': true,
-                        'sections' : [
-                            {
-                                'name': 'basics',
-                                'settings' : [
-                                    {
-                                        'id': 'appEnabled',
-                                        'name': 'Enabled App?',
-                                        'description': 'Easy toggle to enable/disable the app',
-                                        'type': 'BOOLEAN',
-                                        'required': true,
-                                        'defaultValue': true,
-                                        'multiple': false
-                                    },                                    
-                                    {
-                                        'id': 'switches',
-                                        'name': 'Light Switches',
-                                        'description': 'The switches for the app to turn on/off',
-                                        'type': 'DEVICE',
-                                        'required': true,
-                                        'multiple': true,
-                                        'capabilities': ['switch'],
-                                        'permissions': ['r', 'x']
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                }
-            }");
+            var pageId = request.configurationData.pageId.Value;
 
-            return response;
+            return pageId switch
+            {
+                "1" => pageOne,
+                _ => throw new InvalidOperationException($"Unknown pageId: {request.configurationData.pageId.Value}"),
+            };
         }
     }
 }

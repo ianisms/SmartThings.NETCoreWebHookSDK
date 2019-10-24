@@ -21,14 +21,13 @@
 #endregion
 
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json.Linq;
 using System;
 
 namespace ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers
 {
     public interface IConfigWebhookHandler
     {
-        ILogger<IConfigWebhookHandler> logger { get; }
+        ILogger<IConfigWebhookHandler> Logger { get; }
         dynamic HandleRequest(dynamic request);
         dynamic Initialize(dynamic request);
         dynamic Page(dynamic request);
@@ -36,16 +35,16 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers
 
     public abstract class ConfigWebhookHandler : IConfigWebhookHandler
     {
-        public ILogger<IConfigWebhookHandler> logger { get; private set; }
+        public ILogger<IConfigWebhookHandler> Logger { get; private set; }
 
         public ConfigWebhookHandler(ILogger<IConfigWebhookHandler> logger)
         {
-            this.logger = logger;
+            this.Logger = logger;
         }
 
         public virtual void ValidateRequest(dynamic request)
         {
-            logger.LogTrace($"Validating request: {request}");
+            Logger.LogTrace($"Validating request: {request}");
 
             _ = request ??
                 throw new ArgumentNullException(nameof(request));
@@ -59,16 +58,16 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers
         {
             ValidateRequest(request);
 
-            logger.LogDebug("Handling config request...");
-            logger.LogTrace($"Handling request: {request}");
+            Logger.LogDebug("Handling config request...");
+            Logger.LogTrace($"Handling request: {request}");
 
             var phase = request.configurationData.phase.Value.ToLowerInvariant();
 
-            logger.LogDebug($"Config phase: {phase}");
+            Logger.LogDebug($"Config phase: {phase}");
 
             dynamic response;
 
-            if(phase == "initialize")
+            if (phase == "initialize")
             {
                 response = Initialize(request);
             }
@@ -82,7 +81,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers
                 response = Page(request);
             }
 
-            logger.LogTrace($"Response: {response}");
+            Logger.LogTrace($"Response: {response}");
 
             return response;
         }

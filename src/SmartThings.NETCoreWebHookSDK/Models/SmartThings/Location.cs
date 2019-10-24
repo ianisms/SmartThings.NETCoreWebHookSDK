@@ -44,7 +44,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Models.SmartThings
 
         private void InitTimeZone()
         {
-            if(TimeZone == null ||
+            if (TimeZone == null ||
                 solarTimes == null)
             {
                 TimeZone = TZConvert.GetTimeZoneInfo(TimeZoneId);

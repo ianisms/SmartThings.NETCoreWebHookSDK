@@ -79,7 +79,7 @@ namespace MyWebhookLib.Services
 
             try
             {
-                return await rootHandler.HandleRequestAsync(request);
+                return await rootHandler.HandleRequestAsync(request).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -94,7 +94,7 @@ namespace MyWebhookLib.Services
 
             try
             {
-                return await stateManager.GetStateAsync(installedAppId);
+                return await stateManager.GetStateAsync(installedAppId).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -109,7 +109,7 @@ namespace MyWebhookLib.Services
 
             try
             {
-                await stateManager.RemoveStateAsync(installedAppId);
+                await stateManager.RemoveStateAsync(installedAppId).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -128,7 +128,7 @@ namespace MyWebhookLib.Services
 
             try
             {
-                var installedApp = await installedAppManager.GetInstalledAppAsync(installedAppId);
+                var installedApp = await installedAppManager.GetInstalledAppAsync(installedAppId).ConfigureAwait(false);
                 await smartThingsAPIHelper.DeviceCommandAsync(installedApp, deviceId, command);
             }
             catch (Exception ex)
@@ -147,7 +147,7 @@ namespace MyWebhookLib.Services
 
             try
             {
-                var installedApp = await installedAppManager.GetInstalledAppAsync(installedAppId);
+                var installedApp = await installedAppManager.GetInstalledAppAsync(installedAppId).ConfigureAwait(false);
                 var command = LightSwitch.GetDeviceCommand(toggle);
                 await smartThingsAPIHelper.DeviceCommandAsync(installedApp, deviceId, command);
             }

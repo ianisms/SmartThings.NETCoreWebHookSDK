@@ -20,6 +20,7 @@
 // </copyright>
 #endregion
 
+using ianisms.SmartThings.NETCoreWebHookSDK.Extensions;
 using ianisms.SmartThings.NETCoreWebHookSDK.Models.SmartThings;
 using ianisms.SmartThings.NETCoreWebHookSDK.Utils.InstalledApp;
 using ianisms.SmartThings.NETCoreWebHookSDK.Utils.State;
@@ -31,12 +32,12 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace ianisms.SmartThings.GreatWelcomer.Lib.WebhookHandlers
+namespace MyWebhookLib.WebhookHandlers
 {
     public class MyEventWebhookHandler : EventWebhookHandler
     {
-        private IStateManager<MyState> stateManager;
-        private IInstallUpdateWebhookHandler installUpdateHandler;
+        private readonly IStateManager<MyState> stateManager;
+        private readonly IInstallUpdateWebhookHandler installUpdateHandler;
 
         public MyEventWebhookHandler(ILogger<EventWebhookHandler> logger,
             IInstalledAppManager installedAppManager,
@@ -58,7 +59,7 @@ namespace ianisms.SmartThings.GreatWelcomer.Lib.WebhookHandlers
                 throw new InvalidOperationException($"request.eventData.installedApp.config.switches is null");
         }
 
-        public override async Task HandleEventDataAsync(InstalledApp installedApp,
+        public override async Task HandleEventDataAsync(InstalledAppInstance installedApp,
             dynamic eventData)
         {
             _ = installedApp ??
@@ -66,14 +67,14 @@ namespace ianisms.SmartThings.GreatWelcomer.Lib.WebhookHandlers
             _ = eventData ??
                 throw new ArgumentNullException(nameof(eventData));
 
-            logger.LogDebug($"Handling eventData for installedApp: {installedApp.InstalledAppId}...");
+            Logger.LogDebug($"Handling eventData for installedApp: {installedApp.InstalledAppId}...");
 
-            var state = await stateManager.GetStateAsync(installedApp.InstalledAppId);
+            var state = await stateManager.GetStateAsync(installedApp.InstalledAppId).ConfigureAwait(false);
 
             if (state == null)
             {
                 await installUpdateHandler.HandleUpdateDataAsync(installedApp, eventData, false);
-                state = await stateManager.GetStateAsync(installedApp.InstalledAppId);
+                state = await stateManager.GetStateAsync(installedApp.InstalledAppId).ConfigureAwait(false);
             }
 
             _ = state ??
@@ -81,13 +82,13 @@ namespace ianisms.SmartThings.GreatWelcomer.Lib.WebhookHandlers
 
             var raisedEvents = eventData.events;
 
-            logger.LogDebug($"Handling raisedEvents for installedApp: {installedApp.InstalledAppId}...");
+            Logger.LogDebug($"Handling raisedEvents for installedApp: {installedApp.InstalledAppId}...");
 
             var raisedEvent = raisedEvents[0];
             if (raisedEvent.deviceEvent != null)
             {
-                logger.LogDebug($"Handling raisedEvent for installedApp: {installedApp.InstalledAppId}:  {raisedEvent.deviceEvent}");
-                await HandleDeviceEventAsync(state, raisedEvent.deviceEvent);
+                Logger.LogDebug($"Handling raisedEvent for installedApp: {installedApp.InstalledAppId}:  {raisedEvent.deviceEvent}");
+                await HandleDeviceEventAsync(state, raisedEvent.deviceEvent).ConfigureAwait(false);
             }
         }
 
@@ -98,7 +99,8 @@ namespace ianisms.SmartThings.GreatWelcomer.Lib.WebhookHandlers
             _ = deviceEvent ??
                 throw new ArgumentNullException(nameof(deviceEvent));
             _ = deviceEvent.subscriptionName ??
-                throw new ArgumentException($"deviceEvent.subscriptionName is null!", nameof(deviceEvent));
+                throw new ArgumentException($"deviceEvent.subscriptionName is null!",
+                nameof(deviceEvent));
 
             var subscriptionName = deviceEvent.subscriptionName.Value;
 
@@ -106,11 +108,11 @@ namespace ianisms.SmartThings.GreatWelcomer.Lib.WebhookHandlers
             {
                 if (state.LightSwitches == null)
                 {
-                    logger.LogDebug("No light switches configured, ignoring event...");
+                    Logger.LogDebug("No light switches configured, ignoring event...");
                 }
                 else
                 {
-                    logger.LogDebug($"Checking light switch: {deviceEvent}...");
+                    Logger.LogDebug($"Checking light switch: {deviceEvent}...");
 
                     var lightSwitch =
                         state.LightSwitches.SingleOrDefault(ls =>
@@ -122,7 +124,9 @@ namespace ianisms.SmartThings.GreatWelcomer.Lib.WebhookHandlers
                     lightSwitch.CurrentState =
                         LightSwitch.SwitchStateFromDynamic(deviceEvent.value);
 
-                    await stateManager.StoreStateAsync(state.InstalledAppId, state);
+                    Logger.LogDebug($"Updated state for light switch: {lightSwitch.ToJson()}");
+
+                    await stateManager.StoreStateAsync(state.InstalledAppId, state).ConfigureAwait(false);
                 }
             }
             else

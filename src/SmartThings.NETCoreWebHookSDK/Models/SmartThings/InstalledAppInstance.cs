@@ -26,7 +26,7 @@ using System;
 
 namespace ianisms.SmartThings.NETCoreWebHookSDK.Models.SmartThings
 {
-    public class InstalledApp
+    public class InstalledAppInstance
     {
         public string InstalledAppId { get; set; } = null;
         [JsonProperty(PropertyName = "accessToken")]

@@ -63,34 +63,34 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.State
 
         public override async Task LoadCacheAsync()
         {
-            logger.LogDebug("Loading state cache...");
+            Logger.LogDebug("Loading state cache...");
 
             LoadedCacheFromStorage = false;
 
             try
             {
-                if (stateCache == null)
+                if (StateCache == null)
                 {
                     var storageClient = storageAccount.CreateCloudBlobClient();
                     var container = storageClient.GetContainerReference(storageBackedConfig.ContainerName);
-                    await container.CreateIfNotExistsAsync();
+                    await container.CreateIfNotExistsAsync().ConfigureAwait(false);
                     var cacheBlob = container.GetBlockBlobReference(storageBackedConfig.CacheBlobName);
 
-                    if (!await cacheBlob.ExistsAsync())
+                    if (!await cacheBlob.ExistsAsync().ConfigureAwait(false))
                     {
-                        logger.LogDebug("Backing blob does not exist, initializing cache...");
+                        Logger.LogDebug("Backing blob does not exist, initializing cache...");
 
-                        stateCache = new Dictionary<string, T>();
+                        StateCache = new Dictionary<string, T>();
                     }
                     else
                     {
-                        logger.LogDebug("Backing blob exists, loading cache from blob...");
+                        Logger.LogDebug("Backing blob exists, loading cache from blob...");
 
-                        var json = await cacheBlob.DownloadTextAsync();
-                        stateCache = JsonConvert.DeserializeObject<Dictionary<string, T>>(json,
-                            Common.JsonSerializerSettings);
+                        var json = await cacheBlob.DownloadTextAsync().ConfigureAwait(false);
+                        StateCache = JsonConvert.DeserializeObject<Dictionary<string, T>>(json,
+                            STCommon.JsonSerializerSettings);
 
-                        logger.LogDebug("Loaded state cache from blob...");
+                        Logger.LogDebug("Loaded state cache from blob...");
                         LoadedCacheFromStorage = true;
 
                     }
@@ -98,32 +98,32 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.State
             }
             catch (StorageException stEx)
             {
-                logger.LogError(stEx, "Exception trying to load cache from blob...");
+                Logger.LogError(stEx, "Exception trying to load cache from blob...");
                 throw;
             }
         }
 
         public override async Task PersistCacheAsync()
         {
-            logger.LogDebug("Saving state cache...");
+            Logger.LogDebug("Saving state cache...");
 
             try
             {
                 var storageClient = storageAccount.CreateCloudBlobClient();
                 var container = storageClient.GetContainerReference(storageBackedConfig.ContainerName);
-                await container.CreateIfNotExistsAsync();
+                await container.CreateIfNotExistsAsync().ConfigureAwait(false);
                 var cacheBlob = container.GetBlockBlobReference(storageBackedConfig.CacheBlobName);
-                await cacheBlob.DeleteIfExistsAsync();
+                await cacheBlob.DeleteIfExistsAsync().ConfigureAwait(false);
 
-                var json = JsonConvert.SerializeObject(stateCache,
-                    Common.JsonSerializerSettings);
-                await cacheBlob.UploadTextAsync(json);
+                var json = JsonConvert.SerializeObject(StateCache,
+                    STCommon.JsonSerializerSettings);
+                await cacheBlob.UploadTextAsync(json).ConfigureAwait(false);
 
-                logger.LogDebug("Saved state cache...");
+                Logger.LogDebug("Saved state cache...");
             }
             catch (StorageException stEx)
             {
-                logger.LogError(stEx, "Exception trying to save cache to blob...");
+                Logger.LogError(stEx, "Exception trying to save cache to blob...");
                 throw;
             }
         }

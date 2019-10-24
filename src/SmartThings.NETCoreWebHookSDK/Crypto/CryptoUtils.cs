@@ -74,6 +74,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Crypto
             return rsaKey;
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1308:Normalize strings to uppercase", Justification = "Sig headers need to be lowercase")]
         private static byte[] GetSignVal(RequestSignature sig, HttpRequest request)
         {
             var siginingString = new StringBuilder();
@@ -114,7 +115,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Crypto
 
         private async Task InitializeRSAProviderAsync()
         {
-            var pubKeyContent = await this.config.GetPublicKeyContentAsync();
+            var pubKeyContent = await this.config.GetPublicKeyContentAsync().ConfigureAwait(false);
             this.publicKeyProvider = GetRSAProviderFromPem(pubKeyContent);
         }
 
@@ -124,7 +125,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Crypto
 
             if (publicKeyProvider == null)
             {
-                await InitializeRSAProviderAsync();
+                await InitializeRSAProviderAsync().ConfigureAwait(false);
             }
 
             var sig = RequestSignature.ParseFromHeaderVal(request.Headers["Authorization"].FirstOrDefault());

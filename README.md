@@ -1,14 +1,27 @@
 # SmartThings.NETCoreWebHookSDK
 
-#### UPDATES
+### RELEASE NOTES
 
-- 21 October 2019:  Massive updates after working on a SmartApp using the SDK.  README and samples completely updated.
-- 21 October 2019:  Looking at creating a version for .NET Core 3.0.  Support for 3.0 in Azure Functions is in alpha.  Will create a PoC soon.
-- 21 October 2019:  [NuGet package](https://www.nuget.org/packages/SmartThings.NETCoreWebHookSDK/2.2.1-alpha) created:
+#### Latest NUGET
 
-  ```
-  dotnet add package SmartThings.NETCoreWebHookSDK --version 2.2.1-alpha
-  ```
+[2.2.2.0-alpha](https://www.nuget.org/packages/SmartThings.NETCoreWebHookSDK/2.2.2-alpha)
+
+#### General
+
+Looking at creating a version for .NET Core 3.0.  Support for 3.0 in Azure Functions is in alpha.  Will create a PoC soon.
+
+#### 2.2.2.0 - 24 October 2019
+
+- Lots of bug fixes around token management and hosting in AZ Functions.  This forced a split in how we add token management to AZ Functions vs ASP.NET Core.  [Full details](https://github.com/ianisms/SmartThings.NETCoreWebHookSDK/blob/master/README.md#installed-app-token-management-utils).
+- Breaking change to avoid a naming conflict.  The ```InstalledApp``` model has been renamed to ```InstalledAppInstance```.  It was either that or rename the InstalledApp namespace.  I took the path of least resistance.
+- Tons of code cleanliness and CA supressions for things like exception text globalization (perhaps we will add a resource manager for the strings later).
+- Updated the samples to use the nuget package and they are fully working now.
+- Created separate solutions for the SDK and the samples.
+
+#### 2.2.1.0 - 21 October 2019
+
+- Massive updates after working on a SmartApp using the SDK.  README and samples completely updated.
+- Huge perf improvements using mostly fire-and-forget async calls to ensure the responses get back to Samsung ASAP.
 
 ***
 
@@ -40,9 +53,10 @@ To add the SDK WebHook functionality to your app there are 3 steps all involving
    - [```UninstallWebhookHandler```](https://github.com/ianisms/SmartThings.NETCoreWebHookSDK/blob/master/README.md#uninstallwebhookhandler-implementation)
    - [```EventWebhookHandler```](https://github.com/ianisms/SmartThings.NETCoreWebHookSDK/blob/master/README.md#eventwebhookhandler-implementation)
 4. Add an [```InstalledAppManager```](https://github.com/ianisms/SmartThings.NETCoreWebHookSDK/blob/master/README.md#installed-app-management-utils)
-5. Optionally add a [```StateManager```](https://github.com/ianisms/SmartThings.NETCoreWebHookSDK/blob/master/README.md#state-management-utils)
-6. Add the remaining handlers via the ```ianisms.SmartThings.NETCoreWebHookSDK.Extensions.AddWebhookHandlers``` extension method like so ```.AddWebhookHandlers()```.
-7. Pass the ```HttpRequest``` from your ASP.NET Core or FunctionsApp to the ```RootWebhookHandler```.
+5. Add a [```InstalledAppTokenManager```](https://github.com/ianisms/SmartThings.NETCoreWebHookSDK/blob/master/README.md#installed-app-token-management-utils) for either ASP.NET Core (hosted servrce) or Azure Functions (used in a timer trigger you create) to refresh your tokens periodically.
+6. Optionally add a [```StateManager```](https://github.com/ianisms/SmartThings.NETCoreWebHookSDK/blob/master/README.md#state-management-utils)
+7. Add the remaining handlers via the ```ianisms.SmartThings.NETCoreWebHookSDK.Extensions.AddWebhookHandlers``` extension method using ```.AddWebhookHandlers()```.
+8. Pass the ```HttpRequest``` from your ASP.NET Core or FunctionsApp to the ```RootWebhookHandler```.
 
 A full example, DI:
 
@@ -68,6 +82,7 @@ public class FunctionsAppStartup : FunctionsStartup
             .AddSingleton<IUninstallWebhookHandler, MyUninstallWebhookHandler>()
             .AddSingleton<IEventWebhookHandler, MyEventWebhookHandler>()
             .AddInMemoryInstalledAppManager()
+            .AddInstalledAppTokenManager() //.AddInstalledAppTokenManagerService() for ASP.NET Core
             .AddSingleton<IStateManager<MyState>, InMemoryStateManager<MyState>>()
             .AddSingleton<IMyService, MyService>()
             .AddWebhookHandlers();
@@ -672,35 +687,130 @@ public class MyEventWebhookHandler : EventWebhookHandler
 
 ### Installed App Management Utils
 
-I have included an insatlled app manager utility for helping you store/retrive app configs for your app.  There are 3 variations available:  ```InMemoryInstalledAppManager```, ```FileBackedInstalledAppManager```, and ```AzureStorageBackedInstalledAppManager```.  This isnatlled app manager is used throughout the SDK and at least one must be configured.
-
-#### InMemoryInstalledAppManager Usage
-
-To use the InMemoryInstalledAppManager, you simply it like so: ```.AddInMemoryInstalledAppManager()```.
+I have included an installed app manager utility for helping you store/retrive app configs for your app.  There are 2 variations available in the SDK:  ```FileBackedInstalledAppManager```, and ```AzureStorageBackedInstalledAppManager```.    You can easily add your own by extending the abstract class ```InstalledAppManager```.  The installed app manager is used throughout the SDK and at least one must be configured.
 
 #### FileBackedInstalledAppManager Usage
 
 To use the FileBackedInstalledAppManager, you must add a ```FileBackedConfig``` to your service collection like so: ```.Configure<FileBackedConfig<FileBackedInstalledAppManager>>(config.GetSection("FileBackedInstalledAppManager.FileBackedConfig"))```.  You can then inject the ```InstalledAppManager``` like so: ```.AddFileBackedInstalledAppManager()```.
 
+Example config:
+
+```json
+  "FileBackedInstalledAppManager.FileBackedConfig": {
+    "BackingStorePath": "mysmartappdata/installedAppManager.dat"
+  },
+```
+
 #### AzureStorageBackedInstalledAppManager Usage
 
 To use the AzureStorageBackedInstalledAppManager, you must add a ```AzureStorageBackedConfig``` to your service collection like so: ```.Configure<AzureStorageBackedConfig<AzureStorageBackedInstalledAppManager>>(config.GetSection("AzureStorageBackedInstalledAppManager.AzureStorageConfig"))```.  You can then inject the ```InstalledAppManager``` like so: ```.AddAzureStorageInstalledAppManager()```.
 
+Example config:
+
+```json
+"AzureStorageBackedInstalledAppManager.AzureStorageConfig": {
+    "ConnectionString": "<YOURCONNECTIONSTRING>",
+    "ContainerName": "mysmartappdata",
+    "CacheBlobName": "installedAppManager.data"
+  },
+```
+
 ### State Management Utils
 
-I have included a state manager utility for helping you store/retrive state for your app.  There are 3 variations available:  ```InMemoryStateManager```, ```FileBackedStateManager```, and ```AzureStorageBackedStateManager```.
-
-#### InMemoryStateManager Usage
-
-To use the InMemoryStateManager, you simply it like so: ```.AddInMemoryStateManager()```.
+I have included a state manager utility for helping you store/retrive state for your app.  There are 2 variations available in the SDK:  ```FileBackedStateManager```, and ```AzureStorageBackedStateManager```.  You can easily add your own by extending the abstract class ```StateManager<T>```.
 
 #### FileBackedStateManager Usage
 
 To use the FileBackedStateManager, you must add a ```FileBackedConfig``` to your service collection like so: ```.Configure<FileBackedConfig<FileBackedStateManager<MyState>>>(config.GetSection("FileBackedStateManager.FileBackedConfig"))```. ```MyState``` would be your custom state object.  You can then inject the ```StateManager``` like so: ```.AddFileBackedStateManager<MyState>()```.
 
+Example config:
+
+```json
+  "FileBackedStateManager.FileBackedConfig": {
+    "BackingStorePath": "mysmartappdata/stateManager.dat"
+  },
+```
+
 #### AzureStorageBackedStateManager Usage
 
 To use the AzureStorageBackedStateManager, you must add a ```AzureStorageBackedConfig``` to your service collection like so: ```.Configure<AzureStorageBackedConfig<AzureStorageBackedStateManager<MyState>>>(config.GetSection("AzureStorageBackedStateManager.AzureStorageConfig"))```. ```MyState``` would be your custom state object.  You can then inject the ```StateManager``` like so: ```.AddAzureStorageStateManager<MyState>()```.
+
+Example config:
+
+```json
+"AzureStorageBackedStateManager.AzureStorageConfig": {
+    "ConnectionString": "<YOURCONNECTIONSTRING>",
+    "ContainerName": "mysmartappdata",
+    "CacheBlobName": "stateManager.data"
+  },
+```
+
+### Installed App Token Management Utils
+
+You must refresh the tokens for your app periodically.  There are two flavors of token manager available to you to refresh your refresh token periodically if it is about to expire.  Your access token should be refreshed by the SDK before every api call if it is about to expire.  More Info on [SmartApp tokens](https://smartthings.developer.samsung.com/docs/auth-and-permissions.html#Using-SmartApp-tokens).
+
+#### For ASP.NET Core
+
+Use ```InstalledAppTokenManagerService``` by injecting it into to your service collection via ```services.AddInstalledAppTokenManagerService();```.  The ```InstalledAppTokenManagerService``` (hosted service) will refresh your refresh token every 29.5 minutes if it is about to expire.
+
+#### For Azure Functions
+
+Use ```InstalledAppTokenManager``` by injecting it into your service collection via ```services.AddInstalledAppTokenManager();```.  The ```InstalledAppTokenManager``` should be used in a timer trigger to refresh the tokens on your desired schedule.  I reccomend a schedule expression of ```0 */29 * * * *``` (29 minutes).  An example:
+
+```csharp
+using ianisms.SmartThings.NETCoreWebHookSDK.Utils.InstalledApp;
+using Microsoft.Azure.WebJobs;
+using Microsoft.Extensions.Logging;
+using System;
+using System.Threading.Tasks;
+
+namespace AzureFunctionsApp
+{
+    public class FunctionsService
+    {
+        private readonly ILogger<FunctionsService> logger;
+        private readonly IInstalledAppTokenManager installedAppTokenManager;
+
+        public FunctionsService(ILogger<FunctionsService> logger,
+            IInstalledAppTokenManager installedAppTokenManager)
+        {
+            _ = logger ??
+                throw new ArgumentNullException(nameof(logger));
+            _ = installedAppTokenManager ??
+                throw new ArgumentNullException(nameof(installedAppTokenManager));
+
+            this.logger = logger;
+            this.installedAppTokenManager = installedAppTokenManager;
+        }
+
+        /**
+         *  For functions apps, we cannot add a hosted service to handle token refresh so we simply
+         *  spin up a timer trigger to periodically refresh the tokens.
+         *  The schedule expression is for the current refreshToken timeout (30 minutes) with a bit of buffer.
+         *  The accessToken will be refreshed before each api request.
+         **/
+        [FunctionName("InstalledAppTokenRefresh")]
+        public async Task InstalledAppTokenRefresh(
+            [TimerTrigger("0 */29 * * * *")] TimerInfo timer)
+        {
+            try
+            {
+                if (timer.IsPastDue)
+                {
+                    logger.LogDebug("Timer is running late!");
+                }
+
+                await installedAppTokenManager.RefreshAllTokensAsync().ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Exception calling installedAppTokenManager.RefreshAllTokensAsync");
+                throw;
+            }
+        }
+    }
+}
+```
 
 ### Device Models
 

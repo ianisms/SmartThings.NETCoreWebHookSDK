@@ -23,10 +23,8 @@
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json.Linq;
 using System;
-using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Text;
 
 namespace ianisms.SmartThings.NETCoreWebHookSDK.Extensions
 {
@@ -56,7 +54,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Extensions
         {
             _ = request ?? throw new ArgumentNullException(nameof(request));
 
-            request.Headers.Authorization = 
+            request.Headers.Authorization =
                 new AuthenticationHeaderValue("Basic",
                     Convert.ToBase64String(
                         System.Text.Encoding.ASCII.GetBytes(

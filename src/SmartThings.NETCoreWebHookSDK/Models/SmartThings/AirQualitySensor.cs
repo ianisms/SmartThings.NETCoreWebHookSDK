@@ -37,7 +37,8 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Models.SmartThings
             if (status != null)
             {
                 _ = status.components.main.airQualitySensor.airQuality.value ??
-                    throw new ArgumentException("status.components.main.airQualitySensor.airQuality.value is null!", nameof(status));
+                    throw new ArgumentException("status.components.main.airQualitySensor.airQuality.value is null!",
+                    nameof(status));
                 deviceStatus = status.components.main.airQualitySensor.airQuality.value;
             }
 

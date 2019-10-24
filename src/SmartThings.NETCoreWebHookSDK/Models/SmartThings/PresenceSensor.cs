@@ -36,7 +36,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Models.SmartThings
         {
             _ = status ?? throw new ArgumentNullException(nameof(status));
 
-            if(isResponseStatus)
+            if (isResponseStatus)
             {
                 _ = status.components.main.presenceSensor.presence.value ??
                     throw new ArgumentException("status.components.main.presenceSensor.presence.value is null!",
@@ -47,7 +47,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Models.SmartThings
             var val = status.Value.ToLowerInvariant().Replace(" ", "");
 
             var state = PresenceState.Unknown;
-            if(!Enum.TryParse<PresenceState>(val, true, out state))
+            if (!Enum.TryParse<PresenceState>(val, true, out state))
             {
                 throw new ArgumentException($"PresenceSensor.PresenceStateFromDynamic status is an invalid value {status}",
                     nameof(status));
@@ -84,7 +84,8 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Models.SmartThings
             if (status != null)
             {
                 _ = status.components.main.presenceSensor.presence.value ??
-                    throw new ArgumentException("status.components.main.presenceSensor.presence.value is null!", nameof(status));
+                    throw new ArgumentException("status.components.main.presenceSensor.presence.value is null!",
+                    nameof(status));
                 deviceStatus = status.components.main.presenceSensor.presence.value;
             }
 

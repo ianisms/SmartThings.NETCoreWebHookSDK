@@ -35,46 +35,46 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.State
     public class FileBackedStateManager<T> : StateManager<T>
     {
         private readonly FileBackedConfig<FileBackedStateManager<T>> fileBackedConfig;
-        private Dictionary<string, T> stateCache { get; set; }
 
         public FileBackedStateManager(ILogger<IStateManager<T>> logger,
             IOptions<FileBackedConfig<FileBackedStateManager<T>>> options)
-            : base (logger)
+            : base(logger)
         {
             _ = options ?? throw new ArgumentNullException(nameof(options));
 
             this.fileBackedConfig = options.Value;
 
             _ = fileBackedConfig.BackingStorePath ??
-                throw new ArgumentException("fileBackedConfig.BackingStorePath is null", nameof(options));
+                throw new ArgumentException("fileBackedConfig.BackingStorePath is null",
+                nameof(options));
         }
 
         public override async Task LoadCacheAsync()
         {
-            logger.LogDebug("Loading state cache...");
+            Logger.LogDebug("Loading state cache...");
 
-            if (stateCache == null)
+            if (StateCache == null)
             {
-                if(!File.Exists(fileBackedConfig.BackingStorePath))
+                if (!File.Exists(fileBackedConfig.BackingStorePath))
                 {
-                    logger.LogDebug("Backing file does not exist, initializing cache...");
+                    Logger.LogDebug("Backing file does not exist, initializing cache...");
 
-                    stateCache = new Dictionary<string, T>();
+                    StateCache = new Dictionary<string, T>();
                 }
                 else
                 {
-                    logger.LogDebug("Backing file exists, loading cache from file...");
+                    Logger.LogDebug("Backing file exists, loading cache from file...");
 
                     using (var reader = File.OpenText(fileBackedConfig.BackingStorePath))
                     {
-                        var encodedContent = await reader.ReadToEndAsync();
+                        var encodedContent = await reader.ReadToEndAsync().ConfigureAwait(false);
                         //var json = dataProtector.Unprotect(encodedContent);
                         var json = encodedContent;
-                        stateCache = JsonConvert.DeserializeObject<Dictionary<string, T>>(json,
-                            Common.JsonSerializerSettings);
+                        StateCache = JsonConvert.DeserializeObject<Dictionary<string, T>>(json,
+                            STCommon.JsonSerializerSettings);
                     }
 
-                    logger.LogDebug("Loaded state cache from file...");
+                    Logger.LogDebug("Loaded state cache from file...");
 
                 }
             }
@@ -82,20 +82,20 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.State
 
         public override async Task PersistCacheAsync()
         {
-            logger.LogDebug("Saving state cache...");
+            Logger.LogDebug("Saving state cache...");
 
             Directory.CreateDirectory(Path.GetDirectoryName(fileBackedConfig.BackingStorePath));
 
             using (var writer = File.CreateText(fileBackedConfig.BackingStorePath))
             {
-                var json = JsonConvert.SerializeObject(stateCache);
+                var json = JsonConvert.SerializeObject(StateCache);
                 var encodedContent = json;
                 //var encodedContent = dataProtector.Protect(json);
                 await writer.WriteAsync(encodedContent).ConfigureAwait(false);
                 await writer.FlushAsync().ConfigureAwait(false);
             }
 
-            logger.LogDebug("Saved state cache...");
+            Logger.LogDebug("Saved state cache...");
         }
     }
 }

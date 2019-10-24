@@ -29,9 +29,9 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.State
 {
     public interface IStateManager<T> : IObservable<string>
     {
-        ILogger<IStateManager<T>> logger { get; }
-        IList<IObserver<string>> observers { get; }
-        IDictionary<string, T> stateCache { get; }
+        ILogger<IStateManager<T>> Logger { get; }
+        IList<IObserver<string>> Observers { get; }
+        IDictionary<string, T> StateCache { get; }
         Task<T> GetStateAsync(string installedAppId);
         Task StoreStateAsync(string installedAppId, T state);
         Task RemoveStateAsync(string installedAppId);
@@ -39,33 +39,35 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.State
 
     public abstract class StateManager<T> : IStateManager<T>
     {
-        public ILogger<IStateManager<T>> logger { get; private set; }
-        public IList<IObserver<string>> observers { get; private set; }
-        public IDictionary<string, T> stateCache { get; set; }
+        public ILogger<IStateManager<T>> Logger { get; private set; }
+        public IList<IObserver<string>> Observers { get; private set; }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "StateCache needds to be visible to downstream implementers")]
+        public IDictionary<string, T> StateCache { get; set; }
 
         public StateManager(ILogger<IStateManager<T>> logger)
         {
             _ = logger ?? throw new ArgumentNullException(nameof(logger));
-            this.logger = logger;
-            this.observers = new List<IObserver<string>>();
+            this.Logger = logger;
+            this.Observers = new List<IObserver<string>>();
         }
 
         public virtual async Task<T> GetStateAsync(string installedAppId)
         {
             _ = installedAppId ?? throw new ArgumentNullException(nameof(installedAppId));
 
-            await LoadCacheAsync();
+            await LoadCacheAsync().ConfigureAwait(false);
 
-            logger.LogDebug($"Getting state from cache: {installedAppId}...");
+            Logger.LogDebug($"Getting state from cache: {installedAppId}...");
 
             T state = default(T);
-            if (stateCache.TryGetValue(installedAppId, out state))
+            if (StateCache.TryGetValue(installedAppId, out state))
             {
-                logger.LogDebug($"Got state from cache: {installedAppId}...");
+                Logger.LogDebug($"Got state from cache: {installedAppId}...");
             }
             else
             {
-                logger.LogDebug($"Unable to find state in cache: {installedAppId}...");
+                Logger.LogDebug($"Unable to find state in cache: {installedAppId}...");
             }
 
             return state;
@@ -75,31 +77,31 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.State
         {
             _ = installedAppId ?? throw new ArgumentNullException(nameof(installedAppId));
 
-            await LoadCacheAsync();
+            await LoadCacheAsync().ConfigureAwait(false);
 
-            logger.LogDebug($"Adding state to cache: {installedAppId}...");
+            Logger.LogDebug($"Adding state to cache: {installedAppId}...");
 
-            stateCache.Remove(installedAppId);
-            stateCache.Add(installedAppId, state);
+            StateCache.Remove(installedAppId);
+            StateCache.Add(installedAppId, state);
 
             NotifyObservers(installedAppId);
 
-            await PersistCacheAsync();
+            await PersistCacheAsync().ConfigureAwait(false);
         }
 
         public virtual async Task RemoveStateAsync(string installedAppId)
         {
             _ = installedAppId ?? throw new ArgumentNullException(nameof(installedAppId));
 
-            await LoadCacheAsync();
+            await LoadCacheAsync().ConfigureAwait(false);
 
-            logger.LogDebug($"Removing state from cache: {installedAppId}...");
+            Logger.LogDebug($"Removing state from cache: {installedAppId}...");
 
-            stateCache.Remove(installedAppId);
+            StateCache.Remove(installedAppId);
 
             NotifyObservers(installedAppId);
 
-            await PersistCacheAsync();
+            await PersistCacheAsync().ConfigureAwait(false);
         }
 
         public abstract Task PersistCacheAsync();
@@ -108,19 +110,19 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.State
 
         public IDisposable Subscribe(IObserver<string> observer)
         {
-            if(!observers.Contains(observer))
+            if (!Observers.Contains(observer))
             {
-                observers.Add(observer);
+                Observers.Add(observer);
             }
 
-            return new Unsubscriber(observers, observer);
+            return new Unsubscriber(Observers, observer);
         }
 
         public void UnSubscribe(IObserver<string> observer)
         {
-            if (!observers.Contains(observer))
+            if (!Observers.Contains(observer))
             {
-                observers.Remove(observer);
+                Observers.Remove(observer);
             }
         }
 
@@ -146,9 +148,9 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.State
 
         private void NotifyObservers(string installedAppId)
         {
-            logger.LogDebug($"Notifying observers of state change for: {installedAppId}");
+            Logger.LogDebug($"Notifying observers of state change for: {installedAppId}");
 
-            foreach (var observer in observers)
+            foreach (var observer in Observers)
             {
                 observer.OnNext(installedAppId);
             }

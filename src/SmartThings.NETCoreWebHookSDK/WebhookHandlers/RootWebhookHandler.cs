@@ -33,13 +33,13 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers
 {
     public interface IRootWebhookHandler
     {
-        ILogger<IRootWebhookHandler> logger { get; }
+        ILogger<IRootWebhookHandler> Logger { get; }
         Task<dynamic> HandleRequestAsync(HttpRequest request);
     }
 
     public class RootWebhookHandler : IRootWebhookHandler
     {
-        public ILogger<IRootWebhookHandler> logger { get; private set; }
+        public ILogger<IRootWebhookHandler> Logger { get; private set; }
         private readonly IPingWebhookHandler pingHandler;
         private readonly IConfigWebhookHandler configHandler;
         private readonly IInstallUpdateWebhookHandler installUpdateHandler;
@@ -74,7 +74,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers
             _ = cryptoUtils ??
                 throw new ArgumentNullException(nameof(cryptoUtils));
 
-            this.logger = logger;
+            this.Logger = logger;
             this.pingHandler = pingHandler;
             this.configHandler = configHandler;
             this.installUpdateHandler = installUpdateHandler;
@@ -90,20 +90,23 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers
 
             using (var reader = new StreamReader(request.Body))
             {
-                var requestBody = await reader.ReadToEndAsync();
+                var requestBody = await reader.ReadToEndAsync().ConfigureAwait(false);
                 dynamic data = JObject.Parse(requestBody);
 
                 _ = data.lifecycle ??
-                    throw new ArgumentException("lifecycle missing from request body!", nameof(request));
+                    throw new ArgumentException("lifecycle missing from request body!",
+                    nameof(request));
                 _ = data.lifecycle.Value ??
-                    throw new ArgumentException("lifecycle missing from request body!", nameof(request));
+                    throw new ArgumentException("lifecycle missing from request body!",
+                    nameof(request));
 
                 var lifecycleVal = data.lifecycle.Value.ToLowerInvariant().Replace("_", "");
 
                 Lifecycle lifecycle = Lifecycle.Unknown;
-                if(!Enum.TryParse<Lifecycle>(lifecycleVal, true, out lifecycle))
+                if (!Enum.TryParse<Lifecycle>(lifecycleVal, true, out lifecycle))
                 {
-                    throw new ArgumentException($"data.lifecycle is an invalid value: {data.lifecycle.Value}", nameof(request));
+                    throw new ArgumentException($"data.lifecycle is an invalid value: {data.lifecycle.Value}",
+                        nameof(request));
                 }
 
                 switch (lifecycle)
@@ -111,22 +114,22 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers
                     case Lifecycle.Ping:
                         return pingHandler.HandleRequest(data);
                     case Lifecycle.Configuration:
-                        await CheckAuthAsync(request);
+                        await CheckAuthAsync(request).ConfigureAwait(false);
                         return configHandler.HandleRequest(data);
                     case Lifecycle.Install:
-                        await CheckAuthAsync(request);
+                        await CheckAuthAsync(request).ConfigureAwait(false);
                         return await installUpdateHandler.HandleRequestAsync(lifecycle, data);
                     case Lifecycle.Update:
-                        await CheckAuthAsync(request);
+                        await CheckAuthAsync(request).ConfigureAwait(false);
                         return await installUpdateHandler.HandleRequestAsync(lifecycle, data);
                     case Lifecycle.Event:
-                        await CheckAuthAsync(request);
+                        await CheckAuthAsync(request).ConfigureAwait(false);
                         return await eventHandler.HandleRequestAsync(data);
                     case Lifecycle.Uninstall:
-                        await CheckAuthAsync(request);
+                        await CheckAuthAsync(request).ConfigureAwait(false);
                         return await uninstallHandler.HandleRequestAsync(data);
                     case Lifecycle.Oauthcallback:
-                        await CheckAuthAsync(request);
+                        await CheckAuthAsync(request).ConfigureAwait(false);
                         return await oauthHandler.HandleRequestAsync(data);
                     default:
                         break;
@@ -138,7 +141,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers
 
         private async Task CheckAuthAsync(HttpRequest request)
         {
-            if (!await cryptoUtils.VerifySignedRequestAsync(request))
+            if (!await cryptoUtils.VerifySignedRequestAsync(request).ConfigureAwait(false))
             {
                 throw new InvalidOperationException("Could not verify request signature!");
             }

@@ -20,7 +20,7 @@
 // </copyright>
 #endregion
 
-using ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers;
+using ianisms.SmartThings.NETCoreWebHookSDK.Utils.InstalledApp;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
@@ -35,17 +35,22 @@ namespace AzureFunctionsApp
     public class FunctionsService
     {
         private readonly ILogger<FunctionsService> logger;
+        private readonly IInstalledAppTokenManager installedAppTokenManager;
         private readonly IMyService myService;
 
         public FunctionsService(ILogger<FunctionsService> logger,
+            IInstalledAppTokenManager installedAppTokenManager,
             IMyService myService)
         {
             _ = logger ??
                 throw new ArgumentNullException(nameof(logger));
+            _ = installedAppTokenManager ??
+                throw new ArgumentNullException(nameof(installedAppTokenManager));
             _ = myService ??
                 throw new ArgumentNullException(nameof(myService));
 
             this.logger = logger;
+            this.installedAppTokenManager = installedAppTokenManager;
             this.myService = myService;
         }
 
@@ -55,7 +60,7 @@ namespace AzureFunctionsApp
         {
             try
             {
-                var responseObj = await myService.HandleRequestAsync(request);
+                var responseObj = await myService.HandleRequestAsync(request).ConfigureAwait(false);
                 if (responseObj != null)
                 {
                     return new OkObjectResult(responseObj);
@@ -68,7 +73,33 @@ namespace AzureFunctionsApp
             catch (Exception ex)
             {
                 logger.LogError(ex, "Exception calling myService.HandleRequestAsync");
-                return new StatusCodeResult(StatusCodes.Status500InternalServerError);
+                throw;
+            }
+        }
+
+        /**  
+         *  For functions apps, we cannot add a hosted service to handle token refresh so we simply
+         *  spin up a timer trigger to periodically refresh the tokens.
+         *  The schedule expression is for the current refreshToken timeout (30 minutes) with a bit of buffer.
+         *  The accessToken will be refreshed before each api request.
+         **/
+        [FunctionName("InstalledAppTokenRefresh")]
+        public async Task InstalledAppTokenRefresh(
+            [TimerTrigger("0 */29 * * * *")] TimerInfo timer)
+        {
+            try
+            {
+                if (timer.IsPastDue)
+                {
+                    logger.LogDebug("Timer is running late!");
+                }
+
+                await installedAppTokenManager.RefreshAllTokensAsync().ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Exception calling installedAppTokenManager.RefreshAllTokensAsync");
+                throw;
             }
         }
     }

@@ -30,8 +30,8 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers
 {
     public interface IUninstallWebhookHandler
     {
-        ILogger<IUninstallWebhookHandler> logger { get; }
-        IInstalledAppManager installedAppManager { get; }
+        ILogger<IUninstallWebhookHandler> Logger { get; }
+        IInstalledAppManager InstalledAppManager { get; }
         Task<dynamic> HandleRequestAsync(dynamic request);
         void ValidateRequest(dynamic request);
         Task HandleUninstallDataAsync(dynamic uninstallData);
@@ -39,8 +39,8 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers
 
     public abstract class UninstallWebhookHandler : IUninstallWebhookHandler
     {
-        public ILogger<IUninstallWebhookHandler> logger { get; private set; }
-        public IInstalledAppManager installedAppManager { get; private set; }
+        public ILogger<IUninstallWebhookHandler> Logger { get; private set; }
+        public IInstalledAppManager InstalledAppManager { get; private set; }
 
         public UninstallWebhookHandler(ILogger<IUninstallWebhookHandler> logger,
             IInstalledAppManager installedAppManager)
@@ -48,15 +48,15 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers
             _ = logger ?? throw new ArgumentNullException(nameof(logger));
             _ = installedAppManager ?? throw new ArgumentNullException(nameof(installedAppManager));
 
-            this.logger = logger;
-            this.installedAppManager = installedAppManager;
+            this.Logger = logger;
+            this.InstalledAppManager = installedAppManager;
         }
 
         public abstract Task HandleUninstallDataAsync(dynamic uninstallData);
 
         public virtual void ValidateRequest(dynamic request)
         {
-            logger.LogTrace($"Validating request: {request}");
+            Logger.LogTrace($"Validating request: {request}");
 
             _ = request ??
                 throw new ArgumentNullException(nameof(request));
@@ -87,19 +87,19 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers
         {
             ValidateRequest(request);
 
-            logger.LogTrace($"Handling request: {request}");
+            Logger.LogTrace($"Handling request: {request}");
 
             await HandleUninstallDataAsync(request.uninstallData);
 
             var installedAppId = request.uninstallData.installedApp.installedAppId;
 
-            await installedAppManager.RemoveInstalledAppAsync(installedAppId);
+            await InstalledAppManager.RemoveInstalledAppAsync(installedAppId);
 
             dynamic response = new JObject();
 
             response.uninstallData = new JObject();
 
-            logger.LogTrace($"Response: {response}");
+            Logger.LogTrace($"Response: {response}");
 
             return response;
         }

@@ -20,7 +20,6 @@
 // </copyright>
 #endregion
 
-using ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;

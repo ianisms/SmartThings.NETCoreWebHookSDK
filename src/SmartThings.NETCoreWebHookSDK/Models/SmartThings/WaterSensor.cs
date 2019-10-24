@@ -38,7 +38,8 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Models.SmartThings
             if (isResponseStatus)
             {
                 _ = status.components.main.waterSensor.water.value ??
-                    throw new ArgumentException("status.components.main.waterSensor.water.value is null!", nameof(status));
+                    throw new ArgumentException("status.components.main.waterSensor.water.value is null!",
+                    nameof(status));
                 status = status.components.main.waterSensor.water.value;
             }
 
@@ -47,7 +48,8 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Models.SmartThings
             var state = WaterState.Unknown;
             if (!Enum.TryParse<WaterState>(val, true, out state))
             {
-                throw new ArgumentException($"WaterStateFromDynamic status is an invalid value {status}", nameof(status));
+                throw new ArgumentException($"WaterStateFromDynamic status is an invalid value {status}",
+                    nameof(status));
             }
             else
             {
@@ -63,7 +65,8 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Models.SmartThings
             if (status != null)
             {
                 _ = status.components.main.waterSensor.water.value ??
-                    throw new ArgumentException("status.components.main.waterSensor.water.value is null!", nameof(status));
+                    throw new ArgumentException("status.components.main.waterSensor.water.value is null!",
+                    nameof(status));
                 deviceStatus = status.components.main.waterSensor.water.value;
             }
 

@@ -21,8 +21,6 @@
 #endregion
 
 using ianisms.SmartThings.NETCoreWebHookSDK.Crypto;
-using System;
-using System.Collections.Generic;
 using Xunit;
 
 namespace ianisms.SmartThings.NETCoreWebHookSDK.Tests

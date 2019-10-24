@@ -27,9 +27,9 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Extensions
 {
     public static class ObjectExtensions
     {
-        public static string ToJson(this object obj)
+        public static string ToJson(this object target)
         {
-            return JsonConvert.SerializeObject(obj, Common.JsonSerializerSettings);
+            return JsonConvert.SerializeObject(target, STCommon.JsonSerializerSettings);
         }
     }
 }

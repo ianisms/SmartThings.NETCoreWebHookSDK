@@ -36,10 +36,9 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Crypto
         {
             _ = PublicKeyFilePath ?? throw new InvalidOperationException($"{nameof(PublicKeyFilePath)} is null!");
 
-            using (var reader = File.OpenText(PublicKeyFilePath))
-            {
-                return await reader.ReadToEndAsync();
-            }
+            using var reader = File.OpenText(PublicKeyFilePath);
+
+            return await reader.ReadToEndAsync().ConfigureAwait(false);
         }
     }
 }

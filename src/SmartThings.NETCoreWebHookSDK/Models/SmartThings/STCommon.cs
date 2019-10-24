@@ -27,7 +27,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Models.SmartThings
 {
     public enum Lifecycle { Ping, Configuration, Install, Update, Event, Uninstall, Oauthcallback, Unknown }
 
-    public static class Common
+    public static class STCommon
     {
         public static JsonSerializerSettings JsonSerializerSettings
         {

@@ -38,7 +38,7 @@ namespace MyWebhookLib.WebhookHandlers
 {
     public class MyInstallUpdateDataHandler : InstallUpdateWebhookHandler
     {
-        private IStateManager<MyState> stateManager;
+        private readonly IStateManager<MyState> stateManager;
 
         public MyInstallUpdateDataHandler(ILogger<IInstallUpdateWebhookHandler> logger,
             IOptions<SmartAppConfig> options,
@@ -51,7 +51,7 @@ namespace MyWebhookLib.WebhookHandlers
             this.stateManager = stateManager;
         }
 
-        private async Task SubscribeToDeviceEventAsync(InstalledApp installedApp,
+        private async Task SubscribeToDeviceEventAsync(InstalledAppInstance installedApp,
             dynamic deviceConfig)
         {
             _ = installedApp ??
@@ -59,7 +59,7 @@ namespace MyWebhookLib.WebhookHandlers
             _ = deviceConfig ??
                 throw new ArgumentNullException(nameof(deviceConfig));
 
-            var resp = await smartThingsAPIHelper.SubscribeToDeviceEventAsync(
+            var resp = await SmartThingsAPIHelper.SubscribeToDeviceEventAsync(
                 installedApp,
                 deviceConfig);
 
@@ -70,12 +70,14 @@ namespace MyWebhookLib.WebhookHandlers
                 throw new InvalidOperationException("subscriptionResp.id is null!");
         }
 
-        private async Task LoadLightSwitchesAsync(InstalledApp installedApp,
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
+        private async Task LoadLightSwitchesAsync(InstalledAppInstance installedApp,
+#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
             MyState state,
             dynamic data,
             bool shouldSubscribeToEvents = true)
         {
-            logger.LogInformation("Loading lightSwitches...");
+            Logger.LogInformation("Loading lightSwitches...");
             state.LightSwitches = new List<LightSwitch>();
 
             _ = installedApp ??
@@ -102,10 +104,10 @@ namespace MyWebhookLib.WebhookHandlers
                     index++;
 
                     var deviceTasks = new Task<dynamic>[] {
-                        smartThingsAPIHelper.GetDeviceDetailsAsync(
+                        SmartThingsAPIHelper.GetDeviceDetailsAsync(
                             installedApp,
                             deviceId),
-                        smartThingsAPIHelper.GetDeviceStatusAsync(
+                        SmartThingsAPIHelper.GetDeviceStatusAsync(
                             installedApp,
                             deviceId)
                     };
@@ -120,22 +122,24 @@ namespace MyWebhookLib.WebhookHandlers
 
                     if (shouldSubscribeToEvents)
                     {
-                        Task.Run(() => SubscribeToDeviceEventAsync(installedApp, deviceConfig));
+#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
+                        Task.Run(() => SubscribeToDeviceEventAsync(installedApp, deviceConfig).ConfigureAwait(false));
+#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
                     }
                 }
             }
 
-            logger.LogInformation($"Loaded {state.LightSwitches.Count} lightSwitches...");
+            Logger.LogInformation($"Loaded {state.LightSwitches.Count} lightSwitches...");
         }
 
-        public async Task HandleInstallUpdateDataAsync(InstalledApp installedApp,
+        public async Task HandleInstallUpdateDataAsync(InstalledAppInstance installedApp,
             dynamic data,
             bool shouldSubscribeToEvents = true)
         {
             _ = installedApp ??
                 throw new ArgumentNullException(nameof(installedApp));
 
-            var state = await stateManager.GetStateAsync(installedApp.InstalledAppId);
+            var state = await stateManager.GetStateAsync(installedApp.InstalledAppId).ConfigureAwait(false);
 
             if (state == null)
             {
@@ -156,35 +160,41 @@ namespace MyWebhookLib.WebhookHandlers
 
             Task.WaitAll(loadTasks);
 
-            logger.LogDebug($"MyState: {state.ToJson()}");
+            Logger.LogDebug($"MyState: {state.ToJson()}");
 
-            await stateManager.StoreStateAsync(installedApp.InstalledAppId, state);
+            await stateManager.StoreStateAsync(installedApp.InstalledAppId, state).ConfigureAwait(false);
 
-            logger.LogInformation($"Updated config for installedApp: {installedApp.InstalledAppId}...");
+            Logger.LogInformation($"Updated config for installedApp: {installedApp.InstalledAppId}...");
         }
 
-        public override async Task HandleUpdateDataAsync(InstalledApp installedApp,
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
+        public override async Task HandleUpdateDataAsync(InstalledAppInstance installedApp,
+#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
             dynamic data,
             bool shouldSubscribeToEvents = true)
         {
             _ = installedApp ?? throw new ArgumentNullException(nameof(installedApp));
             _ = data ?? throw new ArgumentNullException(nameof(data));
 
-            logger.LogInformation($"Updating installedApp: {installedApp.InstalledAppId}...");
+            Logger.LogInformation($"Updating installedApp: {installedApp.InstalledAppId}...");
 
-            Task.Run(() => HandleInstallUpdateDataAsync(installedApp, data, shouldSubscribeToEvents));
+#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
+            Task.Run(() => HandleInstallUpdateDataAsync(installedApp, data, shouldSubscribeToEvents).ConfigureAwait(false));
+#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
         }
 
-        public override async Task HandleInstallDataAsync(InstalledApp installedApp,
+        public override async Task HandleInstallDataAsync(InstalledAppInstance installedApp,
             dynamic data,
             bool shouldSubscribeToEvents = true)
         {
             _ = installedApp ?? throw new ArgumentNullException(nameof(installedApp));
             _ = data ?? throw new ArgumentNullException(nameof(data));
 
-            logger.LogInformation($"Installing installedApp: {installedApp.InstalledAppId}...");
+            Logger.LogInformation($"Installing installedApp: {installedApp.InstalledAppId}...");
 
-            Task.Run(() => HandleInstallUpdateDataAsync(installedApp, data, shouldSubscribeToEvents));
+#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
+            Task.Run(() => HandleInstallUpdateDataAsync(installedApp, data, shouldSubscribeToEvents).ConfigureAwait(false));
+#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
         }
     }
 }

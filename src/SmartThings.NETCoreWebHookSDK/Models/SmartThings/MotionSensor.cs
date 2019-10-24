@@ -38,7 +38,8 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Models.SmartThings
             if (isResponseStatus)
             {
                 _ = status.components.main.motionSensor.motion.value ??
-                    throw new ArgumentException("status.components.main.motionSensor.motion.value is null!", nameof(status));
+                    throw new ArgumentException("status.components.main.motionSensor.motion.value is null!",
+                    nameof(status));
                 status = status.components.main.motionSensor.motion.value;
             }
 
@@ -47,7 +48,8 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Models.SmartThings
             var state = MotionState.Unknown;
             if (!Enum.TryParse<MotionState>(val, true, out state))
             {
-                throw new ArgumentException($"MotionStateFromDynamic status is an invalid value {status}", nameof(status));
+                throw new ArgumentException($"MotionStateFromDynamic status is an invalid value {status}",
+                    nameof(status));
             }
             else
             {
@@ -63,7 +65,8 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Models.SmartThings
             if (status != null)
             {
                 _ = status.components.main.motionSensor.motion.value ??
-                    throw new ArgumentException("status.components.main.motionSensor.motion.value is null!", nameof(status));
+                    throw new ArgumentException("status.components.main.motionSensor.motion.value is null!",
+                    nameof(status));
                 deviceStatus = status.components.main.motionSensor.motion.value;
             }
 

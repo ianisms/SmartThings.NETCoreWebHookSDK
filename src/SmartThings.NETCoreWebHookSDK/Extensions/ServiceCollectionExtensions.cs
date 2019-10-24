@@ -38,16 +38,22 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Extensions
                 .AddSingleton<IOAuthWebhookHandler, OAuthWebhookHandler>()
                 .AddSingleton<ICryptoUtils, CryptoUtils>()
                 .AddSingleton<ISmartThingsAPIHelper, SmartThingsAPIHelper>()
-                .AddHostedService<InstalledAppTokenManager>()
                 .AddSingleton<IRootWebhookHandler, RootWebhookHandler>()
                 .AddHttpClient();
             return services;
         }
 
-        public static IServiceCollection AddInMemoryInstalledAppManager(this IServiceCollection services)
+        public static IServiceCollection AddInstalledAppTokenManager(this IServiceCollection services)
         {
             services
-                .AddSingleton<IInstalledAppManager, InMemoryInstalledAppManager>();
+                .AddSingleton<IInstalledAppTokenManager, InstalledAppTokenManager>();
+            return services;
+        }
+
+        public static IServiceCollection AddInstalledAppTokenManagerService(this IServiceCollection services)
+        {
+            services
+                .AddHostedService<InstalledAppTokenManagerService>();
             return services;
         }
 
@@ -62,13 +68,6 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Extensions
         {
             services
                 .AddSingleton<IInstalledAppManager, AzureStorageBackedInstalledAppManager>();
-            return services;
-        }
-
-        public static IServiceCollection AddInMemoryStateManager<T>(this IServiceCollection services)
-        {
-            services
-                .AddSingleton<IStateManager<T>, InMemoryStateManager<T>>();
             return services;
         }
 

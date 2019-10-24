@@ -44,7 +44,7 @@ namespace AzureFunctionsApp
 
             builder.Services
                 .AddLogging()
-                .AddMyWebhookService(config);
+                .AddMyWebhookService(config, true);
         }
     }
 }

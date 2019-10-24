@@ -39,7 +39,8 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Models.SmartThings
             if (isResponseStatus)
             {
                 _ = status.components.main["lock"]["lock"].value ??
-                    throw new ArgumentException("status.components.main.lock.lock.value is null!", nameof(status));
+                    throw new ArgumentException("status.components.main.lock.lock.value is null!",
+                    nameof(status));
                 status = status.components.main["lock"]["lock"].value;
             }
 
@@ -48,7 +49,8 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Models.SmartThings
             var state = LockState.Unknown;
             if (!Enum.TryParse<LockState>(val, true, out state))
             {
-                throw new ArgumentException($"DoorLock.LockStateFromDynamic status is an invalid value {status}", nameof(status));
+                throw new ArgumentException($"DoorLock.LockStateFromDynamic status is an invalid value {status}",
+                    nameof(status));
             }
             else
             {
@@ -64,7 +66,8 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Models.SmartThings
             if (status != null)
             {
                 _ = status.components.main["lock"]["lock"].value ??
-                    throw new ArgumentException("status.components.main.lock.lock.value is null!", nameof(status));
+                    throw new ArgumentException("status.components.main.lock.lock.value is null!",
+                    nameof(status));
                 deviceStatus = status.components.main["lock"]["lock"].value;
             }
 

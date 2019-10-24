@@ -31,17 +31,17 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers
 {
     public interface IEventWebhookHandler
     {
-        ILogger<IEventWebhookHandler> logger { get; }
-        IInstalledAppManager installedAppManager { get; }
+        ILogger<IEventWebhookHandler> Logger { get; }
+        IInstalledAppManager InstalledAppManager { get; }
         Task<dynamic> HandleRequestAsync(dynamic request);
         void ValidateRequest(dynamic request);
-        Task HandleEventDataAsync(InstalledApp installedApp, dynamic eventData);
+        Task HandleEventDataAsync(InstalledAppInstance installedApp, dynamic eventData);
     }
 
     public abstract class EventWebhookHandler : IEventWebhookHandler
     {
-        public ILogger<IEventWebhookHandler> logger { get; private set; }
-        public IInstalledAppManager installedAppManager { get; private set; }
+        public ILogger<IEventWebhookHandler> Logger { get; private set; }
+        public IInstalledAppManager InstalledAppManager { get; private set; }
 
         public EventWebhookHandler(ILogger<IEventWebhookHandler> logger,
             IInstalledAppManager installedAppManager)
@@ -51,15 +51,15 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers
             _ = installedAppManager ??
                 throw new ArgumentNullException(nameof(installedAppManager));
 
-            this.logger = logger;
-            this.installedAppManager = installedAppManager;
+            this.Logger = logger;
+            this.InstalledAppManager = installedAppManager;
         }
 
-        public abstract Task HandleEventDataAsync(InstalledApp installedApp, dynamic eventData);
+        public abstract Task HandleEventDataAsync(InstalledAppInstance installedApp, dynamic eventData);
 
         public virtual void ValidateRequest(dynamic request)
         {
-            logger.LogTrace($"Validating request: {request}");
+            Logger.LogTrace($"Validating request: {request}");
 
             _ = request ??
                 throw new ArgumentNullException(nameof(request));
@@ -90,30 +90,32 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers
         {
             ValidateRequest(request);
 
-            logger.LogDebug("Handling event request...");
-            logger.LogTrace($"Handling request: {request}");
+            Logger.LogDebug("Handling event request...");
+            Logger.LogTrace($"Handling request: {request}");
 
             var installedAppId = request.eventData.installedApp.installedAppId.Value;
 
-            logger.LogDebug($"Getting installed app for installedAppId: {installedAppId}...");
+            Logger.LogDebug($"Getting installed app for installedAppId: {installedAppId}...");
 
-            var installedApp = await installedAppManager.GetInstalledAppAsync(installedAppId);
+            var installedApp = await InstalledAppManager.GetInstalledAppAsync(installedAppId);
 
             if (installedApp == null)
             {
                 throw new InvalidOperationException($"unable to retrive installed app for installedAppId: {installedAppId}");
             }
 
-            logger.LogDebug("Setting tokens...");
+            Logger.LogDebug("Setting tokens...");
 
             installedApp.SetTokens(request.eventData.authToken.Value);
 
+#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
             Task.Run(() => HandleEventDataAsync(installedApp, request.eventData));
+#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
 
             dynamic response = new JObject();
             response.eventData = new JObject();
 
-            logger.LogTrace($"Response: {response}");
+            Logger.LogTrace($"Response: {response}");
 
             return response;
         }

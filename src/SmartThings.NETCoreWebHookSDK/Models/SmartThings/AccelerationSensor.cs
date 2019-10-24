@@ -38,7 +38,8 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Models.SmartThings
             if (isResponseStatus)
             {
                 _ = status.components.main.accelerationSensor.acceleration.value ??
-                    throw new ArgumentException("status.components.main.accelerationSensor.acceleration.value is null!", nameof(status));
+                    throw new ArgumentException("status.components.main.accelerationSensor.acceleration.value is null!",
+                    nameof(status));
                 status = status.components.main.accelerationSensor.acceleration.value;
             }
 
@@ -47,7 +48,8 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Models.SmartThings
             var state = AccelerationState.Unknown;
             if (!Enum.TryParse<AccelerationState>(val, true, out state))
             {
-                throw new ArgumentException($"AccelerationStateFromDynamic status is an invalid value {status}", nameof(status));
+                throw new ArgumentException($"AccelerationStateFromDynamic status is an invalid value {status}",
+                    nameof(status));
             }
             else
             {
@@ -63,7 +65,8 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Models.SmartThings
             if (status != null)
             {
                 _ = status.components.main.accelerationSensor.acceleration.value ??
-                    throw new ArgumentException("status.components.main.accelerationSensor.acceleration.value is null!", nameof(status));
+                    throw new ArgumentException("status.components.main.accelerationSensor.acceleration.value is null!",
+                    nameof(status));
                 deviceStatus = status.components.main.accelerationSensor.acceleration.value;
             }
 

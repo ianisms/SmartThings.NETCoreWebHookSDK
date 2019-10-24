@@ -20,13 +20,14 @@
 // </copyright>
 #endregion
 
-using ianisms.SmartThings.NETCoreWebHookSDK.Extensions;
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace ianisms.SmartThings.NETCoreWebHookSDK.Crypto
 {
     public enum OAuthTokenType { AccessToken, RefreshToken }
 
+    [SuppressMessage("Microsoft.Naming", "CA2211:NonConstantFieldsShouldNotBeVisible", Justification = "Can't use const with TimeSpan initialization")]
     public class Token
     {
         public static TimeSpan AccessTokenTTL = TimeSpan.FromMinutes(4.5);
@@ -36,7 +37,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Crypto
         public string TokenValue { get; set; }
         public DateTime ExpiresDT { get; set; }
 
-        public bool IsExpired 
+        public bool IsExpired
         {
             get
             {

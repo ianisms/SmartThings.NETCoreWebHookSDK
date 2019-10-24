@@ -38,7 +38,8 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Models.SmartThings
             if (isResponseStatus)
             {
                 _ = status.components.main.contactSensor.contact.value ??
-                    throw new ArgumentException("status.components.main.contactSensor.contact.value is null!", nameof(status));
+                    throw new ArgumentException("status.components.main.contactSensor.contact.value is null!",
+                    nameof(status));
                 status = status.components.main.contactSensor.contact.value;
             }
 
@@ -47,7 +48,8 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Models.SmartThings
             var state = ContactState.Unknown;
             if (!Enum.TryParse<ContactState>(val, true, out state))
             {
-                throw new ArgumentException($"ContactSensor.MotionStateFromDynamic status is an invalid value {status}", nameof(status));
+                throw new ArgumentException($"ContactSensor.MotionStateFromDynamic status is an invalid value {status}",
+                    nameof(status));
             }
             else
             {
@@ -63,7 +65,8 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Models.SmartThings
             if (status != null)
             {
                 _ = status.components.main.contactSensor.contact.value ??
-                    throw new ArgumentException("status.components.main.contactSensor.contact.value is null!", nameof(status));
+                    throw new ArgumentException("status.components.main.contactSensor.contact.value is null!",
+                    nameof(status));
                 deviceStatus = status.components.main.contactSensor.contact.value;
             }
 

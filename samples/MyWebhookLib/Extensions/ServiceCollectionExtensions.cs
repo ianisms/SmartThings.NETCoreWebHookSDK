@@ -20,7 +20,6 @@
 // </copyright>
 #endregion
 
-using ianisms.SmartThings.GreatWelcomer.Lib.WebhookHandlers;
 using ianisms.SmartThings.NETCoreWebHookSDK.Crypto;
 using ianisms.SmartThings.NETCoreWebHookSDK.Extensions;
 using ianisms.SmartThings.NETCoreWebHookSDK.Models.Config;
@@ -39,21 +38,34 @@ namespace MyWebhookLib.Extensions
     public static class ServiceCollectionExtensions
     {
         public static IServiceCollection AddMyWebhookService(this IServiceCollection services,
-            IConfiguration config)
+            IConfiguration config,
+            bool isFunctionsApp = false)
         {
             _ = config ?? throw new ArgumentNullException(nameof(config));
 
             services
                 .Configure<CryptoUtilsConfig>(config.GetSection(nameof(CryptoUtilsConfig)))
                 .Configure<SmartAppConfig>(config.GetSection(nameof(SmartAppConfig)))
+                .Configure<FileBackedConfig<FileBackedInstalledAppManager>>(config.GetSection("FileBackedInstalledAppManager.FileBackedConfig"))
+                .Configure<FileBackedConfig<FileBackedStateManager<MyState>>>(config.GetSection("FileBackedStateManager.FileBackedConfig"))
                 .AddSingleton<IConfigWebhookHandler, MyConfigWebhookHandler>()
                 .AddSingleton<IInstallUpdateWebhookHandler, MyInstallUpdateDataHandler>()
                 .AddSingleton<IUninstallWebhookHandler, MyUninstallWebhookHandler>()
                 .AddSingleton<IEventWebhookHandler, MyEventWebhookHandler>()
-                .AddInMemoryInstalledAppManager()
-                .AddSingleton<IStateManager<MyState>, InMemoryStateManager<MyState>>()
+                .AddFileBackedInstalledAppManager()
+                .AddFileBackedStateManager<MyState>()
                 .AddSingleton<IMyService, MyService>()
                 .AddWebhookHandlers();
+
+            if(isFunctionsApp)
+            {
+                services.AddInstalledAppTokenManager();
+            }
+            else
+            {
+                services.AddInstalledAppTokenManagerService();
+            }
+
             return services;
         }
     }

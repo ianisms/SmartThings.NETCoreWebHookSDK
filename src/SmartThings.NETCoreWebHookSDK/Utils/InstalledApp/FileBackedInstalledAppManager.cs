@@ -40,13 +40,15 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.InstalledApp
         public FileBackedInstalledAppManager(ILogger<IInstalledAppManager> logger,
             ISmartThingsAPIHelper smartThingsAPIHelper,
             IOptions<FileBackedConfig<FileBackedInstalledAppManager>> options)
-            : base (logger, smartThingsAPIHelper)
+            : base(logger, smartThingsAPIHelper)
         {
             _ = options ?? throw new ArgumentNullException(nameof(options));
 
             this.fileBackedConfig = options.Value;
 
-            _ = fileBackedConfig.BackingStorePath ?? throw new ArgumentException("fileBackedConfig.BackingStorePath is null", nameof(options));
+            _ = fileBackedConfig.BackingStorePath ??
+                throw new ArgumentException("fileBackedConfig.BackingStorePath is null",
+                nameof(options));
         }
 
         public override async Task LoadCacheAsync()
@@ -55,11 +57,11 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.InstalledApp
 
             if (InstalledAppCache == null)
             {
-                if(!File.Exists(fileBackedConfig.BackingStorePath))
+                if (!File.Exists(fileBackedConfig.BackingStorePath))
                 {
                     Logger.LogDebug("Backing file does not exist, initializing intsalled app cache...");
 
-                    InstalledAppCache = new Dictionary<string, Models.SmartThings.InstalledApp>();
+                    InstalledAppCache = new Dictionary<string, InstalledAppInstance>();
                 }
                 else
                 {
@@ -67,11 +69,12 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.InstalledApp
 
                     using (var reader = File.OpenText(fileBackedConfig.BackingStorePath))
                     {
-                        var encodedContent = await reader.ReadToEndAsync();
+                        var encodedContent = await reader.ReadToEndAsync().ConfigureAwait(false);
                         //var json = dataProtector.Unprotect(encodedContent);
                         var json = encodedContent;
-                        InstalledAppCache = JsonConvert.DeserializeObject<Dictionary<string, Models.SmartThings.InstalledApp>>(json,
-                            Common.JsonSerializerSettings);
+                        InstalledAppCache = JsonConvert.DeserializeObject<Dictionary<string,
+                            InstalledAppInstance>>(json,
+                            STCommon.JsonSerializerSettings);
                     }
 
                     Logger.LogDebug("Loaded installed app cache from file...");
@@ -89,7 +92,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.InstalledApp
             using (var writer = File.CreateText(fileBackedConfig.BackingStorePath))
             {
                 var json = JsonConvert.SerializeObject(InstalledAppCache,
-                    Common.JsonSerializerSettings);
+                    STCommon.JsonSerializerSettings);
                 var encodedContent = json;
                 //var encodedContent = dataProtector.Protect(json);
                 await writer.WriteAsync(encodedContent).ConfigureAwait(false);
