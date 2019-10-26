@@ -263,3 +263,5 @@ __pycache__/
 # Local only
 Keys/
 [Dd]ata/
+/src/scripts/addghpkgmgr.cmd
+/src/scripts/pushpkggithub.cmd

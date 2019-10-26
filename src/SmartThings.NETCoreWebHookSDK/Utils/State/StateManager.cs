@@ -60,8 +60,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.State
 
             Logger.LogDebug($"Getting state from cache: {installedAppId}...");
 
-            T state = default(T);
-            if (StateCache.TryGetValue(installedAppId, out state))
+            if (StateCache.TryGetValue(installedAppId, out T state))
             {
                 Logger.LogDebug($"Got state from cache: {installedAppId}...");
             }
@@ -128,8 +127,8 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.State
 
         private class Unsubscriber : IDisposable
         {
-            private IList<IObserver<string>> observers;
-            private IObserver<string> observer;
+            private readonly IList<IObserver<string>> observers;
+            private readonly IObserver<string> observer;
 
             public Unsubscriber(IList<IObserver<string>> observers, IObserver<string> observer)
             {
