@@ -4,11 +4,18 @@
 
 #### Latest NUGET
 
-[2.2.2.0-alpha](https://www.nuget.org/packages/SmartThings.NETCoreWebHookSDK/2.2.2-alpha)
+[2.2.6.0-beta](https://www.nuget.org/packages/SmartThings.NETCoreWebHookSDK/2.2.6-beta)
 
 #### General
 
 Looking at creating a version for .NET Core 3.0.  Support for 3.0 in Azure Functions is in alpha.  Will create a PoC soon.
+
+#### 2.2.6.0 - 25 October 2019
+
+- A bit of code cleanup.
+- Reved to beta.
+- Fixed some package issues.
+- Added symbols package.
 
 #### 2.2.2.0 - 24 October 2019
 
