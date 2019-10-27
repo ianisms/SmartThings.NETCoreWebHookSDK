@@ -13,7 +13,6 @@
    - Started a [branch for .NET Core 3.0](https://github.com/ianisms/SmartThings.NETCoreWebHookSDK/tree/3.0).  I'll be putting most of my attention here.  
      - As an FYI, support for 3.0 in Azure Functions is in beta.  [More Info](https://dev.to/azure/develop-azure-functions-using-net-core-3-0-gcm)
      - Once support for Azure Functions is fully released, this will be updated and become master.
-   - Created 2.2 branch which is cut from release 2.2.6.0.
 
 #### 3.0.1.0 - 25 October 2019
 
