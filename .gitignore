@@ -264,4 +264,5 @@ __pycache__/
 Keys/
 [Dd]ata/
 /src/scripts/addghpkgmgr.cmd
-/src/scripts/pushpkggithub.cmd
+/src/scripts/buildpkg.cmd
+/src/scripts/pushpkg.cmd
