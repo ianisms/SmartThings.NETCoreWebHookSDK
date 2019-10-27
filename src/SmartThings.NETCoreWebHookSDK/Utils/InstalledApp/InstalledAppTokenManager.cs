@@ -16,7 +16,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.InstalledApp
         public ILogger<IInstalledAppTokenManager> Logger { get; private set; }
         public IInstalledAppManager InstalledAppManager { get; private set; }
 
-        protected InstalledAppTokenManager(ILogger<IInstalledAppTokenManager> logger,
+        public InstalledAppTokenManager(ILogger<IInstalledAppTokenManager> logger,
             IInstalledAppManager installedAppManager)
         {
             _ = logger ?? throw new ArgumentNullException(nameof(logger));
