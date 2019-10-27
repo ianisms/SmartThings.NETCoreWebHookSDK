@@ -45,7 +45,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.State
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "StateCache needds to be visible to downstream implementers")]
         public IDictionary<string, T> StateCache { get; set; }
 
-        protected StateManager(ILogger<IStateManager<T>> logger)
+        public StateManager(ILogger<IStateManager<T>> logger)
         {
             _ = logger ?? throw new ArgumentNullException(nameof(logger));
             this.Logger = logger;
