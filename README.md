@@ -16,7 +16,7 @@
 
 #### 3.0.1.0 - 25 October 2019
 
-- Azure Functions working with 3.0.  Please look at [More Info](https://dev.to/azure/)
+- Azure Functions working with 3.0.  Please look at [this post on developing Azure Functions with NET Core 3.0](https://dev.to/azure/develop-azure-functions-using-net-core-3-0-gcm)
 
 #### 2.2.7.0 - 25 October 2019
 
