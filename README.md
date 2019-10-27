@@ -8,7 +8,9 @@
 
 #### General
 
-Looking at creating a version for .NET Core 3.0.  Support for 3.0 in Azure Functions is in alpha.  Will create a PoC soon.
+- Support for .NET Core 3.0 is underway.  Initial tests with my own smart app went great.  As an FYI, support for 3.0 in Azure Functions is in alpha.
+   - Started a branch for .NET Core 3.0.  I'll be putting most of my attention here.  If things go well, this will become master.
+   - Created 2.2 branch which is cut from release 2.2.6.0.
 
 #### 2.2.6.0 - 25 October 2019
 
