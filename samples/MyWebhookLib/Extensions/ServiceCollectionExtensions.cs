@@ -58,7 +58,7 @@ namespace MyWebhookLib.Extensions
                 .AddWebhookHandlers();
 
             if(isFunctionsApp)
-            {
+            {                
                 services.AddInstalledAppTokenManager();
             }
             else
