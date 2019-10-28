@@ -266,3 +266,4 @@ Keys/
 /src/scripts/addghpkgmgr.cmd
 /src/scripts/buildpkg.cmd
 /src/scripts/pushpkg.cmd
+/samples/scripts/startngrokpriv.cmd
