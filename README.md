@@ -10,7 +10,7 @@
 #### General
 
 - Support for .NET Core 3.0 is underway.  Initial tests with my own smart app went great.
-   - Started a [branch for .NET Core 3.0](https://github.com/ianisms/SmartThings.NETCoreWebHookSDK/tree/3.0).  I'll be putting most of my attention here.  
+   - Started a [branch for .NET Core 3.0](https://github.com/ianisms/SmartThings.NETCoreWebHookSDK/tree/3.0).  I'll be putting most of my attention here.
      - As an FYI, support for 3.0 in Azure Functions is in beta.  [More Info](https://dev.to/azure/develop-azure-functions-using-net-core-3-0-gcm)
      - Once support for Azure Functions is fully released, this will be updated and become master.
 
@@ -175,17 +175,29 @@ This SDK utilizes ```Microsoft.Extensions.DependencyInjection``` for DI as it ma
 
 ### CryptoUtilsConfig
 
-```CryptoUtilsConfig``` is used to configure the ```ICryptoUtils``` implementation used to verify the signature on the incoming requests as per the [HTTP signature verification spec](https://smartthings.developer.samsung.com/docs/smartapps/webhook-apps.html#HTTP-signature-verification).
+```CryptoUtilsConfig``` is used to configure the ```ICryptoUtils``` implementation used to verify the signature on the incoming requests as per the [HTTP signature verification spec](https://smartthings.developer.samsung.com/docs/smartapps/webhook-apps.html#HTTP-signature-verification).  The ```CryptoUtilsConfig``` should be configured with the path to a file containing the public key content you get from your sapp regitration.  For example:
 
-The properties it expects are as follows:
+```json
+  "CryptoUtilsConfig": {
+    "PublicKeyFilePath": "Keys/GWPubKey.pem"
+  },
+```
 
-| Property | Description |
-|----------------------------------------|---------------------------------------------------------------|
-| PublicKeyFilePath | The path to the public key file conatining the public key copied from the SmartApp registration. |
+```Keys/GWPubKey.pem``` in this case would contain (not a real key):
+
+```batch
+-----BEGIN PUBLIC KEY-----
+sdfssdfsfsdfsdfsdfsdf+M51NU7QaV
+542Yca7zBQ41BGLkGHPkqkmLC/+dfgdfgdfgdfgdfgdfgdfgdfgdfg
+dfgdfgdfg/dgdfg/sdfsdf/e0BPxgc9mNgGAKsRjpdEM5qvSikwIlIjdgIdK
+eMXiRpPR85r8ofrjZKzHU7ncNbcbunEFLoLaGDrKszGLQBS8xD5gGsQWsF0vhn3ErhvYC5KQfuxC
+ddgfdfgdfgdfgdfgdfgdfgdfgdfgdfgdfgdfg
+-----END PUBLIC KEY-----
+```
 
 ### SmartAppConfig
 
-The ```SmartAppConfig``` should be configured with The ```SmartAppClientId``` and ```SmartAppClientSecret``` given to you in the webhook registration on the developer portal.  This is used to, among other things, refresh the tokens for your app.  For example:
+The ```SmartAppConfig``` should be configured with the ```SmartAppClientId``` and ```SmartAppClientSecret``` given to you in the webhook registration on the developer portal.  This is used to, among other things, refresh the tokens for your app.  Example config:
 
 ```json
 "SmartAppConfig": {
@@ -575,9 +587,9 @@ public override async Task HandleUpdateDataAsync(InstalledApp installedApp,
     bool shouldSubscribeToEvents = true)
 {
     _ = installedApp ??
-    throw new ArgumentNullException(nameof(installedApp));
+        throw new ArgumentNullException(nameof(installedApp));
     _ = data ??
-    throw new ArgumentNullException(nameof(data));
+        throw new ArgumentNullException(nameof(data));
 
     logger.LogInformation($"Updating installedApp: {installedApp.InstalledAppId}...");
 
@@ -589,9 +601,9 @@ public override async Task HandleInstallDataAsync(InstalledApp installedApp,
     bool shouldSubscribeToEvents = true)
 {
     _ = installedApp ??
-    throw new ArgumentNullException(nameof(installedApp));
+        throw new ArgumentNullException(nameof(installedApp));
     _ = data ??
-    throw new ArgumentNullException(nameof(data));
+        throw new ArgumentNullException(nameof(data));
 
     logger.LogInformation($"Installing installedApp: {installedApp.InstalledAppId}...");
 
@@ -616,7 +628,7 @@ public class MyUninstallWebhookHandler : UninstallWebhookHandler
         : base(logger, installedAppManager)
     {
         _ = stateManager ??
-        throw new ArgumentNullException(nameof(stateManager));
+            throw new ArgumentNullException(nameof(stateManager));
     }
 
     public override void ValidateRequest(dynamic request)
