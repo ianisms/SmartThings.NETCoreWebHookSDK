@@ -46,7 +46,7 @@ namespace MyWebhookLib.WebhookHandlers
             }
         }");
 
-        private static readonly dynamic pageOne = JObject.Parse(@"
+        private static readonly dynamic pageOneResponse = JObject.Parse(@"
         {
             'configurationData': {
                 'page': {
@@ -96,7 +96,7 @@ namespace MyWebhookLib.WebhookHandlers
 
             return pageId switch
             {
-                "1" => pageOne,
+                "1" => pageOneResponse,
                 _ => throw new InvalidOperationException($"Unknown pageId: {request.configurationData.pageId.Value}"),
             };
         }

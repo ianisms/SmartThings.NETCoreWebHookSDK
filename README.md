@@ -10,7 +10,7 @@
 #### General
 
 - Support for .NET Core 3.0 is underway.  Initial tests with my own smart app went great.
-   - Started a [branch for .NET Core 3.0](https://github.com/ianisms/SmartThings.NETCoreWebHookSDK/tree/3.0).  I'll be putting most of my attention here.  
+   - Started a [branch for .NET Core 3.0](https://github.com/ianisms/SmartThings.NETCoreWebHookSDK/tree/3.0).  I'll be putting most of my attention here.
      - As an FYI, support for 3.0 in Azure Functions is in beta.  [More Info](https://dev.to/azure/develop-azure-functions-using-net-core-3-0-gcm)
      - Once support for Azure Functions is fully released, this will be updated and become master.
 
@@ -58,11 +58,14 @@ I'll also create a release pipeline to push to NuGet once I have something stabl
 
 This SDK is used to build a WebHook SmartApp for SmartThings using  NET Core.  For details on how to register your SmartApp and how it runs within SmartThings, please read the [SmartApp documentation](https://smartthings.developer.samsung.com/docs/smartapps/smartapp-basics.html)
 
-### DI
+### Samples
 
-This SDK utilizes ```Microsoft.Extensions.DependencyInjection``` for DI as it makes for seamless integration for ASP NET Core and Azure Functions .NET Core apps.  If you favor a different DI library, I welcome you to create a port.
+You can find samples for ASP.NET Core and Azure fuinctions in the samples directory:
 
-To add the SDK WebHook functionality to your app there are 3 steps all involving DI:
+- [.NET Core 2.2 - master branch](https://github.com/ianisms/SmartThings.NETCoreWebHookSDK/tree/master/samples)
+- [.NET Core 3.0 - 3.0 branch](https://github.com/ianisms/SmartThings.NETCoreWebHookSDK/tree/3.0/samples)
+
+### Setup Steps
 
 1. Add an instance of ```CryptoUtilsConfig``` via ```Services.Configure``` like so: ```.Configure<CryptoUtilsConfig>(config.GetSection(nameof(CryptoUtilsConfig)))```.  The details on the properties of ```CryptoUtilsConfig``` can be found [below](https://github.com/ianisms/SmartThings.NETCoreWebHookSDK/blob/master/README.md#cryptoutilsconfig).
 2. Add an instance of ```SmartAppConfig``` via ```.Configure<SmartAppConfig>(config.GetSection(nameof(SmartAppConfig)))```.    The details on the properties of ```SmartAppConfig``` can be found [below](https://github.com/ianisms/SmartThings.NETCoreWebHookSDK/blob/master/README.md#smartappconfig).
@@ -77,7 +80,7 @@ To add the SDK WebHook functionality to your app there are 3 steps all involving
 7. Add the remaining handlers via the ```ianisms.SmartThings.NETCoreWebHookSDK.Extensions.AddWebhookHandlers``` extension method using ```.AddWebhookHandlers()```.
 8. Pass the ```HttpRequest``` from your ASP.NET Core or FunctionsApp to the ```RootWebhookHandler```.
 
-A full example, DI:
+A full example:
 
 ```csharp
 public class FunctionsAppStartup : FunctionsStartup
@@ -109,7 +112,7 @@ public class FunctionsAppStartup : FunctionsStartup
 }
 ```
 
-A full example, pass ```HttpRequest``` to ```RootWebhookHandler```:
+Pass ```HttpRequest``` to ```RootWebhookHandler```:
 
 ```csharp
 public async Task<dynamic> HandleRequestAsync(HttpRequest request)
@@ -128,7 +131,47 @@ public async Task<dynamic> HandleRequestAsync(HttpRequest request)
 }
 ```
 
+### Running Locally
+
+### SmartApp Registration
+
+The details on how to test your app with SmartThings can be found in the [SmartApp documentation](https://smartthings.developer.samsung.com/docs/testing/how-to-test.html).
+
+#### ngrok
+
+To test your app with SmartThings while running the app in your environment, I reccomend using [ngrok](https://ngrok.com/product) to tunnel http / https requests to your app.
+
+To use ngrok, run the command like so:
+
+```batch
+ngrok http 5000 --host-header=localhost
+```
+
+This tells ngrok to tunnel requests via http to port 5000 on your local machine use localhost as the host header.  If your app is not running on localhost, yo can ommit the ```--host-header=localhost``` argument.
+
+The output will look something like:
+
+```batch
+ngrok by @inconshreveable                  (Ctrl+C to quit)
+
+Session Status      online
+Account             Ian N Bennett (Plan: Basic)
+Version             2.3.35
+Region              United States (us)
+Web Interface       http://127.0.0.1:4040
+Forwarding          http://36f32ad6.ngrok.io -> http://localhost:5000
+Forwarding          https://36f32ad6.ngrok.io -> http://localhost:5000
+Connections         ttl     opn     rt1     rt5     p50     p90
+                    0       0       0.00    0.00    0.00    0.00
+```
+
+You can then hit the provided public ngrok endpoint, ```https://36f32ad6.ngrok.io``` in this case, and it will tunnel the requests to your app.  This means that you would set / change your SmartApp registration details to use ```https://36f32ad6.ngrok.io```  in the uri.  In the case of the samples, the uri would be ```https://36f32ad6.ngrok.io/api/FirstWH```.
+
 ## Details
+
+### DI
+
+This SDK utilizes ```Microsoft.Extensions.DependencyInjection``` for DI as it makes for seamless integration for ASP NET Core and Azure Functions .NET Core apps.  If you favor a different DI library, I welcome you to create a port.
 
 ### CryptoUtilsConfig
 
@@ -173,11 +216,12 @@ dynamic response = JObject.Parse(@"{
 For ```Page``` you should return a ```Newtonsoft.Json.Linq dynamic JObject``` respresenting your desired conguration screens like so for a single-page configuration:
 
 ```csharp
-dynamic response = JObject.Parse(@"{
+private static readonly dynamic pageOneResponse = JObject.Parse(@"
+{
     'configurationData': {
         'page': {
             'pageId': '1',
-            'name': 'Configure The Great Welcomer',
+            'name': 'Configure My App',
             'nextPageId': null,
             'previousPageId': null,
             'complete': true,
@@ -186,7 +230,7 @@ dynamic response = JObject.Parse(@"{
                     'name': 'basics',
                     'settings' : [
                         {
-                            'id': 'appEnabled',
+                            'id': 'isAppEnabled',
                             'name': 'Enabled App?',
                             'description': 'Easy toggle to enable/disable the app',
                             'type': 'BOOLEAN',
@@ -196,10 +240,10 @@ dynamic response = JObject.Parse(@"{
                         },
                         {
                             'id': 'switches',
-                            'name': 'Light Switches',
-                            'description': 'The switches for the app to turn on/off',
+                            'name': 'Which Light Switch(es)?',
+                            'description': 'The switch(es) to turn on/off on arrival.',
                             'type': 'DEVICE',
-                            'required': true,
+                            'required': false,
                             'multiple': true,
                             'capabilities': ['switch'],
                             'permissions': ['r', 'x']
@@ -217,19 +261,140 @@ If you are using a multi-page confguration, you should look at the ```pageId``` 
 Multi-page example:
 
 ```csharp
-private dynamic PageOne()
+
+private static readonly dynamic pageOneResponse = JObject.Parse(@"
 {
-    dynamic response = JObject.Parse(@"{
+    'configurationData': {
+        'page': {
+            'pageId': '1',
+            'name': 'Basics',
+            'nextPageId': '2',
+            'previousPageId': null,
+            'complete': false,
+            'sections' : [
+                {
+                    'name': 'Basics',
+                    'settings' : [
+                        {
+                            'id': 'isAppEnabled',
+                            'name': 'Enabled App?',
+                            'description': 'Easy toggle to enable/disable the app',
+                            'type': 'BOOLEAN',
+                            'required': true,
+                            'defaultValue': true,
+                            'multiple': false
+                        },
+                        {
+                            'id': 'locks',
+                            'name': 'Which Lock(s)?',
+                            'description': 'The lock(s) that will be unlocked after arrival.',
+                            'type': 'DEVICE',
+                            'required': false,
+                            'multiple': true,
+                            'capabilities': ['lock'],
+                            'permissions': ['r', 'x']
+                        },
+                    ]
+                }
+            ]
+        }
+    }
+}");
+
+private static readonly dynamic pageTwoResponse = JObject.Parse(@"
+{
+    'configurationData': {
+        'page': {
+            'pageId': '2',
+            'name': 'Motion and Switches',
+            'nextPageId': '3',
+            'previousPageId': '1',
+            'complete': false,
+            'sections' : [
+                {
+                    'name': 'Motion',
+                    'settings' : [
+                        {
+                            'id': 'motionSensors',
+                            'name': 'Which Motion Sensor(s)?',
+                            'description': 'The motion sensor(s) that will trigger the app on presence + motion.  If empty, the presence sesnor alone will trigger the app.',
+                            'type': 'DEVICE',
+                            'required': false,
+                            'multiple': true,
+                            'capabilities': ['motionSensor'],
+                            'permissions': ['r']
+                        }
+                    ]
+                },
+                {
+                    'name': 'Switches',
+                    'settings' : [
+                        {
+                            'id': 'switches',
+                            'name': 'Which Light Switch(es)?',
+                            'description': 'The switch(es) to turn on/off on arrival.',
+                            'type': 'DEVICE',
+                            'required': false,
+                            'multiple': true,
+                            'capabilities': ['switch'],
+                            'permissions': ['r', 'x']
+                        }
+                    ],
+                }
+            ]
+        }
+    }
+}");
+
+public override dynamic Page(dynamic request)
+{
+    var pageId = request.configurationData.pageId.Value;
+
+    return pageId switch
+    {
+        "1" => pageOneResponse,
+        "2" => pageTwoResponse,
+        _ => throw new InvalidOperationException($"Unknown pageId: {request.configurationData.pageId.Value}"),
+    };
+}
+```
+
+More details on the ```CONFIGURATION``` phase can be found [here](https://smartthings.developer.samsung.com/docs/smartapps/configuration.html#Configuration).
+
+Full Example:
+
+```csharp
+public class MyConfigWebhookHandler : ConfigWebhookHandler
+{
+    public MyConfigWebhookHandler(ILogger<ConfigWebhookHandler> logger)
+        : base(logger)
+    {
+    }
+
+    private static readonly dynamic initResponse = JObject.Parse(@"
+    {
+        'configurationData': {
+            'initialize': {
+                'id': 'app',
+                'name': 'My App',
+                'permissions': ['r:devices:*','r:locations:*'],
+                'firstPageId': '1'
+            }
+        }
+    }");
+
+    private static readonly dynamic pageOneResponse = JObject.Parse(@"
+    {
         'configurationData': {
             'page': {
                 'pageId': '1',
-                'name': 'Basics',
-                'nextPageId': '2',
+                'name': 'Configure My App',
+                'nextPageId': null,
                 'previousPageId': null,
-                'complete': false,
+                'complete': true,
                 'sections' : [
                     {
-                        'name': 'Basics',
+                        'name': 'basics',
                         'settings' : [
                             {
                                 'id': 'isAppEnabled',
@@ -241,55 +406,6 @@ private dynamic PageOne()
                                 'multiple': false
                             },
                             {
-                                'id': 'locks',
-                                'name': 'Which Lock(s)?',
-                                'description': 'The lock(s) that will be unlocked after arrival.',
-                                'type': 'DEVICE',
-                                'required': false,
-                                'multiple': true,
-                                'capabilities': ['lock'],
-                                'permissions': ['r', 'x']
-                            },
-                        ]
-                    }
-                ]
-            }
-        }
-    }");
-
-    return response;
-}
-
-private dynamic PageTwo()
-{
-    dynamic response = JObject.Parse(@"{
-        'configurationData': {
-            'page': {
-                'pageId': '2',
-                'name': 'Motion and Switches',
-                'nextPageId': '3',
-                'previousPageId': '1',
-                'complete': false,
-                'sections' : [
-                    {
-                        'name': 'Motion',
-                        'settings' : [
-                            {
-                                'id': 'motionSensors',
-                                'name': 'Which Motion Sensor(s)?',
-                                'description': 'The motion sensor(s) that will trigger the app on presence + motion.  If empty, the presence sesnor alone will trigger the app.',
-                                'type': 'DEVICE',
-                                'required': false,
-                                'multiple': true,
-                                'capabilities': ['motionSensor'],
-                                'permissions': ['r']
-                            }
-                        ]
-                    },
-                    {
-                        'name': 'Switches',
-                        'settings' : [
-                            {
                                 'id': 'switches',
                                 'name': 'Which Light Switch(es)?',
                                 'description': 'The switch(es) to turn on/off on arrival.',
@@ -299,107 +415,27 @@ private dynamic PageTwo()
                                 'capabilities': ['switch'],
                                 'permissions': ['r', 'x']
                             }
-                        ],
+                        ]
                     }
                 ]
             }
         }
     }");
 
-    return response;
-}
-
-public override dynamic Page(dynamic request)
-{
-    var pageId = request.configurationData.pageId.Value;
-
-    switch (pageId)
+    public override dynamic Initialize(dynamic request)
     {
-        case "1":
-            return PageOne();
-        case "2":
-            return PageTwo();
-        default:
-            throw new InvalidOperationException($"Unknown pageId: {request.configurationData.pageId.Value}");
+        return initResponse;
     }
-}
-```
 
-More details on the ```CONFIGURATION``` phase can be found [here](https://smartthings.developer.samsung.com/docs/smartapps/configuration.html#Configuration).
-
-Full Example:
-
-```csharp
-using Microsoft.Extensions.Logging;
-using Newtonsoft.Json.Linq;
-
-namespace AzureFunctionsApp.WebhookHandlers
-{
-    public class ConfigWebhookHandler :
-        ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers.ConfigWebhookHandler
+    public override dynamic Page(dynamic request)
     {
-        public ConfigWebhookHandler(ILogger<ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers.ConfigWebhookHandler> logger) : base(logger)
+        var pageId = request.configurationData.pageId.Value;
+
+        return pageId switch
         {
-        }
-
-        public override dynamic Initialize(dynamic request)
-        {
-            dynamic response = JObject.Parse(@"{
-                'configurationData': {
-                    'initialize': {
-                        'id': 'app',
-                        'name': 'The Great Welcomer',
-                        'permissions': ['r:devices:*'],
-                        'firstPageId': '1'
-                    }
-                }
-            }");
-
-            return response;
-        }
-
-        public override dynamic Page(dynamic request)
-        {
-            dynamic response = JObject.Parse(@"{
-                'configurationData': {
-                    'page': {
-                        'pageId': '1',
-                        'name': 'Configure The Great Welcomer',
-                        'nextPageId': null,
-                        'previousPageId': null,
-                        'complete': true,
-                        'sections' : [
-                            {
-                                'name': 'basics',
-                                'settings' : [
-                                    {
-                                        'id': 'appEnabled',
-                                        'name': 'Enabled App?',
-                                        'description': 'Easy toggle to enable/disable the app',
-                                        'type': 'BOOLEAN',
-                                        'required': true,
-                                        'defaultValue': true,
-                                        'multiple': false
-                                    },
-                                    {
-                                        'id': 'switches',
-                                        'name': 'Light Switches',
-                                        'description': 'The switches for the app to turn on/off',
-                                        'type': 'DEVICE',
-                                        'required': true,
-                                        'multiple': true,
-                                        'capabilities': ['switch'],
-                                        'permissions': ['r', 'x']
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                }
-            }");
-
-            return response;
-        }
+            "1" => pageOneResponse,
+            _ => throw new InvalidOperationException($"Unknown pageId: {request.configurationData.pageId.Value}"),
+        };
     }
 }
 ```
@@ -538,8 +574,10 @@ public override async Task HandleUpdateDataAsync(InstalledApp installedApp,
     dynamic data,
     bool shouldSubscribeToEvents = true)
 {
-    _ = installedApp ?? throw new ArgumentNullException(nameof(installedApp));
-    _ = data ?? throw new ArgumentNullException(nameof(data));
+    _ = installedApp ??
+    throw new ArgumentNullException(nameof(installedApp));
+    _ = data ??
+    throw new ArgumentNullException(nameof(data));
 
     logger.LogInformation($"Updating installedApp: {installedApp.InstalledAppId}...");
 
@@ -550,13 +588,14 @@ public override async Task HandleInstallDataAsync(InstalledApp installedApp,
     dynamic data,
     bool shouldSubscribeToEvents = true)
 {
-    _ = installedApp ?? throw new ArgumentNullException(nameof(installedApp));
-    _ = data ?? throw new ArgumentNullException(nameof(data));
+    _ = installedApp ??
+    throw new ArgumentNullException(nameof(installedApp));
+    _ = data ??
+    throw new ArgumentNullException(nameof(data));
 
     logger.LogInformation($"Installing installedApp: {installedApp.InstalledAppId}...");
 
     Task.Run(() => HandleInstallUpdateDataAsync(installedApp, data, shouldSubscribeToEvents));
-}
 }
 ```
 
@@ -576,7 +615,8 @@ public class MyUninstallWebhookHandler : UninstallWebhookHandler
         IStateManager<MyState> stateManager)
         : base(logger, installedAppManager)
     {
-        _ = stateManager ?? throw new ArgumentNullException(nameof(stateManager));
+        _ = stateManager ??
+        throw new ArgumentNullException(nameof(stateManager));
     }
 
     public override void ValidateRequest(dynamic request)
