@@ -4,18 +4,19 @@
 
 #### Latest NUGET
 
-[2.2.7-beta](https://www.nuget.org/packages/SmartThings.NETCoreWebHookSDK/2.2.7-beta)
+- [2.2.7-beta](https://www.nuget.org/packages/SmartThings.NETCoreWebHookSDK/2.2.7-beta) for .NET Core 2.2 apps.
+- [3.0.1-beta](https://www.nuget.org/packages/SmartThings.NETCoreWebHookSDK/3.0.1-beta) for .NET Core 3.0 apps.
 
 #### General
 
 - Support for .NET Core 3.0 is underway.  Initial tests with my own smart app went great.
-   - Started a branch for .NET Core 3.0.  I'll be putting most of my attention here.  If things go well, this will become master.
+   - Started a [branch for .NET Core 3.0](https://github.com/ianisms/SmartThings.NETCoreWebHookSDK/tree/3.0).  I'll be putting most of my attention here.  
      - As an FYI, support for 3.0 in Azure Functions is in beta.  [More Info](https://dev.to/azure/develop-azure-functions-using-net-core-3-0-gcm)
-   - Created 2.2 branch which is cut from release 2.2.6.0.
+     - Once support for Azure Functions is fully released, this will be updated and become master.
 
 #### 3.0.1.0 - 25 October 2019
 
-- Azure Functions working with 3.0.  Please look at [More Info](https://dev.to/azure/)
+- Azure Functions working with 3.0.  Please look at [this post on developing Azure Functions with NET Core 3.0](https://dev.to/azure/develop-azure-functions-using-net-core-3-0-gcm)
 
 #### 2.2.7.0 - 25 October 2019
 
