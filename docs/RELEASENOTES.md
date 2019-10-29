@@ -9,6 +9,10 @@
 
 ## Releases
 
+### 3.0.3.0 and 2.2.9.0 - 29 October 2019
+
+- Strange packaging issue
+
 ### 3.0.2.0 and 2.2.8.0 - 29 October 2019
 
 - Fixed an issue with ```PresenceSensorFromDynamic, presenceSensorNamePattern```.  If used, it now must be passed as a string (was not working at all before).  The value can be set / gathered however you see fit.  For example, it could be set in the config and gathered via your ```InstallUpdateHandler```.

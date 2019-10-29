@@ -12,14 +12,14 @@ I will expand on the docs/README and tune the functionality once I port my favor
 
 ### Latest NUGET
 
-[2.2.8-beta](https://www.nuget.org/packages/SmartThings.NETCoreWebHookSDK/2.2.8-beta) for .NET Core 2.2 apps.
+[2.2.9-beta](https://www.nuget.org/packages/SmartThings.NETCoreWebHookSDK/2.2.9-beta) for .NET Core 2.2 apps.
 
 ```batch
-dotnet add package SmartThings.NETCoreWebHookSDK --version 2.2.8-beta
+dotnet add package SmartThings.NETCoreWebHookSDK --version 2.2.9-beta
 ```
 
-[3.0.2-beta](https://www.nuget.org/packages/SmartThings.NETCoreWebHookSDK/3.0.2-beta) for .NET Core 3.0 apps.
+[3.0.3-beta](https://www.nuget.org/packages/SmartThings.NETCoreWebHookSDK/3.0.3-beta) for .NET Core 3.0 apps.
 
 ```batch
-dotnet add package SmartThings.NETCoreWebHookSDK --version 3.0.2-beta
+dotnet add package SmartThings.NETCoreWebHookSDK --version 3.0.3-beta
 ```
