@@ -1,5 +1,1 @@
-remote_theme: pmarsceill/just-the-docs
-search_enabled: true
-heading_anchors: true
-
 theme: jekyll-theme-cayman
