@@ -1,20 +1,5 @@
 # SmartThings.NETCoreWebHookSDK
 
-## Description
-
-Currently just a first pass with 2 samples, one for ASP NET Core Web API and one for an Azure Functions HttpTrigger.  Both samples allow for a very basic WebHook based SmartApp that uses a single-page configuration to display a single section with a boolean toggle and a list of switches.  The samples also show how to subscribe to / handle events for the switches.
-
-I will expand on the docs/README and tune the functionality once I port my favorite groovy based SmartApp using this SDK.  Of course I am also happy to take on contributors.  Please use the [issues feature in the repo](https://github.com/ianisms/SmartThings.NETCoreWebHookSDK/issues) to report any issues.
-
-### Latest NUGET
-
-- [2.2.8-beta](https://www.nuget.org/packages/SmartThings.NETCoreWebHookSDK/2.2.8-beta) for .NET Core 2.2 apps.
-- [3.0.2-beta](https://www.nuget.org/packages/SmartThings.NETCoreWebHookSDK/3.0.2-beta) for .NET Core 3.0 apps.
-
-### Release Notes
-
-See [docs/RELEASENOTES.MD](https://github.com/ianisms/SmartThings.NETCoreWebHookSDK/blob/master/docs/RELEASENOTES.md)
-
 ## Getting Started
 
 ### SmartThings SmartApps
@@ -860,3 +845,5 @@ The SDK has stringly typed models for several devices which can be instantiated 
   - AirQualitySensor
   - CarbonMonoxideDetector
   - AccelerationSensor
+
+<script src="scripts/common.js"></script>
