@@ -60,19 +60,14 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Models.SmartThings
 
         public static PresenceSensor PresenceSensorFromDynamic(dynamic val,
             dynamic status = null,
-            dynamic presenceSensorNamePattern = null)
+            string presenceSensorNamePattern = null)
         {
             var label = val.label.Value;
             var friendlyName = label;
 
-            if (presenceSensorNamePattern != null &&
-                presenceSensorNamePattern[0] != null &&
-                presenceSensorNamePattern[0].stringConfig != null &&
-                presenceSensorNamePattern[0].stringConfig.value != null &&
-                presenceSensorNamePattern[0].stringConfig.Value != null)
+            if (!string.IsNullOrWhiteSpace(presenceSensorNamePattern))
             {
-                var presenceSensorNamePatternValue = presenceSensorNamePattern[0].stringConfig.Value;
-                var psnpIndex = friendlyName.IndexOf(presenceSensorNamePatternValue, StringComparison.Ordinal);
+                var psnpIndex = friendlyName.IndexOf(presenceSensorNamePattern, StringComparison.Ordinal);
                 if (psnpIndex > 0)
                 {
                     friendlyName = friendlyName.Substring(0, psnpIndex);
