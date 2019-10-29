@@ -15,16 +15,16 @@ You can find samples for ASP.NET Core and Azure fuinctions in the samples direct
 
 ### Setup Steps
 
-1. Add an instance of ```CryptoUtilsConfig``` via ```Services.Configure``` like so: ```.Configure<CryptoUtilsConfig>(config.GetSection(nameof(CryptoUtilsConfig)))```.  The details on the properties of ```CryptoUtilsConfig``` can be found [below](https://github.com/ianisms/SmartThings.NETCoreWebHookSDK/blob/master/README.md#cryptoutilsconfig).
-2. Add an instance of ```SmartAppConfig``` via ```.Configure<SmartAppConfig>(config.GetSection(nameof(SmartAppConfig)))```.    The details on the properties of ```SmartAppConfig``` can be found [below](https://github.com/ianisms/SmartThings.NETCoreWebHookSDK/blob/master/README.md#smartappconfig).
+1. Add an instance of ```CryptoUtilsConfig``` via ```Services.Configure``` like so: ```.Configure<CryptoUtilsConfig>(config.GetSection(nameof(CryptoUtilsConfig)))```.  The details on the properties of ```CryptoUtilsConfig``` can be found [below](https://ianisms.github.io/SmartThings.NETCoreWebHookSDK/#cryptoutilsconfig).
+2. Add an instance of ```SmartAppConfig``` via ```.Configure<SmartAppConfig>(config.GetSection(nameof(SmartAppConfig)))```.    The details on the properties of ```SmartAppConfig``` can be found [below](https://ianisms.github.io/SmartThings.NETCoreWebHookSDK/#smartappconfig).
 3. Add an instance of your implementation of ```ConfigWebhookHandler```, ```InstallUpdateWebhookHandler```, ```UninstallWebhookHandler``` and ```EventWebhookHandler``` via ```Services.Configure``` like in the example below.  Details on the implementation classes can be found as follows:
-   - [```ConfigWebhookHandler```](https://github.com/ianisms/SmartThings.NETCoreWebHookSDK/blob/master/README.md#configwebhookhandler-implementation)
-   - [```InstallUpdateWebhookHandler```](https://github.com/ianisms/SmartThings.NETCoreWebHookSDK/blob/master/README.md#installupdatewebhookhandler-implementation)
-   - [```UninstallWebhookHandler```](https://github.com/ianisms/SmartThings.NETCoreWebHookSDK/blob/master/README.md#uninstallwebhookhandler-implementation)
-   - [```EventWebhookHandler```](https://github.com/ianisms/SmartThings.NETCoreWebHookSDK/blob/master/README.md#eventwebhookhandler-implementation)
-4. Add an [```InstalledAppManager```](https://github.com/ianisms/SmartThings.NETCoreWebHookSDK/blob/master/README.md#installed-app-management-utils)
-5. Add a [```InstalledAppTokenManager```](https://github.com/ianisms/SmartThings.NETCoreWebHookSDK/blob/master/README.md#installed-app-token-management-utils) for either ASP.NET Core (hosted servrce) or Azure Functions (used in a timer trigger you create) to refresh your tokens periodically.
-6. Optionally add a [```StateManager```](https://github.com/ianisms/SmartThings.NETCoreWebHookSDK/blob/master/README.md#state-management-utils)
+   - [```ConfigWebhookHandler```](https://ianisms.github.io/SmartThings.NETCoreWebHookSDK/#configwebhookhandler-implementation)
+   - [```InstallUpdateWebhookHandler```](https://ianisms.github.io/SmartThings.NETCoreWebHookSDK/#installupdatewebhookhandler-implementation)
+   - [```UninstallWebhookHandler```](https://ianisms.github.io/SmartThings.NETCoreWebHookSDK/#uninstallwebhookhandler-implementation)
+   - [```EventWebhookHandler```](https://ianisms.github.io/SmartThings.NETCoreWebHookSDK/#eventwebhookhandler-implementation)
+4. Add an [```InstalledAppManager```](https://ianisms.github.io/SmartThings.NETCoreWebHookSDK/#installed-app-management-utils)
+5. Add a [```InstalledAppTokenManager```](https://ianisms.github.io/SmartThings.NETCoreWebHookSDK/#installed-app-token-management-utils) for either ASP.NET Core (hosted servrce) or Azure Functions (used in a timer trigger you create) to refresh your tokens periodically.
+6. Optionally add a [```StateManager```](https://ianisms.github.io/SmartThings.NETCoreWebHookSDK/#state-management-utils)
 7. Add the remaining handlers via the ```ianisms.SmartThings.NETCoreWebHookSDK.Extensions.AddWebhookHandlers``` extension method using ```.AddWebhookHandlers()```.
 8. Pass the ```HttpRequest``` from your ASP.NET Core or FunctionsApp to the ```RootWebhookHandler```.
 
