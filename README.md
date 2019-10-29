@@ -1,56 +1,19 @@
 # SmartThings.NETCoreWebHookSDK
 
-### RELEASE NOTES
-
-#### Latest NUGET
-
-- [2.2.7-beta](https://www.nuget.org/packages/SmartThings.NETCoreWebHookSDK/2.2.7-beta) for .NET Core 2.2 apps.
-- [3.0.1-beta](https://www.nuget.org/packages/SmartThings.NETCoreWebHookSDK/3.0.1-beta) for .NET Core 3.0 apps.
-
-#### General
-
-- Support for .NET Core 3.0 is underway.  Initial tests with my own smart app went great.
-   - Started a [branch for .NET Core 3.0](https://github.com/ianisms/SmartThings.NETCoreWebHookSDK/tree/3.0).  I'll be putting most of my attention here.
-     - As an FYI, support for 3.0 in Azure Functions is in beta.  [More Info](https://dev.to/azure/develop-azure-functions-using-net-core-3-0-gcm)
-     - Once support for Azure Functions is fully released, this will be updated and become master.
-
-#### 3.0.1.0 - 25 October 2019
-
-- Azure Functions working with 3.0.  Please look at [this post on developing Azure Functions with NET Core 3.0](https://dev.to/azure/develop-azure-functions-using-net-core-3-0-gcm)
-
-#### 2.2.7.0 - 25 October 2019
-
-- Fix for DI issue in Azure Functions Apps.
-
-#### 2.2.6.0 - 25 October 2019
-
-- A bit of code cleanup.
-- Reved to beta.
-- Fixed some package issues.
-- Added symbols package.
-
-#### 2.2.2.0 - 24 October 2019
-
-- Lots of bug fixes around token management and hosting in AZ Functions.  This forced a split in how we add token management to AZ Functions vs ASP.NET Core.  [Full details](https://github.com/ianisms/SmartThings.NETCoreWebHookSDK/blob/master/README.md#installed-app-token-management-utils).
-- Breaking change to avoid a naming conflict.  The ```InstalledApp``` model has been renamed to ```InstalledAppInstance```.  It was either that or rename the InstalledApp namespace.  I took the path of least resistance.
-- Tons of code cleanliness and CA supressions for things like exception text globalization (perhaps we will add a resource manager for the strings later).
-- Updated the samples to use the nuget package and they are fully working now.
-- Created separate solutions for the SDK and the samples.
-
-#### 2.2.1.0 - 21 October 2019
-
-- Massive updates after working on a SmartApp using the SDK.  README and samples completely updated.
-- Huge perf improvements using mostly fire-and-forget async calls to ensure the responses get back to Samsung ASAP.
-
-***
-
 ## Description
 
-Currently just a first pass with 2 samples, one for ASP NET Core Web API and one for an Azure Functions HttpTrigger.  Both samples allow for a very basic WebHook based SmartApp that uses a single-page configuration to display a single section with a boolean toggle and a list of switches.  The samples also show how to subscribe to and handle events for the switches.
+Currently just a first pass with 2 samples, one for ASP NET Core Web API and one for an Azure Functions HttpTrigger.  Both samples allow for a very basic WebHook based SmartApp that uses a single-page configuration to display a single section with a boolean toggle and a list of switches.  The samples also show how to subscribe to / handle events for the switches.
 
-I will expand on the README and tune the functionality once I port my favorite groovy based SmartApp using this SDK.  Of course I am also happy to take on contributors.  Please use the [issues feature in the repo](https://github.com/ianisms/SmartThings.NETCoreWebHookSDK/issues) to report any issues.
+I will expand on the docs/README and tune the functionality once I port my favorite groovy based SmartApp using this SDK.  Of course I am also happy to take on contributors.  Please use the [issues feature in the repo](https://github.com/ianisms/SmartThings.NETCoreWebHookSDK/issues) to report any issues.
 
-I'll also create a release pipeline to push to NuGet once I have something stable.
+### Latest NUGET
+
+- [2.2.8-beta](https://www.nuget.org/packages/SmartThings.NETCoreWebHookSDK/2.2.8-beta) for .NET Core 2.2 apps.
+- [3.0.2-beta](https://www.nuget.org/packages/SmartThings.NETCoreWebHookSDK/3.0.2-beta) for .NET Core 3.0 apps.
+
+### Release Notes
+
+See [docs/RELEASENOTES.MD](https://github.com/ianisms/SmartThings.NETCoreWebHookSDK/blob/master/docs/RELEASENOTES.md)
 
 ## Getting Started
 
