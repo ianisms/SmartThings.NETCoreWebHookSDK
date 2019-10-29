@@ -845,5 +845,3 @@ The SDK has stringly typed models for several devices which can be instantiated 
   - AirQualitySensor
   - CarbonMonoxideDetector
   - AccelerationSensor
-
-<script src="scripts/common.js"></script>
