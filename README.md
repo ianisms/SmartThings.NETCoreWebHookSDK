@@ -4,8 +4,8 @@
 
 #### Latest NUGET
 
-- [2.2.7-beta](https://www.nuget.org/packages/SmartThings.NETCoreWebHookSDK/2.2.7-beta) for .NET Core 2.2 apps.
-- [3.0.1-beta](https://www.nuget.org/packages/SmartThings.NETCoreWebHookSDK/3.0.1-beta) for .NET Core 3.0 apps.
+- [2.2.9-beta](https://www.nuget.org/packages/SmartThings.NETCoreWebHookSDK/2.2.9-beta) for .NET Core 2.2 apps.
+- [3.0.3-beta](https://www.nuget.org/packages/SmartThings.NETCoreWebHookSDK/3.0.3-beta) for .NET Core 3.0 apps.
 
 #### General
 
