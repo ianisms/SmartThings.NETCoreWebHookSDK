@@ -1,5 +1,3 @@
-# Documentation
-
 ## Getting Started
 
 ### SmartThings SmartApps
