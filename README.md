@@ -7,7 +7,7 @@ SDK for building SmartThings webhook automations using .NET Core 2.2 or .NET Cor
 - [Release Notes](https://github.com/ianisms/SmartThings.NETCoreWebHookSDK/blob/master/docs/RELEASENOTES.md)
 - [Documentation](https://ianisms.github.io/SmartThings.NETCoreWebHookSDK/)
 - [Samples for .NET Core 2.2](https://github.com/ianisms/SmartThings.NETCoreWebHookSDK/tree/master/samples)
-- [Samples for .NEt Core 3.0](https://github.com/ianisms/SmartThings.NETCoreWebHookSDK/tree/3.0/samples)
+- [Samples for .NET Core 3.0](https://github.com/ianisms/SmartThings.NETCoreWebHookSDK/tree/3.0/samples)
 
 ### Latest NUGET
 
