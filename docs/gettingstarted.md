@@ -1,3 +1,5 @@
+# Getting Started
+
 ## SmartThings SmartApps
 
 This SDK is used to build a WebHook SmartApp for SmartThings using  NET Core.  For details on how to register your SmartApp and how it runs within SmartThings, please read the [SmartApp documentation](https://smartthings.developer.samsung.com/docs/smartapps/smartapp-basics.html)
@@ -13,20 +15,20 @@ Please note: support for .NET Core 3.0 in Azure Functions is currently [in previ
 
 ## Setup Steps
 
-1. Add an instance of ```CryptoUtilsConfig``` via ```Services.Configure``` like so: ```.Configure<CryptoUtilsConfig>(config.GetSection(nameof(CryptoUtilsConfig)))```.  The details on the properties of ```CryptoUtilsConfig``` can be found [below](https://ianisms.github.io/SmartThings.NETCoreWebHookSDK/#/details?id=cryptoutilsconfig).
-2. Add an instance of ```SmartAppConfig``` via ```.Configure<SmartAppConfig>(config.GetSection(nameof(SmartAppConfig)))```.    The details on the properties of ```SmartAppConfig``` can be found [below](https://ianisms.github.io/SmartThings.NETCoreWebHookSDK/#/details?id=smartappconfig).
+1. Add an instance of ```CryptoUtilsConfig``` via ```Services.Configure``` like so: ```.Configure<CryptoUtilsConfig>(config.GetSection(nameof(CryptoUtilsConfig)))```.  The details on the properties of ```CryptoUtilsConfig``` can be found [below](CryptoUtilsConfig.md).
+2. Add an instance of ```SmartAppConfig``` via ```.Configure<SmartAppConfig>(config.GetSection(nameof(SmartAppConfig)))```.    The details on the properties of ```SmartAppConfig``` can be found [below](SmartAppConfig.md).
 3. Add an instance of your implementation of ```ConfigWebhookHandler```, ```InstallUpdateWebhookHandler```, ```UninstallWebhookHandler``` and ```EventWebhookHandler``` via ```Services.Configure``` like in the example below.  Details on the implementation classes can be found as follows:
-   - [```ConfigWebhookHandler```](https://ianisms.github.io/SmartThings.NETCoreWebHookSDK/#/details?id=configwebhookhandler-implementation)
-   - [```InstallUpdateWebhookHandler```](https://ianisms.github.io/SmartThings.NETCoreWebHookSDK/#/details?id=installupdatewebhookhandler-implementation)
-   - [```UninstallWebhookHandler```](https://ianisms.github.io/SmartThings.NETCoreWebHookSDK/#/details?id=uninstallwebhookhandler-implementation)
-   - [```EventWebhookHandler```](https://ianisms.github.io/SmartThings.NETCoreWebHookSDK/#/details?id=eventwebhookhandler-implementation)
-4. Add an [```InstalledAppManager```](https://ianisms.github.io/SmartThings.NETCoreWebHookSDK/#/details?id=installed-app-management-utils)
-5. Add a [```InstalledAppTokenManager```](https://ianisms.github.io/SmartThings.NETCoreWebHookSDK/#/details?id=installed-app-token-management-utils) for either ASP.NET Core (hosted servrce) or Azure Functions (used in a timer trigger you create) to refresh your tokens periodically.
-6. Optionally add a [```StateManager```](https://ianisms.github.io/SmartThings.NETCoreWebHookSDK/#/details?id=state-management-utils)
+   - [```ConfigWebhookHandler```](ConfigWebhookHandler.md)
+   - [```InstallUpdateWebhookHandler```](InstallUpdateWebhookHandler.md)
+   - [```UninstallWebhookHandler```](UninstallWebhookHandler.md)
+   - [```EventWebhookHandler```](EventWebhookHandler.md)
+4. Add an [```InstalledAppManager```](InstalledAppManagement.md)
+5. Add a [```InstalledAppTokenManager```](InstalledAppTokenManagement.md) for either ASP.NET Core (hosted servrce) or Azure Functions (used in a timer trigger you create) to refresh your tokens periodically.
+6. Optionally add a [```StateManager```](StateManagement.md)
 7. Add the remaining handlers via the ```ianisms.SmartThings.NETCoreWebHookSDK.Extensions.AddWebhookHandlers``` extension method using ```.AddWebhookHandlers()```.
 8. Pass the ```HttpRequest``` from your ASP.NET Core or FunctionsApp to the ```RootWebhookHandler```.
 
-A full example:
+### Example
 
 ```csharp
 public class FunctionsAppStartup : FunctionsStartup
@@ -79,13 +81,13 @@ public async Task<dynamic> HandleRequestAsync(HttpRequest request)
 
 ## Running Locally
 
-## SmartApp Registration
+### SmartApp Registration
 
 The details on how to test your app with SmartThings can be found in the [SmartApp documentation](https://smartthings.developer.samsung.com/docs/testing/how-to-test.html).
 
 ### ngrok
 
-To test your app with SmartThings while running the app in your environment, I reccomend using [ngrok](https://ngrok.com/product) to tunnel http / https requests to your app.
+To test your app with SmartThings while running the app in your environment, I recommend using [ngrok](https://ngrok.com/product) to tunnel http / https requests to your app.
 
 To use ngrok, run the command like so:
 
