@@ -9,6 +9,8 @@ You can find samples for ASP.NET Core and Azure functions in the samples directo
 - [.NET Core 2.2 - master branch](https://github.com/ianisms/SmartThings.NETCoreWebHookSDK/tree/master/samples)
 - [.NET Core 3.0 - 3.0 branch](https://github.com/ianisms/SmartThings.NETCoreWebHookSDK/tree/3.0/samples)
 
+Please note: support for .NET Core 3.0 in Azure Functions is currently [in preview](https://dev.to/azure/develop-azure-functions-using-net-core-3-0-gcm).
+
 ## Setup Steps
 
 1. Add an instance of ```CryptoUtilsConfig``` via ```Services.Configure``` like so: ```.Configure<CryptoUtilsConfig>(config.GetSection(nameof(CryptoUtilsConfig)))```.  The details on the properties of ```CryptoUtilsConfig``` can be found [below](https://ianisms.github.io/SmartThings.NETCoreWebHookSDK/#cryptoutilsconfig).
