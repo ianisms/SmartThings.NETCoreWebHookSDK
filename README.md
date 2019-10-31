@@ -4,7 +4,7 @@
 SDK for building SmartThings webhook automations using .NET Core 2.2 or .NET Core 3.0.
 
 ## Samples
-There is a sample ASP NET Core and a sample Azure Functions app.  Both samples allow for a very basic WebHook based SmartApp that uses a single-page configuration to display a single section with a boolean toggle and a list of switches.  The samples also show how to subscribe to / handle events for the switches.
+There is a sample ASP NET Core and a sample Azure Functions app sharing a common library for the core service injected via DI.  The samples allow for a basic webhook based automation that uses a single-page configuration to display a single section with a boolean toggle and a list of switches.  The samples also show how to subscribe to / handle events for the switches.
 
 For .NET Core 2.2, take a look at the [master branch](https://github.com/ianisms/SmartThings.NETCoreWebHookSDK/tree/master/samples).
 
