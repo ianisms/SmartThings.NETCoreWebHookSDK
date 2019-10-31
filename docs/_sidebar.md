@@ -1,2 +1,5 @@
 - [Getting Started](gettingstarted.md)
+- Samples
+  - For .NET Core 2.2, [master branch](https://github.com/ianisms/SmartThings.NETCoreWebHookSDK/tree/master/samples)
+  - For .NET Core 3.0, [3.0 branch](https://github.com/ianisms/SmartThings.NETCoreWebHookSDK/tree/3.0/samples)
 - [Full Details](details.md)
