@@ -8,7 +8,9 @@ Use ```InstalledAppTokenManagerService``` by injecting it into to your service c
 
 ## For Azure Functions
 
-Use ```InstalledAppTokenManager``` by injecting it into your service collection via ```services.AddInstalledAppTokenManager();```.  The ```InstalledAppTokenManager``` should be used in a timer trigger to refresh the tokens on your desired schedule.  I reccomend a schedule expression of ```0 */29 * * * *``` (29 minutes).  An example:
+Use ```InstalledAppTokenManager``` by injecting it into your service collection via ```services.AddInstalledAppTokenManager();```.  The ```InstalledAppTokenManager``` should be used in a timer trigger to refresh the tokens on your desired schedule.  I reccomend a schedule expression of ```0 */29 * * * *``` (29 minutes).
+
+### Example
 
 ```csharp
 using ianisms.SmartThings.NETCoreWebHookSDK.Utils.InstalledApp;
