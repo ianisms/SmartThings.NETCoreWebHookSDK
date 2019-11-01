@@ -9,6 +9,10 @@
 
 ## Releases
 
+### 3.0.5.0 and 2.2.12.0 - 1 November 2019
+
+- Strange packaging issue
+
 ### 3.0.4.0 and 2.2.10.0 - 1 November 2019
 
 - Allow IntalledAppTokenManagerService refresh interval to be confiurgable.  To set the interval, configure a ```InstalledAppTokenManagerConfig``` with RefreshInterval set to your desired ```TimeSpan``` and inject it via ```.Configure<InstalledAppTokenManagerConfig>(config.GetSection(nameof(InstalledAppTokenManagerConfig)))```.
