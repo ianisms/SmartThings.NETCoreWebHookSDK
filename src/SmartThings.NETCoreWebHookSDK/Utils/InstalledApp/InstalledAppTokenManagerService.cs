@@ -21,8 +21,10 @@
 #endregion
 
 using ianisms.SmartThings.NETCoreWebHookSDK.Crypto;
+using ianisms.SmartThings.NETCoreWebHookSDK.Models.Config;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -35,8 +37,9 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.InstalledApp
         private Timer refreshTimer;
 
         public InstalledAppTokenManagerService(ILogger<IInstalledAppTokenManager> logger,
-            IInstalledAppManager installedAppManager)
-            : base(logger, installedAppManager)
+            IInstalledAppManager installedAppManager,
+            IOptions<InstalledAppTokenManagerConfig> options)
+            : base(logger, installedAppManager, options)
         {
         }
 
@@ -50,7 +53,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.InstalledApp
                 },
                 null,
                 TimeSpan.Zero,
-                Token.RefreshTokenTTL.Subtract(TimeSpan.FromMinutes(1)));
+                InstalledAppTokenManagerConfig.RefreshInterval);
 
             Logger.LogDebug("InstalledAppTokenManagerService started...");
         }

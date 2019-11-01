@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using ianisms.SmartThings.NETCoreWebHookSDK.Models.Config;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using System;
 using System.Threading.Tasks;
 
@@ -8,6 +10,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.InstalledApp
     {
         ILogger<IInstalledAppTokenManager> Logger { get; }
         IInstalledAppManager InstalledAppManager { get; }
+        InstalledAppTokenManagerConfig InstalledAppTokenManagerConfig { get; }
         Task RefreshAllTokensAsync();
     }
 
@@ -15,15 +18,23 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.InstalledApp
     {
         public ILogger<IInstalledAppTokenManager> Logger { get; private set; }
         public IInstalledAppManager InstalledAppManager { get; private set; }
+        public InstalledAppTokenManagerConfig InstalledAppTokenManagerConfig { get; private set; }
 
         public InstalledAppTokenManager(ILogger<IInstalledAppTokenManager> logger,
-            IInstalledAppManager installedAppManager)
+            IInstalledAppManager installedAppManager,
+            IOptions<InstalledAppTokenManagerConfig> options)
         {
-            _ = logger ?? throw new ArgumentNullException(nameof(logger));
-            _ = installedAppManager ?? throw new ArgumentNullException(nameof(installedAppManager));
+            _ = logger ??
+                throw new ArgumentNullException(nameof(logger));
+            _ = installedAppManager ??
+                throw new ArgumentNullException(nameof(installedAppManager));
 
             this.Logger = logger;
             this.InstalledAppManager = installedAppManager;
+
+            this.InstalledAppTokenManagerConfig = 
+                options != null ? options.Value : 
+                new InstalledAppTokenManagerConfig();
         }
 
         public async Task RefreshAllTokensAsync()
