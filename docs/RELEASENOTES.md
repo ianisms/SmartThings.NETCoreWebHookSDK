@@ -9,7 +9,7 @@
 
 ## Releases
 
-### 3.0.5.0 and 2.2.12.0 - 1 November 2019
+### 3.0.5.0, 3.0.6.0 and 2.2.12.0 - 1 November 2019
 
 - Strange packaging issue
 
