@@ -1,5 +1,5 @@
 ﻿#region Copyright
-// <copyright file="SmartAppConfig.cs" company="Ian N. Bennett">
+// <copyright file="InstalledAppTokenManagerConfig.cs" company="Ian N. Bennett">
 //
 // Copyright (C) 2019 Ian N. Bennett
 // 
