@@ -11,7 +11,7 @@
     <NoWarn>1701;1702;CA1303;</NoWarn>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="SmartThings.NETCoreWebHookSDK" Version="3.0.4-beta" />
+    <PackageReference Include="SmartThings.NETCoreWebHookSDK" Version="3.0.5-beta" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="3.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="3.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="3.0.0" />
