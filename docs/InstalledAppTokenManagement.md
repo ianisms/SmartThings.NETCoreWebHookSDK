@@ -4,7 +4,15 @@ You must refresh the tokens for your app periodically.  There are two flavors of
 
 ## For ASP.NET Core
 
-Use ```InstalledAppTokenManagerService``` by injecting it into to your service collection via ```services.AddInstalledAppTokenManagerService();```.  The ```InstalledAppTokenManagerService``` (hosted service) will refresh your refresh token every 29.5 minutes if it is about to expire.
+Use ```InstalledAppTokenManagerService``` by injecting it into to your service collection via ```services.AddInstalledAppTokenManagerService();```.  The ```InstalledAppTokenManagerService``` (hosted service) will refresh your refresh token every 29.5 minutes by default if it is about to expire.  To set the interval, configure a InstalledAppTokenManagerConfig with RefreshInterval set to your desired TimeSpan and inject it via ```.Configure<InstalledAppTokenManagerConfig>(config.GetSection(nameof(InstalledAppTokenManagerConfig)))```.
+
+### Example InstalledAppTokenManagerConfig
+
+```
+"InstalledAppTokenManagerConfig": {
+    "RefreshInterval": "00:10:00"
+},
+```
 
 ## For Azure Functions
 
