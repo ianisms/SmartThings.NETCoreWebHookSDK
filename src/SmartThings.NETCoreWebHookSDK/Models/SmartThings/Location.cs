@@ -65,14 +65,12 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Models.SmartThings
         {
             InitTimeZone(dtOverride);
             return celestial.SunRise.Value;
-            //return TimeZoneInfo.ConvertTimeFromUtc(celestial.SunRise.Value, TimeZone);
         }
 
         public DateTime GetSunset(DateTime? dtOverride = null)
         {
             InitTimeZone(dtOverride);
             return celestial.SunSet.Value;
-            //return TimeZoneInfo.ConvertTimeFromUtc(celestial.SunSet.Value, TimeZone);
         }
 
         public bool IsAfterSunrise()
