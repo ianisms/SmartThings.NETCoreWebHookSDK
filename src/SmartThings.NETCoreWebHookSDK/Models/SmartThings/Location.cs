@@ -20,7 +20,7 @@
 // </copyright>
 #endregion
 
-using Innovative.SolarCalculator;
+using CoordinateSharp;
 using System;
 using TimeZoneConverter;
 
@@ -32,7 +32,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Models.SmartThings
     {
         public string Id { get; set; }
         public string Label { get; set; }
-        private SolarTimes solarTimes;
+        private Celestial celestial;
         public string CountryCode { get; set; }
         public double Latitude { get; set; }
         public double Longitude { get; set; }
@@ -42,44 +42,47 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Models.SmartThings
         public TimeZoneInfo TimeZone { get; set; }
         public string Locale { get; set; }
 
-        private void InitTimeZone()
+        private void InitTimeZone(DateTime? dtOverride = null)
         {
             if (TimeZone == null ||
-                solarTimes == null)
+                celestial == null)
             {
                 TimeZone = TZConvert.GetTimeZoneInfo(TimeZoneId);
-                solarTimes = new SolarTimes(GetCurrentTime(), Latitude, Longitude);
+
+                var dt = GetDateTimeInLocation(dtOverride);
+                celestial = Celestial.CalculateCelestialTimes(Latitude, Longitude, dt, TimeZone.GetUtcOffset(dt).TotalHours);
             }
         }
 
-        public DateTime GetCurrentTime()
+        public DateTime GetDateTimeInLocation(DateTime? dtOverride = null)
         {
-            return TimeZoneInfo.ConvertTime(DateTime.Now, TimeZone);
+            DateTime dt = dtOverride ?? DateTime.Now;
+            return TimeZoneInfo.ConvertTime(dt, TimeZone);
         }
 
 
-        public DateTime GetSunrise()
+        public DateTime GetSunrise(DateTime? dtOverride = null)
         {
-            InitTimeZone();
-            return TimeZoneInfo.ConvertTimeFromUtc(solarTimes.Sunrise.ToUniversalTime(), TimeZone);
+            InitTimeZone(dtOverride);
+            return celestial.SunRise.Value;
         }
 
-        public DateTime GetSunset()
+        public DateTime GetSunset(DateTime? dtOverride = null)
         {
-            InitTimeZone();
-            return TimeZoneInfo.ConvertTimeFromUtc(solarTimes.Sunset.ToUniversalTime(), TimeZone);
+            InitTimeZone(dtOverride);
+            return celestial.SunSet.Value;
         }
 
         public bool IsAfterSunrise()
         {
             InitTimeZone();
-            return (GetCurrentTime() > GetSunrise());
+            return (GetDateTimeInLocation() > GetSunrise());
         }
 
         public bool IsAfterSunset()
         {
             InitTimeZone();
-            return (GetCurrentTime() > GetSunset());
+            return (GetDateTimeInLocation() > GetSunset());
         }
 
         public static TemperatureScale TemperatureScaleFromDynamic(dynamic val)
