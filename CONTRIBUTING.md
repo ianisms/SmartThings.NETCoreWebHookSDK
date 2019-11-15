@@ -1,6 +1,6 @@
 # How to Contribute
 
-This project is [MIT licensed](LICENSE) and accepts contributions via
+This project is [GPL 3 licensed](LICENSE) and accepts contributions via
 GitHub pull requests.  This document outlines some of the conventions on
 development workflow, commit message formatting, contact points and other
 resources to make it easier to get your contribution accepted.
