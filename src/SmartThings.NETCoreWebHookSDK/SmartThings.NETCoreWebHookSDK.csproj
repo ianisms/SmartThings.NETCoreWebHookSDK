@@ -15,9 +15,9 @@
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <PackageTags>aspnetcore, smartthings, automation, azurefunctions</PackageTags>
-    <Version>3.0.6-beta</Version>
-    <AssemblyVersion>3.0.6.0</AssemblyVersion>
-    <FileVersion>3.0.6.0</FileVersion>
+    <Version>3.0.7-beta</Version>
+    <AssemblyVersion>3.0.7.0</AssemblyVersion>
+    <FileVersion>3.0.7.0</FileVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <NoWarn>1701;1702;CA1303</NoWarn>
@@ -27,6 +27,7 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="BouncyCastle" Version="1.8.5" />
+    <PackageReference Include="CoordinateSharp" Version="2.3.1.1" />
     <PackageReference Include="Microsoft.AspNetCore.Http.Extensions" Version="2.2.0" />
     <PackageReference Include="Microsoft.Azure.Storage.Blob" Version="11.1.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="3.0.0" />
@@ -37,6 +38,7 @@
     <PackageReference Include="Microsoft.Extensions.Http" Version="3.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="3.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
+    <PackageReference Include="TimeZoneConverter" Version="3.2.0" />
     <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.6">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
