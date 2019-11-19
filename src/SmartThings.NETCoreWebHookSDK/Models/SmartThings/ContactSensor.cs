@@ -77,5 +77,24 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Models.SmartThings
                 CurrentState = deviceStatus != null ? ContactStateFromDynamic(deviceStatus) : ContactState.Unknown
             };
         }
+
+        public override bool Equals(object obj)
+        {
+            if (!(obj is ContactSensor))
+            {
+                return false;
+            }
+
+            var targetObj = (obj as ContactSensor);
+
+            return base.Equals(obj) &&
+                this.CurrentState.Equals(targetObj.CurrentState);
+        }
+
+        public override int GetHashCode()
+        {
+            return base.GetHashCode() +
+                this.CurrentState.GetHashCode();
+        }
     }
 }

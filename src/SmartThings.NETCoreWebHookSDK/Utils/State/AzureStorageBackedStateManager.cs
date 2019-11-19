@@ -37,6 +37,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.State
     {
         private readonly AzureStorageBackedConfig<AzureStorageBackedStateManager<T>> storageBackedConfig;
         private readonly CloudStorageAccount storageAccount;
+        private readonly CloudBlobClient storageClient;
 
         public bool LoadedCacheFromStorage { get; set; } = false;
 
@@ -55,10 +56,33 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.State
             _ = this.storageBackedConfig.CacheBlobName ??
                 throw new InvalidOperationException("storageBackedConfig.CacheBlobName is null");
 
-            if (!CloudStorageAccount.TryParse(storageBackedConfig.ConnectionString, out storageAccount))
+            if (CloudStorageAccount.TryParse(storageBackedConfig.ConnectionString, out storageAccount))
+            {
+                storageClient = storageAccount.CreateCloudBlobClient();
+            }
+            else
             {
                 throw new InvalidOperationException($"Unable to initialize CloudStorageAccount with connection string: {storageBackedConfig.ConnectionString}");
             }
+        }
+
+        public AzureStorageBackedStateManager(ILogger<IStateManager<T>> logger,
+            IOptions<AzureStorageBackedConfig<AzureStorageBackedStateManager<T>>> options,
+            CloudBlobClient storageClient)
+            : base(logger)
+        {
+            _ = options ?? throw new ArgumentNullException(nameof(options));
+            _ = storageClient ??
+                throw new ArgumentNullException(nameof(storageClient));
+
+            this.storageBackedConfig = options.Value;
+
+            _ = this.storageBackedConfig.ContainerName ??
+                throw new InvalidOperationException("storageBackedConfig.ContainerName is null");
+            _ = this.storageBackedConfig.CacheBlobName ??
+                throw new InvalidOperationException("storageBackedConfig.CacheBlobName is null");
+
+            this.storageClient = storageClient;
         }
 
         public override async Task LoadCacheAsync()
@@ -71,7 +95,6 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.State
             {
                 if (StateCache == null)
                 {
-                    var storageClient = storageAccount.CreateCloudBlobClient();
                     var container = storageClient.GetContainerReference(storageBackedConfig.ContainerName);
                     await container.CreateIfNotExistsAsync().ConfigureAwait(false);
                     var cacheBlob = container.GetBlockBlobReference(storageBackedConfig.CacheBlobName);
@@ -109,7 +132,6 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.State
 
             try
             {
-                var storageClient = storageAccount.CreateCloudBlobClient();
                 var container = storageClient.GetContainerReference(storageBackedConfig.ContainerName);
                 await container.CreateIfNotExistsAsync().ConfigureAwait(false);
                 var cacheBlob = container.GetBlockBlobReference(storageBackedConfig.CacheBlobName);

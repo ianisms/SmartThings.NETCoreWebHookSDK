@@ -95,5 +95,24 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Models.SmartThings
 
             return deviceCommands;
         }
+
+        public override bool Equals(object obj)
+        {
+            if (!(obj is LightSwitch))
+            {
+                return false;
+            }
+
+            var targetObj = (obj as LightSwitch);
+
+            return base.Equals(obj) &&
+                this.CurrentState.Equals(targetObj.CurrentState);
+        }
+
+        public override int GetHashCode()
+        {
+            return base.GetHashCode() +
+                this.CurrentState.GetHashCode();
+        }
     }
 }

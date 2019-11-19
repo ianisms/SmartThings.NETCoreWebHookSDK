@@ -20,11 +20,32 @@
 // </copyright>
 #endregion
 
+using System;
+
 namespace ianisms.SmartThings.NETCoreWebHookSDK.Models.SmartThings
 {
     public abstract class BaseModel
     {
         public string Id { get; set; }
         public string Label { get; set; }
+
+        public override bool Equals(object obj)
+        {
+            if (!(obj is BaseModel))
+            {
+                return false;
+            }
+
+            var targetObj = (obj as BaseModel);
+
+            return this.Id.Equals(targetObj.Id, StringComparison.Ordinal) &&
+                this.Label.Equals(targetObj.Label, StringComparison.Ordinal);
+        }
+
+        public override int GetHashCode()
+        {
+            return this.Id.GetHashCode(StringComparison.Ordinal) +
+                this.Label.GetHashCode(StringComparison.Ordinal);
+        }
     }
 }

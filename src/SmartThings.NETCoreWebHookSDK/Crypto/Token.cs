@@ -44,5 +44,26 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Crypto
                 return ExpiresDT < DateTime.Now;
             }
         }
+
+        public override bool Equals(object obj)
+        {
+            if (!(obj is Token))
+            {
+                return false;
+            }
+
+            var targetObj = (obj as Token);
+
+            return this.TokenType.Equals(targetObj.TokenType) &&
+                this.TokenValue.Equals(targetObj.TokenValue, StringComparison.Ordinal) &&
+                this.ExpiresDT.Equals(targetObj.ExpiresDT);
+        }
+
+        public override int GetHashCode()
+        {
+            return this.TokenType.GetHashCode() +
+                this.TokenValue.GetHashCode(StringComparison.Ordinal) +
+                this.ExpiresDT.GetHashCode();
+        }
     }
 }
