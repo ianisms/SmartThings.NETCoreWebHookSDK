@@ -71,9 +71,9 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Tests
             ""timeZoneId"": ""America/New_York"",
             ""locale"": ""en""
         }",
-        "11/11/2019",
-        "11/11/2019 06:38:00",
-        "11/11/2019 16:43:00")]
+        "12/18/2019",
+        "12/18/2019 07:14:00",
+        "12/18/2019 16:32:00")]
         [InlineData(@"{
             ""locationId"": ""6b3d1909-1e1c-43ec-adc2-5f941de4fbf9"",
             ""name"": ""Home"",
@@ -85,9 +85,9 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Tests
             ""timeZoneId"": ""Europe/London"",
             ""locale"": ""en""
         }",
-        "11/11/2019",
-        "11/11/2019 07:13:00",
-        "11/11/2019 16:17:00")]
+        "12/18/2019",
+        "12/18/2019 08:02:00",
+        "12/18/2019 15:52:00")]
         public void LocationSunriseSunsetShouldBeWithinTwoMinutesOfExpected(string locJson,
             string dateVal,
             string expectedSunriseVal,
@@ -105,12 +105,9 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Tests
             var sunriseDiff = (sunrise - expectedSunrise).Duration();
             var sunsetDiff = (sunset - expectedSunset).Duration();
 
-            var sunriseCt = sunriseDiff.CompareTo(TimeSpan.FromMinutes(2));
-            var sunsetCt = sunsetDiff.CompareTo(TimeSpan.FromMinutes(2));
-
             // within 2 minutes
-            Assert.True(sunriseCt < 1);
-            Assert.True(sunsetCt < 1);
+            Assert.True(sunriseDiff.TotalMinutes < 2);
+            Assert.True(sunsetDiff.TotalMinutes < 2);
         }
     }
 }

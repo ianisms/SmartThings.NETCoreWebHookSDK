@@ -25,20 +25,13 @@ using ianisms.SmartThings.NETCoreWebHookSDK.Models.SmartThings;
 using ianisms.SmartThings.NETCoreWebHookSDK.Utils.InstalledApp;
 using ianisms.SmartThings.NETCoreWebHookSDK.Utils.SmartThings;
 using ianisms.SmartThings.NETCoreWebHookSDK.Utils.State;
-using Microsoft.Azure.Storage;
-using Microsoft.Azure.Storage.Auth;
 using Microsoft.Azure.Storage.Blob;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Internal;
 using Microsoft.Extensions.Options;
 using Moq;
-using Moq.Contrib.HttpClient;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
 using System.Threading.Tasks;
 using Xunit;
 using Xunit.Abstractions;
@@ -52,8 +45,6 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Tests
         private readonly Mock<IOptions<AzureStorageBackedConfig<AzureStorageBackedInstalledAppManager>>> mockIAOptions;
         private readonly Mock<IOptions<AzureStorageBackedConfig<AzureStorageBackedStateManager<string>>>> mockStateOptions;
         private readonly Mock<ISmartThingsAPIHelper> mockSmartThingsAPIHelper;
-        private readonly Mock<CloudBlobClient> mockIABlobClient;
-        private readonly Mock<CloudBlobClient> mockStateBlobClient;
         private readonly IInstalledAppManager installedAppManager;
         private readonly IStateManager<string> stateManager;
 
@@ -64,14 +55,12 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Tests
             mockIALogger.Setup(log => log.Log(It.IsAny<Microsoft.Extensions.Logging.LogLevel>(), It.IsAny<EventId>(), It.IsAny<object>(), null, It.IsAny<Func<object, Exception, string>>()))
                 .Callback<Microsoft.Extensions.Logging.LogLevel, EventId, object, Exception, Func<object, Exception, string>>((logLevel, e, state, ex, f) =>
                 {
-                    var formattedLog = state as FormattedLogValues;
-                    output.WriteLine($"{logLevel} logged: \"{formattedLog}\"");
+                    output.WriteLine($"{logLevel} logged: \"{state}\"");
                 });
             mockStateLogger.Setup(log => log.Log(It.IsAny<Microsoft.Extensions.Logging.LogLevel>(), It.IsAny<EventId>(), It.IsAny<object>(), null, It.IsAny<Func<object, Exception, string>>()))
                 .Callback<Microsoft.Extensions.Logging.LogLevel, EventId, object, Exception, Func<object, Exception, string>>((logLevel, e, state, ex, f) =>
                 {
-                    var formattedLog = state as FormattedLogValues;
-                    output.WriteLine($"{logLevel} logged: \"{formattedLog}\"");
+                    output.WriteLine($"{logLevel} logged: \"{state}\"");
                 });
 
             mockSmartThingsAPIHelper = new Mock<ISmartThingsAPIHelper>();
@@ -81,58 +70,18 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Tests
                     return Task.FromResult<InstalledAppInstance>(GetValidInstalledAppInstance());
                 });
 
-            var mockIABlob = new Mock<CloudBlockBlob>(new Uri("http://localhost/MyBlob"));
-            mockIABlob.Setup(b => b.ExistsAsync())
-                .Returns(() =>
-                {
-                    return Task.FromResult(true);
-                });
-            mockIABlob.Setup(b => b.DownloadTextAsync())
-                .Returns(() =>
-                {
-                    return Task.FromResult(JsonConvert.SerializeObject(GetIACache()));
-                });
-
-            var mockIAContainer = new Mock<CloudBlobContainer>(new Uri("http://localhost/MyContainer"));
-            mockIAContainer.Setup(c => c.GetBlockBlobReference(It.IsAny<string>()))
-                .Returns(mockIABlob.Object);
-
-            mockIABlobClient = new Mock<CloudBlobClient>(new Uri("http://localhost/MyCLient"), null);
-            mockIABlobClient.Setup(cbc => cbc.GetContainerReference(It.IsAny<string>()))
-                .Returns(mockIAContainer.Object);
-
-            var mockStateBlob = new Mock<CloudBlockBlob>(new Uri("http://localhost/MyBlob"));
-            mockStateBlob.Setup(b => b.ExistsAsync())
-                .Returns(() =>
-                {
-                    return Task.FromResult(true);
-                });
-            mockStateBlob.Setup(b => b.DownloadTextAsync())
-                .Returns(() =>
-                {
-                    return Task.FromResult(JsonConvert.SerializeObject(GetStateCache()));
-                });
-
-            var mockStateContainer = new Mock<CloudBlobContainer>(new Uri("http://localhost/MyContainer"));
-            mockStateContainer.Setup(c => c.GetBlockBlobReference(It.IsAny<string>()))
-                .Returns(mockStateBlob.Object);
-
-            mockStateBlobClient = new Mock<CloudBlobClient>(new Uri("http://localhost/MyCLient"), null);
-            mockStateBlobClient.Setup(cbc => cbc.GetContainerReference(It.IsAny<string>()))
-                .Returns(mockStateContainer.Object);
-
             var iaConfig = new AzureStorageBackedConfig<AzureStorageBackedInstalledAppManager>()
             {
-                CacheBlobName = "Blob",
+                CacheBlobName = "installedapps",
                 ConnectionString = "UseDevelopmentStorage=true",
-                ContainerName = "Blobs"
+                ContainerName = "smartthingssdk"
             };
 
             var stateConfig = new AzureStorageBackedConfig<AzureStorageBackedStateManager<string>>()
             {
-                CacheBlobName = "Blob",
+                CacheBlobName = "state",
                 ConnectionString = "UseDevelopmentStorage=true",
-                ContainerName = "Blobs"
+                ContainerName = "smartthingssdk"
             };
 
             mockIAOptions = new Mock<IOptions<AzureStorageBackedConfig<AzureStorageBackedInstalledAppManager>>>();
@@ -149,6 +98,10 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Tests
 
             stateManager = new AzureStorageBackedStateManager<string>(mockStateLogger.Object,
                 mockStateOptions.Object);
+
+            var installedApp = GetValidInstalledAppInstance();
+            installedAppManager.StoreInstalledAppAsync(installedApp).Wait();
+            stateManager.StoreStateAsync(installedApp.InstalledAppId, GetStateObject()).Wait();
         }
 
         private static Dictionary<string, InstalledAppInstance> iaCache;
