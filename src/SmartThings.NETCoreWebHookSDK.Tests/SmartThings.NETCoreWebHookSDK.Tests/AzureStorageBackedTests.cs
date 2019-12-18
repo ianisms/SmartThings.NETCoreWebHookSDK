@@ -74,14 +74,14 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Tests
             {
                 CacheBlobName = "installedapps",
                 ConnectionString = "UseDevelopmentStorage=true",
-                ContainerName = "smartthingssdk"
+                ContainerName = "smartthingssdktest"
             };
 
             var stateConfig = new AzureStorageBackedConfig<AzureStorageBackedStateManager<string>>()
             {
                 CacheBlobName = "state",
                 ConnectionString = "UseDevelopmentStorage=true",
-                ContainerName = "smartthingssdk"
+                ContainerName = "smartthingssdktest"
             };
 
             mockIAOptions = new Mock<IOptions<AzureStorageBackedConfig<AzureStorageBackedInstalledAppManager>>>();
@@ -102,36 +102,6 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Tests
             var installedApp = GetValidInstalledAppInstance();
             installedAppManager.StoreInstalledAppAsync(installedApp).Wait();
             stateManager.StoreStateAsync(installedApp.InstalledAppId, GetStateObject()).Wait();
-        }
-
-        private static Dictionary<string, InstalledAppInstance> iaCache;
-        private static Dictionary<string, InstalledAppInstance> GetIACache()
-        {
-            if (iaCache == null)
-            {
-                var ia = GetValidInstalledAppInstance();
-                iaCache = new Dictionary<string, InstalledAppInstance>()
-                {
-                    { ia.InstalledAppId, ia }
-                };
-            }
-
-            return iaCache;
-        }
-
-        private static Dictionary<string, object> stateCache;
-        private static Dictionary<string, object> GetStateCache()
-        {
-            if (stateCache == null)
-            {
-                var ia = GetValidInstalledAppInstance();
-                stateCache = new Dictionary<string, object>()
-                {
-                    { ia.InstalledAppId, GetStateObject() }
-                };
-            }
-
-            return stateCache;
         }
 
         private static InstalledAppInstance installedAppInstance;
@@ -212,17 +182,17 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Tests
 
         [Theory]
         [MemberData(nameof(ValidInstalledAppInstance))]
-        public async Task IARemoveInstalledAppAsync_ShouldNotError(InstalledAppInstance installedApp)
+        public async Task IAStoreInstalledAppAsyncc_ShouldNotError(InstalledAppInstance installedApp)
         {
-            await installedAppManager.LoadCacheAsync();
-            await installedAppManager.RemoveInstalledAppAsync(installedApp.InstalledAppId);
+            await installedAppManager.StoreInstalledAppAsync(installedApp);
         }
 
         [Theory]
         [MemberData(nameof(ValidInstalledAppInstance))]
-        public async Task IAStoreInstalledAppAsyncc_ShouldNotError(InstalledAppInstance installedApp)
+        public async Task IARemoveInstalledAppAsync_ShouldNotError(InstalledAppInstance installedApp)
         {
-            await installedAppManager.StoreInstalledAppAsync(installedApp);
+            await installedAppManager.LoadCacheAsync();
+            await installedAppManager.RemoveInstalledAppAsync(installedApp.InstalledAppId);
         }
 
         [Theory]
@@ -236,18 +206,18 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Tests
 
         [Theory]
         [MemberData(nameof(ValidInstalledAppInstance))]
-        public async Task StateRemoveStateAsync_ShouldNotError(InstalledAppInstance installedApp)
-        {
-            await stateManager.RemoveStateAsync(installedApp.InstalledAppId);
-        }
-
-        [Theory]
-        [MemberData(nameof(ValidInstalledAppInstance))]
         public async Task StateStoreStateAsync_ShouldNotErrorAndShouldNotify(InstalledAppInstance installedApp)
         {
             var observer = new StateObserver(mockStateLogger.Object);
             stateManager.Subscribe(observer);
             await stateManager.StoreStateAsync(installedApp.InstalledAppId, GetStateObject());
+        }
+
+        [Theory]
+        [MemberData(nameof(ValidInstalledAppInstance))]
+        public async Task StateRemoveStateAsync_ShouldNotError(InstalledAppInstance installedApp)
+        {
+            await stateManager.RemoveStateAsync(installedApp.InstalledAppId);
         }
     }
 
