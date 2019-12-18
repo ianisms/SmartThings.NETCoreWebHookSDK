@@ -2,16 +2,14 @@
 
 ## General
 
-- Support for .NET Core 3.0 is underway.  Initial tests with my own smart app went great.
-   - Started a [branch for .NET Core 3.0](https://github.com/ianisms/SmartThings.NETCoreWebHookSDK/tree/3.0).  I'll be putting most of my attention here.
-     - As an FYI, support for 3.0 in Azure Functions is in beta.  [More Info](https://dev.to/azure/develop-azure-functions-using-net-core-3-0-gcm)
-     - Once support for Azure Functions is fully released, this will be updated and become master.
+- Support for .NET Core 3.1 in Azure Functions is now GA!
+  - The 3.0 branch will become main!
 
 ## Releases
 
-### 3.0.7.0 and 2.2.14.0 - 11 November 2019
+### 3.1.0.0 - 18 December 2019
 
-- Fix for Location Sunrise, Sunset
+- Reved all 3.0 references to 3.1
 
 ### 3.0.5.0, 3.0.6.0 and 2.2.12.0 - 1 November 2019
 
