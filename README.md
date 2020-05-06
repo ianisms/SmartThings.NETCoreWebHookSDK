@@ -17,9 +17,3 @@ SDK for building SmartThings webhook automations using .NET Core 3.1.
 ```batch
 dotnet add package SmartThings.NETCoreWebHookSDK --version 3.1.1
 ```
-
-[2.2.14-beta](https://www.nuget.org/packages/SmartThings.NETCoreWebHookSDK/2.2.14-beta) for .NET Core 2.2 apps.
-
-```batch
-dotnet add package SmartThings.NETCoreWebHookSDK --version 2.2.14-beta
-```
