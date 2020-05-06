@@ -7,6 +7,10 @@
 
 ## Releases
 
+### 3.1.2.0 - 6 May 2020
+
+- Full test coverage, updates from testing, updates per changes in ST API
+
 ### 3.1.0.0 - 18 December 2019
 
 - Reved all 3.0 references to 3.1
