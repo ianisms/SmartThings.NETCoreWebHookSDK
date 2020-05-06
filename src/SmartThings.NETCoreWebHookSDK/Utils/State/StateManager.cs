@@ -32,6 +32,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.State
         ILogger<IStateManager<T>> Logger { get; }
         IList<IObserver<string>> Observers { get; }
         IDictionary<string, T> StateCache { get; }
+        Task LoadCacheAsync();
         Task<T> GetStateAsync(string installedAppId);
         Task StoreStateAsync(string installedAppId, T state);
         Task RemoveStateAsync(string installedAppId);

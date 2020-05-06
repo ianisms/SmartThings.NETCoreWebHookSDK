@@ -20,6 +20,7 @@
 // </copyright>
 #endregion
 
+using Newtonsoft.Json;
 using System;
 
 namespace ianisms.SmartThings.NETCoreWebHookSDK.Models.SmartThings
@@ -46,6 +47,11 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Models.SmartThings
         {
             return this.Id.GetHashCode(StringComparison.Ordinal) +
                 this.Label.GetHashCode(StringComparison.Ordinal);
+        }
+
+        public string ToJson()
+        {
+            return JsonConvert.SerializeObject(this);
         }
     }
 }

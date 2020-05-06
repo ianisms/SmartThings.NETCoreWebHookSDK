@@ -54,7 +54,6 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers
         public SmartAppConfig AppConfig { get; private set; }
         public IInstalledAppManager InstalledAppManager { get; private set; }
         public ISmartThingsAPIHelper SmartThingsAPIHelper { get; private set; }
-        public HttpClient HttpClient { get; private set; }
 
         public InstallUpdateWebhookHandler(ILogger<IInstallUpdateWebhookHandler> logger,
             IOptions<SmartAppConfig> options,

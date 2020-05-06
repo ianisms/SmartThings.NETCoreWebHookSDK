@@ -24,7 +24,6 @@ using ianisms.SmartThings.NETCoreWebHookSDK.Models.Config;
 using ianisms.SmartThings.NETCoreWebHookSDK.Models.SmartThings;
 using ianisms.SmartThings.NETCoreWebHookSDK.Utils.SmartThings;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Internal;
 using Microsoft.Extensions.Options;
 using Moq;
 using Moq.Contrib.HttpClient;
@@ -51,12 +50,19 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Tests
         public SmartThingsAPIHelperTests(ITestOutputHelper output)
         {
             mockLogger = new Mock<ILogger<ISmartThingsAPIHelper>>();
-            mockLogger.Setup(log => log.Log(It.IsAny<LogLevel>(), It.IsAny<EventId>(), It.IsAny<object>(), null, It.IsAny<Func<object, Exception, string>>()))
-                .Callback<LogLevel, EventId, object, Exception, Func<object, Exception, string>>((logLevel, e, state, ex, f) =>
-                {
-                    var formattedLog = state as FormattedLogValues;
-                    output.WriteLine($"{logLevel} logged: \"{formattedLog}\"");
-                });
+            mockLogger.Setup(log => log.Log(It.IsAny<LogLevel>(),
+                It.IsAny<EventId>(),
+                It.IsAny<object>(),
+                null,
+                It.IsAny<Func<object, Exception, string>>()))
+                .Callback<LogLevel,
+                    EventId,
+                    object,
+                    Exception,
+                    Func<object, Exception, string>>((logLevel, e, state, ex, f) =>
+                    {
+                        output.WriteLine($"{logLevel} logged: \"{state}\"");
+                    });
 
             var smartAppConfig = new SmartAppConfig()
             {

@@ -41,6 +41,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers
     {
         public ILogger<IRootWebhookHandler> Logger { get; private set; }
         private readonly IPingWebhookHandler pingHandler;
+        private readonly IConfirmationWebhookHandler confirmationHandler;
         private readonly IConfigWebhookHandler configHandler;
         private readonly IInstallUpdateWebhookHandler installUpdateHandler;
         private readonly IEventWebhookHandler eventHandler;
@@ -50,6 +51,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers
 
         public RootWebhookHandler(ILogger<IRootWebhookHandler> logger,
             IPingWebhookHandler pingHandler,
+            IConfirmationWebhookHandler confirmationHandler,
             IConfigWebhookHandler configHandler,
             IInstallUpdateWebhookHandler installUpdateHandler,
             IEventWebhookHandler eventHandler,
@@ -59,6 +61,8 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers
         {
             _ = logger ??
                 throw new ArgumentNullException(nameof(logger));
+            _ = confirmationHandler ??
+                throw new ArgumentNullException(nameof(confirmationHandler));
             _ = pingHandler ??
                 throw new ArgumentNullException(nameof(pingHandler));
             _ = configHandler ??
@@ -75,6 +79,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers
                 throw new ArgumentNullException(nameof(cryptoUtils));
 
             this.Logger = logger;
+            this.confirmationHandler = confirmationHandler;
             this.pingHandler = pingHandler;
             this.configHandler = configHandler;
             this.installUpdateHandler = installUpdateHandler;
@@ -113,6 +118,8 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers
                 {
                     case Lifecycle.Ping:
                         return pingHandler.HandleRequest(data);
+                    case Lifecycle.Confirmation:
+                        return await confirmationHandler.HandleRequestAsync(data);
                     case Lifecycle.Configuration:
                         await CheckAuthAsync(request).ConfigureAwait(false);
                         return configHandler.HandleRequest(data);

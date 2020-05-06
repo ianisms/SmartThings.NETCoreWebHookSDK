@@ -25,7 +25,7 @@ using Newtonsoft.Json.Serialization;
 
 namespace ianisms.SmartThings.NETCoreWebHookSDK.Models.SmartThings
 {
-    public enum Lifecycle { Ping, Configuration, Install, Update, Event, Uninstall, Oauthcallback, Unknown }
+    public enum Lifecycle { Ping, Confirmation, Configuration, Install, Update, Event, Uninstall, Oauthcallback, Unknown }
 
     public static class STCommon
     {
