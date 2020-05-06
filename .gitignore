@@ -267,3 +267,4 @@ Keys/
 /src/scripts/buildpkg.cmd
 /src/scripts/pushpkg.cmd
 /samples/scripts/startngrokpriv.cmd
+scripts/
