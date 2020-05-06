@@ -43,7 +43,9 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.InstalledApp
         Task RefreshAllInstalledAppTokensAsync();
     }
 
+#pragma warning disable CA1012 // Abstract types should not have constructors
     public abstract class InstalledAppManager : IInstalledAppManager
+#pragma warning restore CA1012 // Abstract types should not have constructors
     {
         public ILogger<IInstalledAppManager> Logger { get; private set; }
         public ISmartThingsAPIHelper SmartThingsAPIHelper { get; private set; }

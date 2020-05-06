@@ -8,11 +8,7 @@ This SDK is used to build a WebHook SmartApp for SmartThings using  NET Core.  F
 
 You can find samples for ASP.NET Core and Azure functions in the samples directory:
 
-- [.NET Core 2.2 - master branch](https://github.com/ianisms/SmartThings.NETCoreWebHookSDK/tree/master/samples)
-- [.NET Core 3.0 - 3.0 branch](https://github.com/ianisms/SmartThings.NETCoreWebHookSDK/tree/3.0/samples)
-
-> [!NOTE]
-> Support for .NET Core 3.0 in Azure Functions is currently [in preview](https://dev.to/azure/develop-azure-functions-using-net-core-3-0-gcm).
+- [.NET Core 3.1](https://github.com/ianisms/SmartThings.NETCoreWebHookSDK/tree/master/samples)
 
 ## Setup Steps
 
