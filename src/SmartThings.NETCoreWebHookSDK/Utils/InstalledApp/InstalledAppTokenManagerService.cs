@@ -95,8 +95,11 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.InstalledApp
                 // and unmanaged resources.
                 if (disposing)
                 {
-                    // Dispose managed resources.
-                    refreshTimer.Dispose();
+                    if (refreshTimer != null)
+                    {
+                        // Dispose managed resources.
+                        refreshTimer.Dispose();
+                    }
                 }
 
                 // Note disposing has been done.
