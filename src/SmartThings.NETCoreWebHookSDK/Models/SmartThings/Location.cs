@@ -116,5 +116,38 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Models.SmartThings
                 Locale = val.locale.Value
             };
         }
+
+        public override bool Equals(object obj)
+        {
+            if(!(obj is Location))
+            {
+                return false;
+            }
+
+            var targetLoc = (obj as Location);
+
+            return this.Id.Equals(targetLoc.Id, StringComparison.Ordinal) &&
+                this.CountryCode.Equals(targetLoc.CountryCode, StringComparison.Ordinal) &&
+                this.Label.Equals(targetLoc.Label, StringComparison.Ordinal) &&
+                this.Latitude.Equals(targetLoc.Latitude) &&
+                this.Locale.Equals(targetLoc.Locale, StringComparison.Ordinal) &&
+                this.Longitude.Equals(targetLoc.Longitude) &&
+                this.RegionRadius.Equals(targetLoc.RegionRadius) &&
+                this.TempScale.Equals(targetLoc.TempScale) &&
+                this.TimeZoneId.Equals(targetLoc.TimeZoneId, StringComparison.Ordinal);
+        }
+
+        public override int GetHashCode()
+        {
+            return this.Id.GetHashCode(StringComparison.Ordinal) +
+                this.CountryCode.GetHashCode(StringComparison.Ordinal) +
+                this.Label.GetHashCode(StringComparison.Ordinal) +
+                this.Latitude.GetHashCode() +
+                this.Locale.GetHashCode(StringComparison.Ordinal) +
+                this.Longitude.GetHashCode() +
+                this.RegionRadius.GetHashCode() +
+                this.TempScale.GetHashCode() +
+                this.TimeZoneId.GetHashCode(StringComparison.Ordinal);
+        }
     }
 }

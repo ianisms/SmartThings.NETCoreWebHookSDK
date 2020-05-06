@@ -63,9 +63,6 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers
             _ = request.uninstallData ??
                 throw new ArgumentException("request.uninstallData is null",
                     nameof(request));
-            _ = request.uninstallData.authToken ??
-                throw new ArgumentException("request.uninstallData.authToken is null",
-                    nameof(request));
             _ = request.uninstallData.installedApp ??
                 throw new ArgumentException("request.uninstallData.installedApp is null",
                     nameof(request));
@@ -78,9 +75,6 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers
             _ = request.uninstallData.installedApp.config ??
                 throw new ArgumentException("request.uninstallData.installedApp.config is null",
                     nameof(request));
-            _ = request.uninstallData.events ??
-                throw new ArgumentException("request.uninstallData.events is null",
-                    nameof(request));
         }
 
         public virtual async Task<dynamic> HandleRequestAsync(dynamic request)
@@ -91,9 +85,9 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers
 
             await HandleUninstallDataAsync(request.uninstallData);
 
-            var installedAppId = request.uninstallData.installedApp.installedAppId;
+            var installedAppId = (string)request.uninstallData.installedApp.installedAppId;
 
-            await InstalledAppManager.RemoveInstalledAppAsync(installedAppId);
+            await InstalledAppManager.RemoveInstalledAppAsync(installedAppId).ConfigureAwait(false);
 
             dynamic response = new JObject();
 

@@ -26,6 +26,7 @@ using ianisms.SmartThings.NETCoreWebHookSDK.Utils.State;
 using ianisms.SmartThings.NETCoreWebHookSDK.Utils.InstalledApp;
 using ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers;
 using Microsoft.Extensions.DependencyInjection;
+using System.IO.Abstractions;
 
 namespace ianisms.SmartThings.NETCoreWebHookSDK.Extensions
 {
@@ -35,6 +36,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Extensions
         {
             services
                 .AddSingleton<IPingWebhookHandler, PingWebhookHandler>()
+                .AddSingleton<IConfirmationWebhookHandler, ConfirmationWebhookHandler>()
                 .AddSingleton<IOAuthWebhookHandler, OAuthWebhookHandler>()
                 .AddSingleton<ICryptoUtils, CryptoUtils>()
                 .AddSingleton<ISmartThingsAPIHelper, SmartThingsAPIHelper>()
@@ -60,6 +62,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Extensions
         public static IServiceCollection AddFileBackedInstalledAppManager(this IServiceCollection services)
         {
             services
+                .AddSingleton<IFileSystem, FileSystem>()
                 .AddSingleton<IInstalledAppManager, FileBackedInstalledAppManager>();
             return services;
         }
@@ -74,6 +77,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Extensions
         public static IServiceCollection AddFileBackedStateManager<T>(this IServiceCollection services)
         {
             services
+                .AddSingleton<IFileSystem, FileSystem>()
                 .AddSingleton<IStateManager<T>, FileBackedStateManager<T>>();
             return services;
         }

@@ -92,5 +92,24 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Models.SmartThings
                 FriendlyName = friendlyName
             };
         }
+
+        public override bool Equals(object obj)
+        {
+            if (!(obj is PresenceSensor))
+            {
+                return false;
+            }
+
+            var targetObj = (obj as PresenceSensor);
+
+            return base.Equals(obj) &&
+                this.CurrentState.Equals(targetObj.CurrentState);
+        }
+
+        public override int GetHashCode()
+        {
+            return base.GetHashCode() +
+                this.CurrentState.GetHashCode();
+        }
     }
 }

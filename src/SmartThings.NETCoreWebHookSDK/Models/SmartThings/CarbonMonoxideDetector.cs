@@ -77,5 +77,24 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Models.SmartThings
                 CurrentState = deviceStatus != null ? CarbonMonoxideStateFromDynamic(deviceStatus) : CarbonMonoxideState.Unknown
             };
         }
+
+        public override bool Equals(object obj)
+        {
+            if (!(obj is CarbonMonoxideDetector))
+            {
+                return false;
+            }
+
+            var targetObj = (obj as CarbonMonoxideDetector);
+
+            return base.Equals(obj) &&
+                this.CurrentState.Equals(targetObj.CurrentState);
+        }
+
+        public override int GetHashCode()
+        {
+            return base.GetHashCode() +
+                this.CurrentState.GetHashCode();
+        }
     }
 }

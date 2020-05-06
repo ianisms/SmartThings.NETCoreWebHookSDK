@@ -36,6 +36,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.IO.Abstractions.TestingHelpers;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -44,19 +45,17 @@ using Xunit.Abstractions;
 
 namespace ianisms.SmartThings.NETCoreWebHookSDK.Tests
 {
-    public class AzureStorageBackedTests
+    public class FileBackedTests
     {
         private readonly Mock<ILogger<IInstalledAppManager>> mockIALogger;
         private readonly Mock<ILogger<IStateManager<string>>> mockStateLogger;
-        private readonly Mock<IOptions<AzureStorageBackedConfig<AzureStorageBackedInstalledAppManager>>> mockIAOptions;
-        private readonly Mock<IOptions<AzureStorageBackedConfig<AzureStorageBackedStateManager<string>>>> mockStateOptions;
+        private readonly Mock<IOptions<FileBackedConfig<FileBackedInstalledAppManager>>> mockIAOptions;
+        private readonly Mock<IOptions<FileBackedConfig<FileBackedStateManager<string>>>> mockStateOptions;
         private readonly Mock<ISmartThingsAPIHelper> mockSmartThingsAPIHelper;
-        private readonly Mock<CloudBlobClient> mockIABlobClient;
-        private readonly Mock<CloudBlobClient> mockStateBlobClient;
         private readonly IInstalledAppManager installedAppManager;
         private readonly IStateManager<string> stateManager;
 
-        public AzureStorageBackedTests(ITestOutputHelper output)
+        public FileBackedTests(ITestOutputHelper output)
         {
             mockIALogger = new Mock<ILogger<IInstalledAppManager>>();
             mockStateLogger = new Mock<ILogger<IStateManager<string>>>();
@@ -94,80 +93,42 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Tests
                     return Task.FromResult<InstalledAppInstance>(CommonUtils.GetValidInstalledAppInstance());
                 });
 
-            var mockIABlob = new Mock<CloudBlockBlob>(new Uri("http://localhost/MyBlob"));
-            mockIABlob.Setup(b => b.ExistsAsync())
-                .Returns(() =>
-                {
-                    return Task.FromResult(true);
-                });
-            mockIABlob.Setup(b => b.DownloadTextAsync())
-                .Returns(() =>
-                {
-                    return Task.FromResult(JsonConvert.SerializeObject(CommonUtils.GetIACache()));
-                });
-
-            var mockIAContainer = new Mock<CloudBlobContainer>(new Uri("http://localhost/MyContainer"));
-            mockIAContainer.Setup(c => c.GetBlockBlobReference(It.IsAny<string>()))
-                .Returns(mockIABlob.Object);
-
-            mockIABlobClient = new Mock<CloudBlobClient>(new Uri("http://localhost/MyCLient"), null);
-            mockIABlobClient.Setup(cbc => cbc.GetContainerReference(It.IsAny<string>()))
-                .Returns(mockIAContainer.Object);
-
-            var mockStateBlob = new Mock<CloudBlockBlob>(new Uri("http://localhost/MyBlob"));
-            mockStateBlob.Setup(b => b.ExistsAsync())
-                .Returns(() =>
-                {
-                    return Task.FromResult(true);
-                });
-            mockStateBlob.Setup(b => b.DownloadTextAsync())
-                .Returns(() =>
-                {
-                    return Task.FromResult(JsonConvert.SerializeObject(CommonUtils.GetStateCache()));
-                });
-
-            var mockStateContainer = new Mock<CloudBlobContainer>(new Uri("http://localhost/MyContainer"));
-            mockStateContainer.Setup(c => c.GetBlockBlobReference(It.IsAny<string>()))
-                .Returns(mockStateBlob.Object);
-
-            mockStateBlobClient = new Mock<CloudBlobClient>(new Uri("http://localhost/MyCLient"), null);
-            mockStateBlobClient.Setup(cbc => cbc.GetContainerReference(It.IsAny<string>()))
-                .Returns(mockStateContainer.Object);
-
-            var iaConfig = new AzureStorageBackedConfig<AzureStorageBackedInstalledAppManager>()
+            var iaConfig = new FileBackedConfig<FileBackedInstalledAppManager>()
             {
-                CacheBlobName = "Blob",
-                ConnectionString = "ConnString",
-                ContainerName = "Blobs"
+                BackingStorePath = "data/ia.store"
             };
 
-            var stateConfig = new AzureStorageBackedConfig<AzureStorageBackedStateManager<string>>()
+            var stateConfig = new FileBackedConfig<FileBackedStateManager<string>>()
             {
-                CacheBlobName = "Blob",
-                ConnectionString = "ConnString",
-                ContainerName = "Blobs"
+                BackingStorePath = "data/state.store"
             };
 
-            mockIAOptions = new Mock<IOptions<AzureStorageBackedConfig<AzureStorageBackedInstalledAppManager>>>();
+            mockIAOptions = new Mock<IOptions<FileBackedConfig<FileBackedInstalledAppManager>>>();
             mockIAOptions.Setup(opt => opt.Value)
                 .Returns(iaConfig);
 
-            mockStateOptions = new Mock<IOptions<AzureStorageBackedConfig<AzureStorageBackedStateManager<string>>>>();
+            mockStateOptions = new Mock<IOptions<FileBackedConfig<FileBackedStateManager<string>>>>();
             mockStateOptions.Setup(opt => opt.Value)
                 .Returns(stateConfig);
 
-            installedAppManager = new AzureStorageBackedInstalledAppManager(mockIALogger.Object,
+            var mockIAFileData = new MockFileData(JsonConvert.SerializeObject(CommonUtils.GetIACache()));
+
+            var mockStateFileData = new MockFileData(JsonConvert.SerializeObject(CommonUtils.GetStateCache()));
+
+            var mockFileSystem = new MockFileSystem();
+
+            mockFileSystem.AddFile("data/ia.store", mockIAFileData);
+
+            mockFileSystem.AddFile("data/state.store", mockStateFileData);
+
+            installedAppManager = new FileBackedInstalledAppManager(mockIALogger.Object,
                 mockSmartThingsAPIHelper.Object,
                 mockIAOptions.Object,
-                mockIABlobClient.Object);
+                mockFileSystem);
 
-            installedAppManager.LoadCacheAsync().Wait();
-
-            stateManager = new AzureStorageBackedStateManager<string>(mockStateLogger.Object,
+            stateManager = new FileBackedStateManager<string>(mockStateLogger.Object,
                 mockStateOptions.Object,
-                mockStateBlobClient.Object);
-
-            stateManager.LoadCacheAsync().Wait();
+                mockFileSystem);
         }
 
         public static IEnumerable<object[]> ValidInstalledAppInstance()

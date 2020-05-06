@@ -49,5 +49,24 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Models.SmartThings
                 CurrentValue = deviceStatus != null ? int.Parse(deviceStatus.Value) : -1
             };
         }
+
+        public override bool Equals(object obj)
+        {
+            if (!(obj is AirQualitySensor))
+            {
+                return false;
+            }
+
+            var targetObj = (obj as AirQualitySensor);
+
+            return base.Equals(obj) &&
+                this.CurrentValue.Equals(targetObj.CurrentValue);
+        }
+
+        public override int GetHashCode()
+        {
+            return base.GetHashCode() +
+                this.CurrentValue.GetHashCode();
+        }
     }
 }

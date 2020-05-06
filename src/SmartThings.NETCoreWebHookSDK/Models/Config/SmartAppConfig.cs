@@ -26,5 +26,6 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Models.Config
     {
         public string SmartAppClientId { get; set; } = null;
         public string SmartAppClientSecret { get; set; } = null;
+        public string PAT { get; set; } = null;
     }
 }

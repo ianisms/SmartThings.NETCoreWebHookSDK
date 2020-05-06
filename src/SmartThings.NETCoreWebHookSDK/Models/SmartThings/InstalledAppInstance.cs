@@ -70,5 +70,28 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Models.SmartThings
                 };
             }
         }
+
+        public override bool Equals(object obj)
+        {
+            if (!(obj is InstalledAppInstance))
+            {
+                return false;
+            }
+
+            var targetObj = (obj as InstalledAppInstance);
+
+            return this.InstalledAppId.Equals(targetObj.InstalledAppId, StringComparison.Ordinal) &&
+                this.AccessToken.Equals(targetObj.AccessToken) &&
+                this.RefreshToken.Equals(targetObj.RefreshToken) &&
+                this.InstalledLocation.Equals(targetObj.InstalledLocation);
+        }
+
+        public override int GetHashCode()
+        {
+            return this.InstalledAppId.GetHashCode(StringComparison.Ordinal) +
+                this.AccessToken.GetHashCode() +
+                this.RefreshToken.GetHashCode() +
+                this.InstalledLocation.GetHashCode();
+        }
     }
 }

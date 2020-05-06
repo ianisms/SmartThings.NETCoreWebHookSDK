@@ -29,6 +29,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Abstractions;
 using System.Threading.Tasks;
 
 namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.InstalledApp
@@ -36,15 +37,19 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.InstalledApp
     public class FileBackedInstalledAppManager : InstalledAppManager
     {
         private readonly FileBackedConfig<FileBackedInstalledAppManager> fileBackedConfig;
+        private readonly IFileSystem fileSystem;
 
         public FileBackedInstalledAppManager(ILogger<IInstalledAppManager> logger,
             ISmartThingsAPIHelper smartThingsAPIHelper,
-            IOptions<FileBackedConfig<FileBackedInstalledAppManager>> options)
+            IOptions<FileBackedConfig<FileBackedInstalledAppManager>> options,
+            IFileSystem fileSystem)
             : base(logger, smartThingsAPIHelper)
         {
             _ = options ?? throw new ArgumentNullException(nameof(options));
+            _ = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
 
             this.fileBackedConfig = options.Value;
+            this.fileSystem = fileSystem;
 
             _ = fileBackedConfig.BackingStorePath ??
                 throw new ArgumentException("fileBackedConfig.BackingStorePath is null",
@@ -57,7 +62,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.InstalledApp
 
             if (InstalledAppCache == null)
             {
-                if (!File.Exists(fileBackedConfig.BackingStorePath))
+                if (!fileSystem.File.Exists(fileBackedConfig.BackingStorePath))
                 {
                     Logger.LogDebug("Backing file does not exist, initializing intsalled app cache...");
 
@@ -67,7 +72,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.InstalledApp
                 {
                     Logger.LogDebug("Backing file exists, loading installed app cache from file...");
 
-                    using (var reader = File.OpenText(fileBackedConfig.BackingStorePath))
+                    using (var reader = fileSystem.File.OpenText(fileBackedConfig.BackingStorePath))
                     {
                         var encodedContent = await reader.ReadToEndAsync().ConfigureAwait(false);
                         //var json = dataProtector.Unprotect(encodedContent);
@@ -87,9 +92,9 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.InstalledApp
         {
             Logger.LogDebug("Saving installed app cache...");
 
-            Directory.CreateDirectory(Path.GetDirectoryName(fileBackedConfig.BackingStorePath));
+            Directory.CreateDirectory(fileSystem.Path.GetDirectoryName(fileBackedConfig.BackingStorePath));
 
-            using (var writer = File.CreateText(fileBackedConfig.BackingStorePath))
+            using (var writer = fileSystem.File.CreateText(fileBackedConfig.BackingStorePath))
             {
                 var json = JsonConvert.SerializeObject(InstalledAppCache,
                     STCommon.JsonSerializerSettings);
