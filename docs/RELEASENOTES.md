@@ -1,10 +1,5 @@
 # Release Notes
 
-## General
-
-- Support for .NET Core 3.1 in Azure Functions is now GA!
-  - The 3.0 branch will become main!
-
 ## Releases
 
 ### 3.1.2.0 - 6 May 2020
