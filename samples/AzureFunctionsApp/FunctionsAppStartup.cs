@@ -1,7 +1,7 @@
 ﻿#region Copyright
 // <copyright file="FunctionsAppStartup.cs" company="Ian N. Bennett">
 //
-// Copyright (C) 2019 Ian N. Bennett
+// Copyright (C) 2020 Ian N. Bennett
 // 
 // This file is part of SmartThings.NETCoreWebHookSDK
 //
