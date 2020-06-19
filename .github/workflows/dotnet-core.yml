@@ -18,7 +18,7 @@ jobs:
       with:
         dotnet-version: 3.1.101
     - name: Install dependencies
-      run: dotnet restore
+      run: dotnet restore src/SmartThings.NETCoreWebHookSDK/SmartThings.NETCoreWebHookSDK.csproj
     - name: Build
       run: dotnet build src/SmartThings.NETCoreWebHookSDK/SmartThings.NETCoreWebHookSDK.csproj --configuration Release --no-restore
     - name: Test
