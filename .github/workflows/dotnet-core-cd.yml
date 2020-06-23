@@ -17,18 +17,13 @@ jobs:
       with:
         dotnet-version: 3.1.101
     - name: Install dependencies
-      run: dotnet restore src/SmartThings.NETCoreWebHookSDK/SmartThings.NETCoreWebHookSDK.csproj
+      run: dotnet restore src/SmartThings.NETCoreWebHookSDK.sln
     - name: Build
-      run: dotnet build src/SmartThings.NETCoreWebHookSDK/SmartThings.NETCoreWebHookSDK.csproj
+      run: dotnet build src/SmartThings.NETCoreWebHookSDK.sln
         --configuration Release
         --no-restore
     - name: Test
-      run: dotnet test src/SmartThings.NETCoreWebHookSDK.Tests/SmartThings.NETCoreWebHookSDK.Tests/SmartThings.NETCoreWebHookSDK.Tests.csproj
-        --no-restore
-        --verbosity normal
-    - name: Build Nuget Package
-      run: dotnet pack src/SmartThings.NETCoreWebHookSDK/SmartThings.NETCoreWebHookSDK.csproj
-        --configuration Release
+      run: dotnet test src/SmartThings.NETCoreWebHookSDK.sln
         --no-restore
     - name: Publish Nuget Package
       run: dotnet nuget push src/SmartThings.NETCoreWebHookSDK/bin/Release/*.nupkg
