@@ -2,6 +2,10 @@
 
 ## Releases
 
+### 3.1.4.0 - 23 June 2020
+
+- Package build and deployment via Github Actions
+
 ### 3.1.2.0 - 6 May 2020
 
 - Full test coverage, updates from testing, updates per changes in ST API
