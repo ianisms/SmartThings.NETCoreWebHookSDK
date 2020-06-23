@@ -1,5 +1,7 @@
 # SmartThings.NETCoreWebHookSDK
 
+![.NET Core](https://github.com/ianisms/SmartThings.NETCoreWebHookSDK/workflows/.NET%20Core/badge.svg)
+
 ## Description
 
 SDK for building SmartThings webhook automations using .NET Core 3.1.
@@ -12,8 +14,8 @@ SDK for building SmartThings webhook automations using .NET Core 3.1.
 
 ### Latest NUGET
 
-[3.1.2](https://www.nuget.org/packages/SmartThings.NETCoreWebHookSDK/3.1.2) for .NET Core 3.1 apps.
+[3.1.3](https://www.nuget.org/packages/SmartThings.NETCoreWebHookSDK/3.1.3) for .NET Core 3.1 apps.
 
 ```batch
-dotnet add package SmartThings.NETCoreWebHookSDK --version 3.1.2
+dotnet add package SmartThings.NETCoreWebHookSDK --version 3.1.3
 ```
