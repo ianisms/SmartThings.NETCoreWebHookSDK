@@ -63,6 +63,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.InstalledApp
 
         public override async Task LoadCacheAsync()
         {
+            throw new Exception("Testing test");
             Logger.LogDebug("Loading installed app cache...");
 
             if (InstalledAppCache == null)
