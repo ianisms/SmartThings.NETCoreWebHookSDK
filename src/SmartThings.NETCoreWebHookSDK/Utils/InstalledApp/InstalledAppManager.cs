@@ -74,7 +74,6 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.InstalledApp
 
         public virtual async Task<InstalledAppInstance> GetInstalledAppAsync(string installedAppId)
         {
-            throw new InvalidOperationException("Testing test");
             _ = installedAppId ?? throw new ArgumentNullException(nameof(installedAppId));
 
             await LoadCacheAsync().ConfigureAwait(false);
