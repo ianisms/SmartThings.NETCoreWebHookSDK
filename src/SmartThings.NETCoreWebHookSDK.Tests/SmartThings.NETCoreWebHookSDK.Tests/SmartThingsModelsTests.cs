@@ -80,9 +80,9 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Tests
             ""timeZoneId"": ""America/New_York"",
             ""locale"": ""en""
         }",
-        "11/11/2019",
-        "11/11/2019 06:38:00",
-        "11/11/2019 16:43:00")]
+        "07/24/2020",
+        "07/24/2020 05:46:00",
+        "07/24/2020 20:20:00")]
         [InlineData(@"{
             ""locationId"": ""625BF45D-6C40-4C66-964E-42C1CE22E480"",
             ""name"": ""Home"",
@@ -94,9 +94,9 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Tests
             ""timeZoneId"": ""Europe/London"",
             ""locale"": ""en""
         }",
-        "11/11/2019",
-        "11/11/2019 07:13:00",
-        "11/11/2019 16:17:00")]
+        "07/24/2020",
+        "07/24/2020 05:13:00",
+        "07/24/2020 21:01:00")]
         public void Location_SunriseSunset_ShouldBeCloseToExpected(string locJson,
             string dateVal,
             string expectedSunriseVal,
@@ -105,11 +105,11 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Tests
             dynamic loc = JObject.Parse(locJson);
             var location = Location.LocationFromDynamic(loc);
             var dt = DateTime.Parse(dateVal).ToUniversalTime();
-            var expectedSunrise = DateTime.Parse(expectedSunriseVal).ToUniversalTime();
-            var expectedSunset = DateTime.Parse(expectedSunsetVal).ToUniversalTime();
+            var expectedSunrise = DateTime.Parse(expectedSunriseVal);
+            var expectedSunset = DateTime.Parse(expectedSunsetVal);
 
-            var sunrise = location.GetSunrise(dt).ToUniversalTime();
-            var sunset = location.GetSunset(dt).ToUniversalTime();
+            var sunrise = location.GetSunrise(dt);
+            var sunset = location.GetSunset(dt);
 
             var sunriseDiff = (sunrise - expectedSunrise).Duration();
             var sunsetDiff = (sunset - expectedSunset).Duration();
