@@ -81,7 +81,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Tests
             ""timeZoneId"": ""America/New_York"",
             ""locale"": ""en""
         }",
-        "07/24/2020",
+        "07/24/2020 05:46:00",
         "07/24/2020 05:46:00",
         "07/24/2020 20:20:00")]
         [InlineData(@"{
@@ -95,7 +95,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Tests
             ""timeZoneId"": ""Europe/London"",
             ""locale"": ""en""
         }",
-        "07/24/2020",
+        "07/24/2020 05:13:00",
         "07/24/2020 05:13:00",
         "07/24/2020 21:01:00")]
         public void Location_SunriseSunset_ShouldBeCloseToExpected(string locJson,
@@ -118,7 +118,6 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Tests
             var sunriseCt = sunriseDiff.CompareTo(TimeSpan.FromMinutes(5));
             var sunsetCt = sunsetDiff.CompareTo(TimeSpan.FromMinutes(5));
 
-            testOutputHelper.WriteLine($"Location: {JsonConvert.SerializeObject(location)}");
             testOutputHelper.WriteLine($"Expected sunrise: {expectedSunrise}");
             testOutputHelper.WriteLine($"Expected sunset: {expectedSunset}");
             testOutputHelper.WriteLine($"Computed sunrise: {sunrise}");
