@@ -21,6 +21,7 @@
 #endregion
 
 using ianisms.SmartThings.NETCoreWebHookSDK.Models.SmartThings;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -117,6 +118,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Tests
             var sunriseCt = sunriseDiff.CompareTo(TimeSpan.FromMinutes(5));
             var sunsetCt = sunsetDiff.CompareTo(TimeSpan.FromMinutes(5));
 
+            testOutputHelper.WriteLine($"Location: {JsonConvert.SerializeObject(location)}");
             testOutputHelper.WriteLine($"Expected sunrise: {expectedSunrise}");
             testOutputHelper.WriteLine($"Expected sunset: {expectedSunset}");
             testOutputHelper.WriteLine($"Computed sunrise: {sunrise}");
