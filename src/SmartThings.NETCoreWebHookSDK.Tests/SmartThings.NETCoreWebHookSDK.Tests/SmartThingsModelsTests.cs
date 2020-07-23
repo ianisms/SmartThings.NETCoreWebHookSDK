@@ -89,7 +89,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Tests
         "11/11/2019",
         "11/11/2019 07:13:00",
         "11/11/2019 16:17:00")]
-        public void Location_SunriseSunset_ShouldBeWithinTwoMinutesOfExpected(string locJson,
+        public void Location_SunriseSunset_ShouldBeWithinFiveMinutesOfExpected(string locJson,
             string dateVal,
             string expectedSunriseVal,
             string expectedSunsetVal)
@@ -106,8 +106,8 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Tests
             var sunriseDiff = (sunrise - expectedSunrise).Duration();
             var sunsetDiff = (sunset - expectedSunset).Duration();
 
-            var sunriseCt = sunriseDiff.CompareTo(TimeSpan.FromMinutes(2));
-            var sunsetCt = sunsetDiff.CompareTo(TimeSpan.FromMinutes(2));
+            var sunriseCt = sunriseDiff.CompareTo(TimeSpan.FromMinutes(5));
+            var sunsetCt = sunsetDiff.CompareTo(TimeSpan.FromMinutes(5));
 
             // within 2 minutes
             Assert.True(sunriseCt < 1);
