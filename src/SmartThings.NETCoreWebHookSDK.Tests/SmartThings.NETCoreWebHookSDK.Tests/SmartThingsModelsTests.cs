@@ -104,7 +104,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Tests
         {
             dynamic loc = JObject.Parse(locJson);
             var location = Location.LocationFromDynamic(loc);
-            var dt = DateTime.Parse(dateVal);
+            var dt = DateTime.Parse(dateVal).ToUniversalTime();
             var expectedSunrise = DateTime.Parse(expectedSunriseVal).ToUniversalTime();
             var expectedSunset = DateTime.Parse(expectedSunsetVal).ToUniversalTime();
 
@@ -122,7 +122,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Tests
             testOutputHelper.WriteLine($"Computed sunrise: {sunrise}");
             testOutputHelper.WriteLine($"Computed sunset: {sunset}");
             testOutputHelper.WriteLine($"Computed sunrise diff: {sunriseDiff}");
-            testOutputHelper.WriteLine($"Computed senset diff: {sunsetDiff}");
+            testOutputHelper.WriteLine($"Computed sunset diff: {sunsetDiff}");
 
             Assert.True(sunriseCt < 1);
             Assert.True(sunsetCt < 1);
