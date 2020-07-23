@@ -25,8 +25,16 @@ jobs:
     - name: Test
       run: dotnet test src/SmartThings.NETCoreWebHookSDK.sln
         --no-restore
-    - name: Publish Nuget Package
+    - name: Publish Nuget Package to Nuget
       run: dotnet nuget push src/SmartThings.NETCoreWebHookSDK/bin/Release/*.nupkg
         --api-key ${{ secrets.NUGET_DEPLOY_KEY }}
         --source https://api.nuget.org/v3/index.json
+    - name: Publish Nuget Package to GitHub
+      uses: tanaka-takayoshi/nuget-publish-to-github-packages-action@v2.1
+      with:
+        nupkg-path: src/SmartThings.NETCoreWebHookSDK/bin/Release/*.nupkg
+        repo-owner: ianisms
+        gh-user: ianisms
+        token: ${{ secrets.PAT }}
+        skip-duplicate: true
 
