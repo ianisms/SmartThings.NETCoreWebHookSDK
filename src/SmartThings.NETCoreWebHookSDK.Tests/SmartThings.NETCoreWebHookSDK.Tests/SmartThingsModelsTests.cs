@@ -25,11 +25,19 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace ianisms.SmartThings.NETCoreWebHookSDK.Tests
 {
     public class SmartThingsModelsTests
     {
+        private readonly ITestOutputHelper testOutputHelper;
+
+        public SmartThingsModelsTests(ITestOutputHelper testOutputHelper)
+        {
+            this.testOutputHelper = testOutputHelper;
+        }
+
         [Theory]
         [InlineData(@"{
             ""locationId"": ""625BF45D-6C40-4C66-964E-42C1CE22E480"",
@@ -89,7 +97,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Tests
         "11/11/2019",
         "11/11/2019 07:13:00",
         "11/11/2019 16:17:00")]
-        public void Location_SunriseSunset_ShouldBeWithinFiveMinutesOfExpected(string locJson,
+        public void Location_SunriseSunset_ShouldBeCloseToExpected(string locJson,
             string dateVal,
             string expectedSunriseVal,
             string expectedSunsetVal)
@@ -109,7 +117,14 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Tests
             var sunriseCt = sunriseDiff.CompareTo(TimeSpan.FromMinutes(5));
             var sunsetCt = sunsetDiff.CompareTo(TimeSpan.FromMinutes(5));
 
-            // within 2 minutes
+            testOutputHelper.WriteLine($"Expected sunrise: {expectedSunrise}");
+            testOutputHelper.WriteLine($"Expected sunset: {expectedSunset}");
+            testOutputHelper.WriteLine($"Computed sunrise: {sunrise}");
+            testOutputHelper.WriteLine($"Computed sunset: {sunset}");
+            testOutputHelper.WriteLine($"Computed sunrise diff: {sunriseDiff}");
+            testOutputHelper.WriteLine($"Computed senset diff: {sunsetDiff}");
+
+            // within 10 minutes
             Assert.True(sunriseCt < 1);
             Assert.True(sunsetCt < 1);
         }
