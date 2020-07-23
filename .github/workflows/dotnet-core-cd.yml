@@ -29,7 +29,3 @@ jobs:
       run: dotnet nuget push src/SmartThings.NETCoreWebHookSDK/bin/Release/*.nupkg
         --api-key ${{ secrets.NUGET_DEPLOY_KEY }}
         --source https://api.nuget.org/v3/index.json
-        --skip-duplicate
-    - name: Publish Nuget Package to GitHub
-      run: gpr push src/SmartThings.NETCoreWebHookSDK/bin/Release/*.nupkg
-        --api-key ${{ secrets.PAT }}
