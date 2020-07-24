@@ -15,7 +15,7 @@
     <RepositoryUrl>https://github.com/ianisms/SmartThings.NETCoreWebHookSDK</RepositoryUrl>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-    <PackageTags>aspnetcore, smartthings, automation, azurefunctions</PackageTags>
+    <PackageTags>aspnetcore, smartthings, automation, azurefunctions, iot</PackageTags>
     <Version>3.1.5</Version>
     <AssemblyVersion>3.1.5.0</AssemblyVersion>
     <FileVersion>3.1.5.0</FileVersion>
