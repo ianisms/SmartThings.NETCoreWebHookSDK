@@ -30,16 +30,19 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-
-    # Autobuild attempts to build any compiled languages  (C/C++, C#, or Java).
-    # If this step fails, then you should remove it and run the build manually (see below)
-    - name: Autobuild
-      uses: github/codeql-action/autobuild@v1
       
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 3.1.101
+        
+    - name: Install dependencies
+      run: dotnet restore src/SmartThings.NETCoreWebHookSDK.sln
+      
+    - name: Build
+      run: dotnet build src/SmartThings.NETCoreWebHookSDK.sln
+        --configuration Release
+        --no-restore
         
     - name: Test
       run: dotnet test src/SmartThings.NETCoreWebHookSDK.sln
@@ -64,11 +67,19 @@ jobs:
 
     steps: 
     - uses: actions/checkout@v2
-
-    # Autobuild attempts to build any compiled languages  (C/C++, C#, or Java).
-    # If this step fails, then you should remove it and run the build manually (see below)
-    - name: Autobuild
-      uses: github/codeql-action/autobuild@v1
+      
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 3.1.101
+        
+    - name: Install dependencies
+      run: dotnet restore src/SmartThings.NETCoreWebHookSDK.sln
+      
+    - name: Build
+      run: dotnet build src/SmartThings.NETCoreWebHookSDK.sln
+        --configuration Release
+        --no-restoren
       
     - name: Initialize CodeQL
       uses: github/codeql-action/init@v1
