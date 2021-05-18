@@ -14,21 +14,8 @@ jobs:
   build:
     name: Build and Test
     runs-on: ubuntu-latest   
-    
-    permissions:
-      actions: read
-      contents: read
-      security-events: write
-
-    strategy:
-      fail-fast: false
-      matrix:
-        language: [ 'csharp' ]
-        # CodeQL supports [ 'cpp', 'csharp', 'go', 'java', 'javascript', 'python' ]
-        # Learn more:
-        # https://docs.github.com/en/free-pro-team@latest/github/finding-security-vulnerabilities-and-errors-in-your-code/configuring-code-scanning#changing-the-languages-that-are-analyzed
-
     steps:
+    - name: Checkout Code
     - uses: actions/checkout@v2
       
     - name: Setup .NET Core
@@ -66,20 +53,11 @@ jobs:
         # https://docs.github.com/en/free-pro-team@latest/github/finding-security-vulnerabilities-and-errors-in-your-code/configuring-code-scanning#changing-the-languages-that-are-analyzed
 
     steps: 
+    - name: Checkout Code
     - uses: actions/checkout@v2
       
-    - name: Setup .NET Core
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: 3.1.101
-        
-    - name: Install dependencies
-      run: dotnet restore src/SmartThings.NETCoreWebHookSDK.sln
-      
-    - name: Build
-      run: dotnet build src/SmartThings.NETCoreWebHookSDK.sln
-        --configuration Release
-        --no-restore
+    - name: Autobuild
+      uses: github/codeql-action/autobuild@v1
       
     - name: Initialize CodeQL
       uses: github/codeql-action/init@v1
