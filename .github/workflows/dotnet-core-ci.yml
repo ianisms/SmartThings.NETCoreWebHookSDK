@@ -79,7 +79,7 @@ jobs:
     - name: Build
       run: dotnet build src/SmartThings.NETCoreWebHookSDK.sln
         --configuration Release
-        --no-restoren
+        --no-restore
       
     - name: Initialize CodeQL
       uses: github/codeql-action/init@v1
