@@ -13,10 +13,11 @@ on:
 jobs:
   build:
     name: Build and Test
-    runs-on: ubuntu-latest   
+    runs-on: ubuntu-latest  
+    
     steps:
     - name: Checkout Code
-    - uses: actions/checkout@v2
+      uses: actions/checkout@v2
       
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
@@ -54,7 +55,7 @@ jobs:
 
     steps: 
     - name: Checkout Code
-    - uses: actions/checkout@v2
+      uses: actions/checkout@v2
       
     - name: Autobuild
       uses: github/codeql-action/autobuild@v1
