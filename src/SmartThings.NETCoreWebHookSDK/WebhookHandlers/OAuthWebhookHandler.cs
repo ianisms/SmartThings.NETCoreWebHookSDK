@@ -34,17 +34,17 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers
 {
     public interface IOAuthWebhookHandler
     {
-        ILogger<IOAuthWebhookHandler> logger { get; }
+        ILogger<IOAuthWebhookHandler> Logger { get; }
         Task<dynamic> HandleRequestAsync(dynamic request);
     }
 
     public class OAuthWebhookHandler : IOAuthWebhookHandler
     {
-        public ILogger<IOAuthWebhookHandler> logger { get; private set; }
+        public ILogger<IOAuthWebhookHandler> Logger { get; private set; }
 
         public OAuthWebhookHandler(ILogger<IOAuthWebhookHandler> logger)
         {
-            this.logger = logger;
+            this.Logger = logger;
         }
 
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
@@ -53,12 +53,12 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers
         {
             _ = request ?? throw new ArgumentNullException(nameof(request));
 
-            logger.LogDebug($"handling request: {request}");
+            Logger.LogDebug($"handling request: {request}");
 
             dynamic response = new JObject();
             response.oAuthCallbackData = new JObject();
 
-            logger.LogDebug($"response: {response}");
+            Logger.LogDebug($"response: {response}");
 
             return response;
         }

@@ -41,8 +41,9 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.InstalledApp
 {
     public class FileBackedInstalledAppManager : InstalledAppManager
     {
-        private readonly FileBackedConfig<FileBackedInstalledAppManager> fileBackedConfig;
-        private readonly IFileSystem fileSystem;
+        private readonly ILogger<IInstalledAppManager> _logger;
+        private readonly FileBackedConfig<FileBackedInstalledAppManager> _fileBackedConfig;
+        private readonly IFileSystem _fileSystem;
 
         public FileBackedInstalledAppManager(ILogger<IInstalledAppManager> logger,
             ISmartThingsAPIHelper smartThingsAPIHelper,
@@ -50,44 +51,42 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.InstalledApp
             IFileSystem fileSystem)
             : base(logger, smartThingsAPIHelper)
         {
-            _ = options ?? throw new ArgumentNullException(nameof(options));
-            _ = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
+            _logger = logger ??
+                throw new ArgumentNullException(nameof(logger));
+            _fileBackedConfig = options.Value ?? throw new ArgumentNullException(nameof(options));
+            _fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
 
-            this.fileBackedConfig = options.Value;
-            this.fileSystem = fileSystem;
-
-            _ = fileBackedConfig.BackingStorePath ??
+            _ = _fileBackedConfig.BackingStorePath ??
                 throw new ArgumentException("fileBackedConfig.BackingStorePath is null",
-                nameof(options));
+                    nameof(options));
         }
 
         public override async Task LoadCacheAsync()
         {
-            Logger.LogDebug("Loading installed app cache...");
+            _logger.LogDebug("Loading installed app cache...");
 
             if (InstalledAppCache == null)
             {
-                if (!fileSystem.File.Exists(fileBackedConfig.BackingStorePath))
+                if (!_fileSystem.File.Exists(_fileBackedConfig.BackingStorePath))
                 {
-                    Logger.LogDebug("Backing file does not exist, initializing intsalled app cache...");
+                    _logger.LogDebug("Backing file does not exist, initializing intsalled app cache...");
 
                     InstalledAppCache = new Dictionary<string, InstalledAppInstance>();
                 }
                 else
                 {
-                    Logger.LogDebug("Backing file exists, loading installed app cache from file...");
+                    _logger.LogDebug("Backing file exists, loading installed app cache from file...");
 
-                    using (var reader = fileSystem.File.OpenText(fileBackedConfig.BackingStorePath))
+                    using (var reader = _fileSystem.File.OpenText(_fileBackedConfig.BackingStorePath))
                     {
                         var encodedContent = await reader.ReadToEndAsync().ConfigureAwait(false);
-                        //var json = dataProtector.Unprotect(encodedContent);
                         var json = encodedContent;
                         InstalledAppCache = JsonConvert.DeserializeObject<Dictionary<string,
                             InstalledAppInstance>>(json,
                             STCommon.JsonSerializerSettings);
                     }
 
-                    Logger.LogDebug("Loaded installed app cache from file...");
+                    _logger.LogDebug("Loaded installed app cache from file...");
 
                 }
             }
@@ -95,21 +94,20 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.InstalledApp
 
         public override async Task PersistCacheAsync()
         {
-            Logger.LogDebug("Saving installed app cache...");
+            _logger.LogDebug("Saving installed app cache...");
 
-            Directory.CreateDirectory(fileSystem.Path.GetDirectoryName(fileBackedConfig.BackingStorePath));
+            Directory.CreateDirectory(_fileSystem.Path.GetDirectoryName(_fileBackedConfig.BackingStorePath));
 
-            using (var writer = fileSystem.File.CreateText(fileBackedConfig.BackingStorePath))
+            using (var writer = _fileSystem.File.CreateText(_fileBackedConfig.BackingStorePath))
             {
                 var json = JsonConvert.SerializeObject(InstalledAppCache,
                     STCommon.JsonSerializerSettings);
                 var encodedContent = json;
-                //var encodedContent = dataProtector.Protect(json);
                 await writer.WriteAsync(encodedContent).ConfigureAwait(false);
                 await writer.FlushAsync().ConfigureAwait(false);
             }
 
-            Logger.LogDebug("Saved installed app cache...");
+            _logger.LogDebug("Saved installed app cache...");
         }
     }
 }

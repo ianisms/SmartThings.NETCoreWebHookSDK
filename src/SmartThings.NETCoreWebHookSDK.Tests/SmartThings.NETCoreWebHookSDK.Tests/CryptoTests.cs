@@ -21,12 +21,132 @@
 #endregion
 
 using ianisms.SmartThings.NETCoreWebHookSDK.Crypto;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Moq;
+using FluentAssertions;
+using System;
+using System.Net.Http;
 using Xunit;
+using System.Collections.Generic;
+using Microsoft.AspNetCore.Http;
+using System.Threading.Tasks;
+using Moq.Protected;
+using Moq.Contrib.HttpClient;
+using System.Threading;
 
 namespace ianisms.SmartThings.NETCoreWebHookSDK.Tests
 {
     public class CryptoTests
     {
+        private readonly Mock<ILogger<CryptoUtils>> _mockLogger;
+        private readonly Mock<IOptions<CryptoUtilsConfig>> _mockOptions;
+        private readonly Mock<IOptions<CryptoUtilsConfig>> _mockBadOptions;
+        private readonly Mock<CryptoUtilsConfig> _mockConfig;
+        private readonly Mock<CryptoUtilsConfigValidator> _mockCryptoUtilsConfigValidator;
+        private readonly HttpClient _httpClient;
+
+        public CryptoTests()
+        {
+            _mockLogger = new Mock<ILogger<CryptoUtils>>();
+            _mockOptions = new Mock<IOptions<CryptoUtilsConfig>>();
+            _mockBadOptions = new Mock<IOptions<CryptoUtilsConfig>>();
+            _mockConfig = new Mock<CryptoUtilsConfig>();
+            _mockCryptoUtilsConfigValidator = new Mock<CryptoUtilsConfigValidator>();
+
+            _mockOptions.SetupGet(m => m.Value)
+                .Returns(_mockConfig.Object);
+
+            var handler = new Mock<HttpMessageHandler>();
+
+            handler.Protected().As<IHttpMessageHandler>()
+                .Setup(x => x.SendAsync(It.IsAny<HttpRequestMessage>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new HttpResponseMessage()
+                {
+                    Content = new ByteArrayContent(Array.Empty<byte>())
+                });
+
+            _httpClient = new HttpClient(handler.Object, false);
+        }
+
+        [Fact]
+        public void CryptoUtilsCtor_Should_Not_Error()
+        {
+            _ = new CryptoUtils(_mockLogger.Object,
+                _mockOptions.Object,
+                _mockCryptoUtilsConfigValidator.Object,
+                _httpClient);
+        }
+
+        [Fact]
+        public void CryptoUtilsCtor_Missing_Args_Should_Throw()
+        {
+            Action ctorCall = () =>
+            {
+                var utils = new CryptoUtils(null,
+                    _mockOptions.Object,
+                    _mockCryptoUtilsConfigValidator.Object,
+                    _httpClient);
+            };
+            ctorCall.Should().Throw<ArgumentNullException>("Of missing logger");
+
+            ctorCall = () =>
+            {
+                var utils = new CryptoUtils(_mockLogger.Object,
+                    null,
+                    _mockCryptoUtilsConfigValidator.Object,
+                    _httpClient);
+            };
+            ctorCall.Should().Throw<ArgumentNullException>("Of missing options");
+
+            ctorCall = () =>
+            {
+                var utils = new CryptoUtils(_mockLogger.Object,
+                    _mockBadOptions.Object,
+                    _mockCryptoUtilsConfigValidator.Object,
+                    _httpClient);
+            };
+            ctorCall.Should().Throw<ArgumentNullException>("Of missing options.value");
+
+            ctorCall = () =>
+            {
+                var utils = new CryptoUtils(_mockLogger.Object,
+                    _mockOptions.Object,
+                    null,
+                    _httpClient);
+            };
+            ctorCall.Should().Throw<ArgumentNullException>("Of missing validator");
+
+            ctorCall = () =>
+            {
+                var utils = new CryptoUtils(_mockLogger.Object,
+                    _mockOptions.Object,
+                    _mockCryptoUtilsConfigValidator.Object,
+                    null);
+            };
+            ctorCall.Should().Throw<ArgumentNullException>("Of missing http client");
+        }
+
+        [Fact]
+        public async Task VerifySignedRequestAsync_Valid_Sig_Should_Not_Throw_Unexpected()
+        {
+            var headerVal = "Signature keyId=\"/SmartThings/89:94:9a:9a:51:24:2d:6d:40:21:63:44:9c:b1:88:14\",signature=\"Zm9v\",headers=\"(request-target) digest date\",algorithm=\"rsa-sha256\"";
+            var httpContext = new DefaultHttpContext();
+
+            httpContext.Request.Method = "GET";
+            httpContext.Request.Path = "/";
+            httpContext.Request.Headers.Add("Authorization", headerVal);
+            httpContext.Request.Headers.Add("(request-target)", $"get /");
+            httpContext.Request.Headers.Add("digest", "foo");
+            httpContext.Request.Headers.Add("date", $"{DateTime.UtcNow.ToFileTimeUtc()}");
+
+            var utils = new CryptoUtils(_mockLogger.Object,
+                _mockOptions.Object,
+                _mockCryptoUtilsConfigValidator.Object,
+                _httpClient);
+            _ = await utils.VerifySignedRequestAsync(httpContext.Request);
+        }
+
         [Fact]
         public void RequestSignatureParseFromHeaderValParsesHeaderCorrectly()
         {

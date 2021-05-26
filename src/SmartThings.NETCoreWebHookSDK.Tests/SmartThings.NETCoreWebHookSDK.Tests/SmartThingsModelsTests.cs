@@ -196,6 +196,62 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Tests
                 status);
 
             Assert.Equal(expectedResult, result);
+
+            statusJson = $@"{{
+                ""deviceId"": ""{expectedResult.Id}"",
+                ""name"": ""NAME"",
+                ""label"": ""{expectedResult.Label}"",
+                ""locationId"": ""{installedApp.InstalledLocation.Id}"",
+                ""components"" : {{
+                    ""main"": {{
+                        ""accelerationSensor"": {{
+                            ""acceleration"": {{
+                                ""value"": ""inactive""
+                            }}
+                        }}
+                    }}
+                }}
+            }}";
+
+            expectedResult.CurrentState = AccelerationState.InActive;
+
+            device = JObject.Parse(deviceJson);
+            status = JObject.Parse(statusJson);
+
+            result = AccelerationSensor.AccelerationSensorFromDynamic(device,
+                status);
+
+            Assert.Equal(expectedResult, result);
+
+            statusJson = $@"{{
+                ""deviceId"": ""{expectedResult.Id}"",
+                ""name"": ""NAME"",
+                ""label"": ""{expectedResult.Label}"",
+                ""locationId"": ""{installedApp.InstalledLocation.Id}"",
+                ""components"" : {{
+                    ""main"": {{
+                        ""accelerationSensor"": {{
+                            ""acceleration"": {{
+                                ""value"": ""unknown""
+                            }}
+                        }}
+                    }}
+                }}
+            }}";
+
+            expectedResult.CurrentState = AccelerationState.Unknown;
+
+            device = JObject.Parse(deviceJson);
+            status = JObject.Parse(statusJson);
+
+            result = AccelerationSensor.AccelerationSensorFromDynamic(device,
+                status);
+
+            Assert.Equal(expectedResult, result);
+
+            _ = expectedResult.GetHashCode();
+
+            _ = expectedResult.ToJson();
         }
 
         [Theory]
@@ -239,6 +295,9 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Tests
                 status);
 
             Assert.Equal(expectedResult, result);
+
+            _ = expectedResult.GetHashCode();
+            _ = expectedResult.ToJson();
         }
 
         [Theory]
@@ -282,6 +341,81 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Tests
                 status);
 
             Assert.Equal(expectedResult, result);
+
+            expectedResult.CurrentState = CarbonMonoxideState.Detected;
+            statusJson = $@"{{
+                ""deviceId"": ""{expectedResult.Id}"",
+                ""name"": ""NAME"",
+                ""label"": ""{expectedResult.Label}"",
+                ""locationId"": ""{installedApp.InstalledLocation.Id}"",
+                ""components"" : {{
+                    ""main"": {{
+                        ""carbonMonoxideDetector"": {{
+                            ""carbonMonoxide"": {{
+                                ""value"": ""detected""
+                            }}
+                        }}
+                    }}
+                }}
+            }}";
+
+            status = JObject.Parse(statusJson);
+
+            result = CarbonMonoxideDetector.CarbonMonoxideDetectorFromDynamic(device,
+                status);
+
+            Assert.Equal(expectedResult, result);
+
+            expectedResult.CurrentState = CarbonMonoxideState.Tested;
+            statusJson = $@"{{
+                ""deviceId"": ""{expectedResult.Id}"",
+                ""name"": ""NAME"",
+                ""label"": ""{expectedResult.Label}"",
+                ""locationId"": ""{installedApp.InstalledLocation.Id}"",
+                ""components"" : {{
+                    ""main"": {{
+                        ""carbonMonoxideDetector"": {{
+                            ""carbonMonoxide"": {{
+                                ""value"": ""tested""
+                            }}
+                        }}
+                    }}
+                }}
+            }}";
+
+            status = JObject.Parse(statusJson);
+
+            result = CarbonMonoxideDetector.CarbonMonoxideDetectorFromDynamic(device,
+                status);
+
+            Assert.Equal(expectedResult, result);
+
+            expectedResult.CurrentState = CarbonMonoxideState.Unknown;
+            statusJson = $@"{{
+                ""deviceId"": ""{expectedResult.Id}"",
+                ""name"": ""NAME"",
+                ""label"": ""{expectedResult.Label}"",
+                ""locationId"": ""{installedApp.InstalledLocation.Id}"",
+                ""components"" : {{
+                    ""main"": {{
+                        ""carbonMonoxideDetector"": {{
+                            ""carbonMonoxide"": {{
+                                ""value"": ""unknown""
+                            }}
+                        }}
+                    }}
+                }}
+            }}";
+
+            status = JObject.Parse(statusJson);
+
+            result = CarbonMonoxideDetector.CarbonMonoxideDetectorFromDynamic(device,
+                status);
+
+            Assert.Equal(expectedResult, result);
+
+            _ = expectedResult.GetHashCode();
+            _ = expectedResult.ToJson();
         }
 
         [Theory]
@@ -325,6 +459,57 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Tests
                 status);
 
             Assert.Equal(expectedResult, result);
+
+            expectedResult.CurrentState = ContactState.Open;
+            statusJson = $@"{{
+                ""deviceId"": ""{expectedResult.Id}"",
+                ""name"": ""NAME"",
+                ""label"": ""{expectedResult.Label}"",
+                ""locationId"": ""{installedApp.InstalledLocation.Id}"",
+                ""components"" : {{
+                    ""main"": {{
+                        ""contactSensor"": {{
+                            ""contact"": {{
+                                ""value"": ""open""
+                            }}
+                        }}
+                    }}
+                }}
+            }}";
+
+            status = JObject.Parse(statusJson);
+
+            result = ContactSensor.ContactSensorFromDynamic(device,
+                status);
+
+            Assert.Equal(expectedResult, result);
+
+            expectedResult.CurrentState = ContactState.Unknown;
+            statusJson = $@"{{
+                ""deviceId"": ""{expectedResult.Id}"",
+                ""name"": ""NAME"",
+                ""label"": ""{expectedResult.Label}"",
+                ""locationId"": ""{installedApp.InstalledLocation.Id}"",
+                ""components"" : {{
+                    ""main"": {{
+                        ""contactSensor"": {{
+                            ""contact"": {{
+                                ""value"": ""unknown""
+                            }}
+                        }}
+                    }}
+                }}
+            }}";
+
+            status = JObject.Parse(statusJson);
+
+            result = ContactSensor.ContactSensorFromDynamic(device,
+                status);
+
+            Assert.Equal(expectedResult, result);
+
+            _ = expectedResult.GetHashCode();
+            _ = expectedResult.ToJson();
         }
 
         [Theory]
@@ -368,6 +553,57 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Tests
                 status);
 
             Assert.Equal(expectedResult, result);
+
+            expectedResult.CurrentState = LockState.Unlocked;
+            statusJson = $@"{{
+                ""deviceId"": ""{expectedResult.Id}"",
+                ""name"": ""NAME"",
+                ""label"": ""{expectedResult.Label}"",
+                ""locationId"": ""{installedApp.InstalledLocation.Id}"",
+                ""components"" : {{
+                    ""main"": {{
+                        ""lock"": {{
+                            ""lock"": {{
+                                ""value"": ""unlocked""
+                            }}
+                        }}
+                    }}
+                }}
+            }}";
+
+            status = JObject.Parse(statusJson);
+
+            result = DoorLock.LockFromDynamic(device,
+                status);
+
+            Assert.Equal(expectedResult, result);
+
+            expectedResult.CurrentState = LockState.Unknown;
+            statusJson = $@"{{
+                ""deviceId"": ""{expectedResult.Id}"",
+                ""name"": ""NAME"",
+                ""label"": ""{expectedResult.Label}"",
+                ""locationId"": ""{installedApp.InstalledLocation.Id}"",
+                ""components"" : {{
+                    ""main"": {{
+                        ""lock"": {{
+                            ""lock"": {{
+                                ""value"": ""unknown""
+                            }}
+                        }}
+                    }}
+                }}
+            }}";
+
+            status = JObject.Parse(statusJson);
+
+            result = DoorLock.LockFromDynamic(device,
+                status);
+
+            Assert.Equal(expectedResult, result);
+
+            _ = expectedResult.GetHashCode();
+            _ = expectedResult.ToJson();
         }
 
         [Theory]
@@ -411,6 +647,57 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Tests
                 status);
 
             Assert.Equal(expectedResult, result);
+
+            expectedResult.CurrentState = SwitchState.On;
+            statusJson = $@"{{
+                ""deviceId"": ""{expectedResult.Id}"",
+                ""name"": ""NAME"",
+                ""label"": ""{expectedResult.Label}"",
+                ""locationId"": ""{installedApp.InstalledLocation.Id}"",
+                ""components"" : {{
+                    ""main"": {{
+                        ""switch"": {{
+                            ""switch"": {{
+                                ""value"": ""on""
+                            }}
+                        }}
+                    }}
+                }}
+            }}";
+
+            status = JObject.Parse(statusJson);
+
+            result = LightSwitch.SwitchFromDynamic(device,
+                status);
+
+            Assert.Equal(expectedResult, result);
+
+            expectedResult.CurrentState = SwitchState.Unknown;
+            statusJson = $@"{{
+                ""deviceId"": ""{expectedResult.Id}"",
+                ""name"": ""NAME"",
+                ""label"": ""{expectedResult.Label}"",
+                ""locationId"": ""{installedApp.InstalledLocation.Id}"",
+                ""components"" : {{
+                    ""main"": {{
+                        ""switch"": {{
+                            ""switch"": {{
+                                ""value"": ""unknown""
+                            }}
+                        }}
+                    }}
+                }}
+            }}";
+
+            status = JObject.Parse(statusJson);
+
+            result = LightSwitch.SwitchFromDynamic(device,
+                status);
+
+            Assert.Equal(expectedResult, result);
+
+            _ = expectedResult.GetHashCode();
+            _ = expectedResult.ToJson();
         }
 
         [Theory]
@@ -454,6 +741,57 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Tests
                 status);
 
             Assert.Equal(expectedResult, result);
+
+            expectedResult.CurrentState = MotionState.InActive;
+            statusJson = $@"{{
+                ""deviceId"": ""{expectedResult.Id}"",
+                ""name"": ""NAME"",
+                ""label"": ""{expectedResult.Label}"",
+                ""locationId"": ""{installedApp.InstalledLocation.Id}"",
+                ""components"" : {{
+                    ""main"": {{
+                        ""motionSensor"": {{
+                            ""motion"": {{
+                                ""value"": ""inactive""
+                            }}
+                        }}
+                    }}
+                }}
+            }}";
+
+            status = JObject.Parse(statusJson);
+
+            result = MotionSensor.MotionSensorFromDynamic(device,
+                status);
+
+            Assert.Equal(expectedResult, result);
+
+            expectedResult.CurrentState = MotionState.Unknown;
+            statusJson = $@"{{
+                ""deviceId"": ""{expectedResult.Id}"",
+                ""name"": ""NAME"",
+                ""label"": ""{expectedResult.Label}"",
+                ""locationId"": ""{installedApp.InstalledLocation.Id}"",
+                ""components"" : {{
+                    ""main"": {{
+                        ""motionSensor"": {{
+                            ""motion"": {{
+                                ""value"": ""unknown""
+                            }}
+                        }}
+                    }}
+                }}
+            }}";
+
+            status = JObject.Parse(statusJson);
+
+            result = MotionSensor.MotionSensorFromDynamic(device,
+                status);
+
+            Assert.Equal(expectedResult, result);
+
+            _ = expectedResult.GetHashCode();
+            _ = expectedResult.ToJson();
         }
 
         [Theory]
@@ -497,6 +835,57 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Tests
                 status);
 
             Assert.Equal(expectedResult, result);
+
+            expectedResult.CurrentState = PresenceState.Present;
+            statusJson = $@"{{
+                ""deviceId"": ""{expectedResult.Id}"",
+                ""name"": ""NAME"",
+                ""label"": ""{expectedResult.Label}"",
+                ""locationId"": ""{installedApp.InstalledLocation.Id}"",
+                ""components"" : {{
+                    ""main"": {{
+                        ""presenceSensor"": {{
+                            ""presence"": {{
+                                ""value"": ""present""
+                            }}
+                        }}
+                    }}
+                }}
+            }}";
+
+            status = JObject.Parse(statusJson);
+
+            result = PresenceSensor.PresenceSensorFromDynamic(device,
+                status);
+
+            Assert.Equal(expectedResult, result);
+
+            expectedResult.CurrentState = PresenceState.Unknown;
+            statusJson = $@"{{
+                ""deviceId"": ""{expectedResult.Id}"",
+                ""name"": ""NAME"",
+                ""label"": ""{expectedResult.Label}"",
+                ""locationId"": ""{installedApp.InstalledLocation.Id}"",
+                ""components"" : {{
+                    ""main"": {{
+                        ""presenceSensor"": {{
+                            ""presence"": {{
+                                ""value"": ""unknown""
+                            }}
+                        }}
+                    }}
+                }}
+            }}";
+
+            status = JObject.Parse(statusJson);
+
+            result = PresenceSensor.PresenceSensorFromDynamic(device,
+                status);
+
+            Assert.Equal(expectedResult, result);
+
+            _ = expectedResult.GetHashCode();
+            _ = expectedResult.ToJson();
         }
 
         [Theory]
@@ -540,6 +929,57 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Tests
                 status);
 
             Assert.Equal(expectedResult, result);
+
+            expectedResult.CurrentState = WaterState.Wet;
+            statusJson = $@"{{
+                ""deviceId"": ""{expectedResult.Id}"",
+                ""name"": ""NAME"",
+                ""label"": ""{expectedResult.Label}"",
+                ""locationId"": ""{installedApp.InstalledLocation.Id}"",
+                ""components"" : {{
+                    ""main"": {{
+                        ""waterSensor"": {{
+                            ""water"": {{
+                                ""value"": ""wet""
+                            }}
+                        }}
+                    }}
+                }}
+            }}";
+
+            status = JObject.Parse(statusJson);
+
+            result = WaterSensor.WaterSensorFromDynamic(device,
+                status);
+
+            Assert.Equal(expectedResult, result);
+
+            expectedResult.CurrentState = WaterState.Unknown;
+            statusJson = $@"{{
+                ""deviceId"": ""{expectedResult.Id}"",
+                ""name"": ""NAME"",
+                ""label"": ""{expectedResult.Label}"",
+                ""locationId"": ""{installedApp.InstalledLocation.Id}"",
+                ""components"" : {{
+                    ""main"": {{
+                        ""waterSensor"": {{
+                            ""water"": {{
+                                ""value"": ""unknown""
+                            }}
+                        }}
+                    }}
+                }}
+            }}";
+
+            status = JObject.Parse(statusJson);
+
+            result = WaterSensor.WaterSensorFromDynamic(device,
+                status);
+
+            Assert.Equal(expectedResult, result);
+
+            _ = expectedResult.GetHashCode();
+            _ = expectedResult.ToJson();
         }
     }
 }

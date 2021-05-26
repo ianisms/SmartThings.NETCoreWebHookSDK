@@ -145,7 +145,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers
             var installedAppId = dataToken.installedApp.installedAppId.Value;
             var locationId = dataToken.installedApp.locationId.Value;
 
-            InstalledAppInstance installedApp = new InstalledAppInstance()
+            InstalledAppInstance installedApp = new()
             {
                 InstalledAppId = installedAppId
             };

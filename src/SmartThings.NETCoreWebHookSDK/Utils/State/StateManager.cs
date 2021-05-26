@@ -34,9 +34,6 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.State
 {
     public interface IStateManager<T> : IObservable<string>
     {
-        ILogger<IStateManager<T>> Logger { get; }
-        IList<IObserver<string>> Observers { get; }
-        IDictionary<string, T> StateCache { get; }
         Task LoadCacheAsync();
         Task<T> GetStateAsync(string installedAppId);
         Task StoreStateAsync(string installedAppId, T state);
@@ -45,17 +42,15 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.State
 
     public abstract class StateManager<T> : IStateManager<T>
     {
-        public ILogger<IStateManager<T>> Logger { get; private set; }
-        public IList<IObserver<string>> Observers { get; private set; }
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "StateCache needds to be visible to downstream implementers")]
         public IDictionary<string, T> StateCache { get; set; }
+
+        private readonly ILogger<IStateManager<T>> _logger;
+        private readonly IList<IObserver<string>> _observers;
 
         public StateManager(ILogger<IStateManager<T>> logger)
         {
-            _ = logger ?? throw new ArgumentNullException(nameof(logger));
-            this.Logger = logger;
-            this.Observers = new List<IObserver<string>>();
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _observers = new List<IObserver<string>>();
         }
 
         public virtual async Task<T> GetStateAsync(string installedAppId)
@@ -64,15 +59,15 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.State
 
             await LoadCacheAsync().ConfigureAwait(false);
 
-            Logger.LogDebug($"Getting state from cache: {installedAppId}...");
+            _logger.LogDebug($"Getting state from cache: {installedAppId}...");
 
             if (StateCache.TryGetValue(installedAppId, out T state))
             {
-                Logger.LogDebug($"Got state from cache: {installedAppId}...");
+                _logger.LogDebug($"Got state from cache: {installedAppId}...");
             }
             else
             {
-                Logger.LogDebug($"Unable to find state in cache: {installedAppId}...");
+                _logger.LogDebug($"Unable to find state in cache: {installedAppId}...");
             }
 
             return state;
@@ -84,7 +79,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.State
 
             await LoadCacheAsync().ConfigureAwait(false);
 
-            Logger.LogDebug($"Adding state to cache: {installedAppId}...");
+            _logger.LogDebug($"Adding state to cache: {installedAppId}...");
 
             StateCache.Remove(installedAppId);
             StateCache.Add(installedAppId, state);
@@ -100,7 +95,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.State
 
             await LoadCacheAsync().ConfigureAwait(false);
 
-            Logger.LogDebug($"Removing state from cache: {installedAppId}...");
+            _logger.LogDebug($"Removing state from cache: {installedAppId}...");
 
             StateCache.Remove(installedAppId);
 
@@ -115,19 +110,19 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.State
 
         public IDisposable Subscribe(IObserver<string> observer)
         {
-            if (!Observers.Contains(observer))
+            if (!_observers.Contains(observer))
             {
-                Observers.Add(observer);
+                _observers.Add(observer);
             }
 
-            return new Unsubscriber(Observers, observer);
+            return new Unsubscriber(_observers, observer);
         }
 
         public void UnSubscribe(IObserver<string> observer)
         {
-            if (!Observers.Contains(observer))
+            if (!_observers.Contains(observer))
             {
-                Observers.Remove(observer);
+                _observers.Remove(observer);
             }
         }
 
@@ -153,9 +148,9 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.State
 
         private void NotifyObservers(string installedAppId)
         {
-            Logger.LogDebug($"Notifying observers of state change for: {installedAppId}");
+            _logger.LogDebug($"Notifying observers of state change for: {installedAppId}");
 
-            foreach (var observer in Observers)
+            foreach (var observer in _observers)
             {
                 observer.OnNext(installedAppId);
             }

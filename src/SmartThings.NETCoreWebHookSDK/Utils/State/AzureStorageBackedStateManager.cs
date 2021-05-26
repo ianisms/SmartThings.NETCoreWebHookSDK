@@ -25,134 +25,130 @@
 // SOFTWARE.
 // </copyright>
 #endregion
+using Azure.Storage.Blobs;
+using FluentValidation;
 using ianisms.SmartThings.NETCoreWebHookSDK.Models.Config;
 using ianisms.SmartThings.NETCoreWebHookSDK.Models.SmartThings;
-using Microsoft.Azure.Storage;
-using Microsoft.Azure.Storage.Blob;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.State
 {
     public class AzureStorageBackedStateManager<T> : StateManager<T>
     {
-        private readonly AzureStorageBackedConfig<AzureStorageBackedStateManager<T>> storageBackedConfig;
-        private readonly CloudStorageAccount storageAccount;
-        private readonly CloudBlobClient storageClient;
+        private readonly ILogger<IStateManager<T>> _logger;
+        private readonly AzureStorageBackedConfig<AzureStorageBackedStateManager<T>> _storageBackedConfig;
+        private readonly AzureStorageBackedConfigValidator<AzureStorageBackedStateManager<T>> _storageBackedConfigValidator;
+        private readonly AzureStorageBackedConfigWithClientValidator<AzureStorageBackedStateManager<T>> _storageBackedConfigWithClientValidator;
+        private readonly BlobServiceClient _blobServiceClient;
 
         public bool LoadedCacheFromStorage { get; set; } = false;
 
         public AzureStorageBackedStateManager(ILogger<IStateManager<T>> logger,
-            IOptions<AzureStorageBackedConfig<AzureStorageBackedStateManager<T>>> options)
+            IOptions<AzureStorageBackedConfig<AzureStorageBackedStateManager<T>>> options,
+            AzureStorageBackedConfigValidator<AzureStorageBackedStateManager<T>> storageBackedConfigValidator)
             : base(logger)
         {
-            _ = options ?? throw new ArgumentNullException(nameof(options));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _storageBackedConfig = options?.Value ??
+                throw new ArgumentNullException(nameof(options));
+            _storageBackedConfigValidator = storageBackedConfigValidator ??
+                throw new ArgumentNullException(nameof(storageBackedConfigValidator));
 
-            this.storageBackedConfig = options.Value;
+            _storageBackedConfigValidator.ValidateAndThrow(_storageBackedConfig);
 
-            _ = this.storageBackedConfig.ConnectionString ??
-                throw new InvalidOperationException("storageBackedConfig.ConnectionString is null");
-            _ = this.storageBackedConfig.ContainerName ??
-                throw new InvalidOperationException("storageBackedConfig.ContainerName is null");
-            _ = this.storageBackedConfig.CacheBlobName ??
-                throw new InvalidOperationException("storageBackedConfig.CacheBlobName is null");
-
-            if (CloudStorageAccount.TryParse(storageBackedConfig.ConnectionString, out storageAccount))
-            {
-                storageClient = storageAccount.CreateCloudBlobClient();
-            }
-            else
-            {
-                throw new InvalidOperationException($"Unable to initialize CloudStorageAccount with connection string: {storageBackedConfig.ConnectionString}");
-            }
+            _blobServiceClient = new BlobServiceClient(_storageBackedConfig.ConnectionString);
         }
 
         public AzureStorageBackedStateManager(ILogger<IStateManager<T>> logger,
             IOptions<AzureStorageBackedConfig<AzureStorageBackedStateManager<T>>> options,
-            CloudBlobClient storageClient)
+            AzureStorageBackedConfigWithClientValidator<AzureStorageBackedStateManager<T>> storageBackedConfigWithClientValidator,
+            BlobServiceClient blobServiceClient)
             : base(logger)
         {
-            _ = options ?? throw new ArgumentNullException(nameof(options));
-            _ = storageClient ??
-                throw new ArgumentNullException(nameof(storageClient));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _storageBackedConfig = options?.Value ??
+                throw new ArgumentNullException(nameof(options));
+            _storageBackedConfigWithClientValidator = storageBackedConfigWithClientValidator ??
+                throw new ArgumentNullException(nameof(storageBackedConfigWithClientValidator));
+            _blobServiceClient = blobServiceClient ??
+                throw new ArgumentNullException(nameof(blobServiceClient));
 
-            this.storageBackedConfig = options.Value;
-
-            _ = this.storageBackedConfig.ContainerName ??
-                throw new InvalidOperationException("storageBackedConfig.ContainerName is null");
-            _ = this.storageBackedConfig.CacheBlobName ??
-                throw new InvalidOperationException("storageBackedConfig.CacheBlobName is null");
-
-            this.storageClient = storageClient;
+            _storageBackedConfigWithClientValidator.ValidateAndThrow(_storageBackedConfig);
         }
 
         public override async Task LoadCacheAsync()
         {
-            Logger.LogDebug("Loading state cache...");
+            _logger.LogDebug("Loading state cache...");
 
             LoadedCacheFromStorage = false;
-
-            try
+            if (StateCache == null)
             {
-                if (StateCache == null)
+                var containerClient = _blobServiceClient.GetBlobContainerClient(_storageBackedConfig.ContainerName);
+                await containerClient.CreateIfNotExistsAsync();
+
+                var blobClient = containerClient.GetBlobClient(_storageBackedConfig.CacheBlobName);
+
+                if (!await blobClient.ExistsAsync().ConfigureAwait(false))
                 {
-                    var container = storageClient.GetContainerReference(storageBackedConfig.ContainerName);
-                    await container.CreateIfNotExistsAsync().ConfigureAwait(false);
-                    var cacheBlob = container.GetBlockBlobReference(storageBackedConfig.CacheBlobName);
+                    _logger.LogDebug("Backing blob does not exist...");
+                    StateCache = new Dictionary<string, T>();
+                }
+                else
+                {
+                    _logger.LogDebug("Backing blob exists, loading cache from blob...");
 
-                    if (!await cacheBlob.ExistsAsync().ConfigureAwait(false))
+                    var blobInfo = await blobClient.DownloadAsync();
+
+                    if (blobInfo != null &&
+                        blobInfo.Value != null &&
+                        blobInfo.Value.ContentLength > 0)
                     {
-                        Logger.LogDebug("Backing blob does not exist, initializing cache...");
+                        using var reader = new StreamReader(blobInfo.Value.Content);
+                        var json = await reader.ReadToEndAsync().ConfigureAwait(false);
 
-                        StateCache = new Dictionary<string, T>();
-                    }
-                    else
-                    {
-                        Logger.LogDebug("Backing blob exists, loading cache from blob...");
-
-                        var json = await cacheBlob.DownloadTextAsync().ConfigureAwait(false);
                         StateCache = JsonConvert.DeserializeObject<Dictionary<string, T>>(json,
                             STCommon.JsonSerializerSettings);
 
-                        Logger.LogDebug("Loaded state cache from blob...");
+                        _logger.LogDebug("Loaded state cache from blob...");
                         LoadedCacheFromStorage = true;
-
                     }
+                    else
+                    {
+                        _logger.LogDebug("Backing blob was empty...");
+                        StateCache = new Dictionary<string, T>();
+                    }
+
                 }
-            }
-            catch (StorageException stEx)
-            {
-                Logger.LogError(stEx, "Exception trying to load cache from blob...");
-                throw;
             }
         }
 
         public override async Task PersistCacheAsync()
         {
-            Logger.LogDebug("Saving state cache...");
+            _logger.LogDebug("Saving state cache...");
 
-            try
-            {
-                var container = storageClient.GetContainerReference(storageBackedConfig.ContainerName);
-                await container.CreateIfNotExistsAsync().ConfigureAwait(false);
-                var cacheBlob = container.GetBlockBlobReference(storageBackedConfig.CacheBlobName);
-                await cacheBlob.DeleteIfExistsAsync().ConfigureAwait(false);
+            var containerClient = _blobServiceClient.GetBlobContainerClient(_storageBackedConfig.ContainerName);
+            await containerClient.CreateIfNotExistsAsync().ConfigureAwait(false);
 
-                var json = JsonConvert.SerializeObject(StateCache,
-                    STCommon.JsonSerializerSettings);
-                await cacheBlob.UploadTextAsync(json).ConfigureAwait(false);
+            var blobClient = containerClient.GetBlobClient(_storageBackedConfig.CacheBlobName);
 
-                Logger.LogDebug("Saved state cache...");
-            }
-            catch (StorageException stEx)
-            {
-                Logger.LogError(stEx, "Exception trying to save cache to blob...");
-                throw;
-            }
+            var json = JsonConvert.SerializeObject(StateCache,
+                STCommon.JsonSerializerSettings);
+
+            using var stream = new MemoryStream();
+            using var writer = new StreamWriter(stream);
+            await writer.WriteAsync(json);
+            writer.Flush();
+            stream.Position = 0;
+
+            await blobClient.UploadAsync(stream).ConfigureAwait(false);
+
+            _logger.LogDebug("Saved state cache...");
         }
     }
 }

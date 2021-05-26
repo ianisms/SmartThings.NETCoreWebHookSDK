@@ -34,24 +34,20 @@ namespace AzureFunctionsApp
 {
     public class FunctionsService
     {
-        private readonly ILogger<FunctionsService> logger;
-        private readonly IInstalledAppTokenManager installedAppTokenManager;
-        private readonly IMyService myService;
+        private readonly ILogger<FunctionsService> _logger;
+        private readonly IInstalledAppTokenManager _installedAppTokenManager;
+        private readonly IMyService _myService;
 
         public FunctionsService(ILogger<FunctionsService> logger,
             IInstalledAppTokenManager installedAppTokenManager,
             IMyService myService)
         {
-            _ = logger ??
+            _logger = logger ??
                 throw new ArgumentNullException(nameof(logger));
-            _ = installedAppTokenManager ??
+            _installedAppTokenManager = installedAppTokenManager ??
                 throw new ArgumentNullException(nameof(installedAppTokenManager));
-            _ = myService ??
+            _myService = myService ??
                 throw new ArgumentNullException(nameof(myService));
-
-            this.logger = logger;
-            this.installedAppTokenManager = installedAppTokenManager;
-            this.myService = myService;
         }
 
         [FunctionName("FirstWH")]
@@ -60,7 +56,7 @@ namespace AzureFunctionsApp
         {
             try
             {
-                var responseObj = await myService.HandleRequestAsync(request).ConfigureAwait(false);
+                var responseObj = await _myService.HandleRequestAsync(request).ConfigureAwait(false);
                 if (responseObj != null)
                 {
                     return new OkObjectResult(responseObj);
@@ -72,7 +68,7 @@ namespace AzureFunctionsApp
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Exception calling myService.HandleRequestAsync");
+                _logger.LogError(ex, "Exception calling myService.HandleRequestAsync");
                 throw;
             }
         }
@@ -91,14 +87,14 @@ namespace AzureFunctionsApp
             {
                 if (timer.IsPastDue)
                 {
-                    logger.LogDebug("Timer is running late!");
+                    _logger.LogDebug("Timer is running late!");
                 }
 
-                await installedAppTokenManager.RefreshAllTokensAsync().ConfigureAwait(false);
+                await _installedAppTokenManager.RefreshAllTokensAsync().ConfigureAwait(false);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Exception calling installedAppTokenManager.RefreshAllTokensAsync");
+                _logger.LogError(ex, "Exception calling installedAppTokenManager.RefreshAllTokensAsync");
                 throw;
             }
         }

@@ -33,19 +33,16 @@ namespace ASPNetCoreWebAPI.Controllers
     [ApiController]
     public class DefaultController : ControllerBase
     {
-        private readonly ILogger<DefaultController> logger;
-        private readonly IMyService myService;
+        private readonly ILogger<DefaultController> _logger;
+        private readonly IMyService _myService;
 
         public DefaultController(ILogger<DefaultController> logger,
             IMyService myService)
         {
-            _ = logger ??
+            _logger = logger ??
                 throw new ArgumentNullException(nameof(logger));
-            _ = myService ??
+            _myService = myService ??
                 throw new ArgumentNullException(nameof(myService));
-
-            this.logger = logger;
-            this.myService = myService;
         }
 
 
@@ -62,7 +59,7 @@ namespace ASPNetCoreWebAPI.Controllers
         {
             try
             {
-                var responseObj = await myService.HandleRequestAsync(Request);
+                var responseObj = await _myService.HandleRequestAsync(Request);
                 if (responseObj != null)
                 {
                     return new OkObjectResult(responseObj);
@@ -74,7 +71,7 @@ namespace ASPNetCoreWebAPI.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Exception calling myService.HandleRequestAsync");
+                _logger.LogError(ex, "Exception calling myService.HandleRequestAsync");
                 return new StatusCodeResult(StatusCodes.Status500InternalServerError);
             }
         }

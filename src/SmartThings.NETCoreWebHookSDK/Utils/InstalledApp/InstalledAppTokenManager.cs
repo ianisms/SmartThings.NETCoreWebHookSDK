@@ -35,47 +35,35 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.InstalledApp
 {
     public interface IInstalledAppTokenManager
     {
-        ILogger<IInstalledAppTokenManager> Logger { get; }
-        IInstalledAppManager InstalledAppManager { get; }
-        InstalledAppTokenManagerConfig InstalledAppTokenManagerConfig { get; }
         Task RefreshAllTokensAsync();
     }
 
     public class InstalledAppTokenManager : IInstalledAppTokenManager
     {
-        public ILogger<IInstalledAppTokenManager> Logger { get; private set; }
-        public IInstalledAppManager InstalledAppManager { get; private set; }
-        public InstalledAppTokenManagerConfig InstalledAppTokenManagerConfig { get; private set; }
+        private readonly ILogger<IInstalledAppTokenManager> _logger;
+        private readonly IInstalledAppManager _installedAppManager;
 
         public InstalledAppTokenManager(ILogger<IInstalledAppTokenManager> logger,
-            IInstalledAppManager installedAppManager,
-            IOptions<InstalledAppTokenManagerConfig> options)
+            IInstalledAppManager installedAppManager)
         {
-            _ = logger ??
+            _logger = logger ??
                 throw new ArgumentNullException(nameof(logger));
-            _ = installedAppManager ??
+            _installedAppManager = installedAppManager ??
                 throw new ArgumentNullException(nameof(installedAppManager));
-
-            this.Logger = logger;
-            this.InstalledAppManager = installedAppManager;
-
-            this.InstalledAppTokenManagerConfig = 
-                options != null ? options.Value : 
-                new InstalledAppTokenManagerConfig();
         }
 
         public async Task RefreshAllTokensAsync()
         {
-            Logger.LogDebug("Refreshing all tokens...");
+            _logger.LogDebug("Refreshing all tokens...");
 
             try
             {
-                await InstalledAppManager.RefreshAllInstalledAppTokensAsync().ConfigureAwait(false);
-                Logger.LogDebug("All tokens refreshed...");
+                await _installedAppManager.RefreshAllInstalledAppTokensAsync().ConfigureAwait(false);
+                _logger.LogDebug("All tokens refreshed...");
             }
             catch (AggregateException ex)
             {
-                Logger.LogError(ex, "Exception trying to refresh all tokens!");
+                _logger.LogError(ex, "Exception trying to refresh all tokens!");
             }
         }
     }

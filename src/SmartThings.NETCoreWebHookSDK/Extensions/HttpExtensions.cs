@@ -55,9 +55,12 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Extensions
             _ = payload ?? throw new ArgumentNullException(nameof(payload));
             return new StringContent(payload.ToString());
         }
+
         public static void SetBasicAuthHeader(this HttpRequestMessage request, string username, string password)
         {
             _ = request ?? throw new ArgumentNullException(nameof(request));
+            _ = username ?? throw new ArgumentNullException(nameof(username));
+            _ = password ?? throw new ArgumentNullException(nameof(password));
 
             request.Headers.Authorization =
                 new AuthenticationHeaderValue("Basic",
@@ -65,9 +68,11 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Extensions
                         System.Text.Encoding.ASCII.GetBytes(
                             $"{username}:{password}")));
         }
+
         public static void SetBearerAuthHeader(this HttpRequestMessage request, string tokenValue)
         {
             _ = request ?? throw new ArgumentNullException(nameof(request));
+            _ = tokenValue ?? throw new ArgumentNullException(nameof(tokenValue));
 
             request.Headers.Authorization =
                 new AuthenticationHeaderValue("Bearer", tokenValue);

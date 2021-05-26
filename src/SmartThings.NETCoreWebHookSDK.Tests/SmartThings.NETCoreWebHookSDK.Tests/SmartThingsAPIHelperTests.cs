@@ -41,16 +41,16 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Tests
     public class SmartThingsAPIHelperTests
     {
         private readonly string BaseUri = "https://api.smartthings.com";
-        private readonly Mock<ILogger<ISmartThingsAPIHelper>> mockLogger;
-        private readonly Mock<IOptions<SmartAppConfig>> mockOptions;
-        private readonly Mock<HttpMessageHandler> mockHttpMessageHandler;
-        private readonly IHttpClientFactory mockHttpClientFactory;
-        private readonly ISmartThingsAPIHelper smartThingsAPIHelper;
+        private readonly Mock<ILogger<ISmartThingsAPIHelper>> _mockLogger;
+        private readonly Mock<IOptions<SmartAppConfig>> _mockOptions;
+        private readonly Mock<HttpMessageHandler> _mockHttpMessageHandler;
+        private readonly HttpClient _mockHttpClient;
+        private readonly ISmartThingsAPIHelper _smartThingsAPIHelper;
 
         public SmartThingsAPIHelperTests(ITestOutputHelper output)
         {
-            mockLogger = new Mock<ILogger<ISmartThingsAPIHelper>>();
-            mockLogger.Setup(log => log.Log(It.IsAny<LogLevel>(),
+            _mockLogger = new Mock<ILogger<ISmartThingsAPIHelper>>();
+            _mockLogger.Setup(log => log.Log(It.IsAny<LogLevel>(),
                 It.IsAny<EventId>(),
                 It.IsAny<object>(),
                 null,
@@ -70,16 +70,16 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Tests
                 SmartAppClientSecret = "SACLIENTSECRET"
             };
 
-            mockOptions = new Mock<IOptions<SmartAppConfig>>();
-            mockOptions.Setup(opt => opt.Value)
+            _mockOptions = new Mock<IOptions<SmartAppConfig>>();
+            _mockOptions.Setup(opt => opt.Value)
                 .Returns(smartAppConfig);
 
-            mockHttpMessageHandler = new Mock<HttpMessageHandler>();
+            _mockHttpMessageHandler = new Mock<HttpMessageHandler>();
 
-            mockHttpClientFactory = mockHttpMessageHandler.CreateClientFactory();
-            smartThingsAPIHelper = new SmartThingsAPIHelper(mockLogger.Object,
-                mockOptions.Object,
-                mockHttpClientFactory);
+            _mockHttpClient = _mockHttpMessageHandler.CreateClient();
+            _smartThingsAPIHelper = new SmartThingsAPIHelper(_mockLogger.Object,
+                _mockOptions.Object,
+                _mockHttpClient);
         }
 
         public static IEnumerable<object[]> ValidInstalledAppInstance()
@@ -113,11 +113,11 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Tests
         public async Task ClearSubscriptionsAsync_ShouldNotError(InstalledAppInstance installedApp)
         {
             var uri = $"{BaseUri}/installedapps/{installedApp.InstalledAppId}/subscriptions";
-            mockHttpMessageHandler.SetupRequest(HttpMethod.Delete,
+            _mockHttpMessageHandler.SetupRequest(HttpMethod.Delete,
                 uri)
                 .ReturnsResponse("ok");
 
-            var result = await smartThingsAPIHelper.ClearSubscriptionsAsync(installedApp);
+            var result = await _smartThingsAPIHelper.ClearSubscriptionsAsync(installedApp);
 
             Assert.NotNull(result);
         }
@@ -133,11 +133,11 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Tests
                 Label = "Front door lock"
             };
 
-            mockHttpMessageHandler.SetupRequest(HttpMethod.Post,
+            _mockHttpMessageHandler.SetupRequest(HttpMethod.Post,
                 $"{BaseUri}/devices/{doorLock.Id}/commands")
                 .ReturnsResponse("ok");
 
-            await smartThingsAPIHelper.DeviceCommandAsync(installedApp,
+            await _smartThingsAPIHelper.DeviceCommandAsync(installedApp,
                 doorLock.Id,
                 DoorLock.GetDeviceCommand(false));
         }
@@ -162,11 +162,11 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Tests
 
             dynamic expectedResult = JObject.Parse(responseBody);
 
-            mockHttpMessageHandler.SetupRequest(HttpMethod.Get,
+            _mockHttpMessageHandler.SetupRequest(HttpMethod.Get,
                 $"{BaseUri}/devices/{doorLock.Id}")
                 .ReturnsResponse(responseBody);
 
-            var result = await smartThingsAPIHelper.GetDeviceDetailsAsync(installedApp,
+            var result = await _smartThingsAPIHelper.GetDeviceDetailsAsync(installedApp,
                 doorLock.Id);
 
             Assert.Equal(expectedResult, result);
@@ -201,11 +201,11 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Tests
 
             dynamic expectedResult = JObject.Parse(responseBody);
 
-            mockHttpMessageHandler.SetupRequest(HttpMethod.Get,
+            _mockHttpMessageHandler.SetupRequest(HttpMethod.Get,
                 $"{BaseUri}/devices/{doorLock.Id}/status")
                 .ReturnsResponse(responseBody);
 
-            var result = await smartThingsAPIHelper.GetDeviceStatusAsync(installedApp,
+            var result = await _smartThingsAPIHelper.GetDeviceStatusAsync(installedApp,
                 doorLock.Id);
 
             Assert.Equal(expectedResult, result);
@@ -215,11 +215,11 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Tests
         [MemberData(nameof(ValidInstalledAppInstance))]
         public async Task GetLocationAsync_ShouldReturnExpectedResult(InstalledAppInstance installedApp)
         {
-            mockHttpMessageHandler.SetupRequest(HttpMethod.Get,
+            _mockHttpMessageHandler.SetupRequest(HttpMethod.Get,
                 $"{BaseUri}/locations/{installedApp.InstalledLocation.Id}")
                 .ReturnsResponse(JsonConvert.SerializeObject(installedApp.InstalledLocation));
 
-            var result = await smartThingsAPIHelper.GetLocationAsync(installedApp,
+            var result = await _smartThingsAPIHelper.GetLocationAsync(installedApp,
                 installedApp.InstalledLocation.Id);
 
             Assert.Equal(installedApp.InstalledLocation, result);
@@ -240,10 +240,10 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Tests
                 ""expires_in"": ""{atExpires}""
             }}";
 
-            mockHttpMessageHandler.SetupRequest(HttpMethod.Post,
+            _mockHttpMessageHandler.SetupRequest(HttpMethod.Post,
                 "https://auth-global.api.smartthings.com/oauth/token")
                 .ReturnsResponse(responseBody);
-            var result = await smartThingsAPIHelper.RefreshTokensAsync(installedApp);
+            var result = await _smartThingsAPIHelper.RefreshTokensAsync(installedApp);
 
             Assert.NotNull(result);
 
@@ -285,7 +285,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Tests
 
 
             var responseBody = $@"{{
-                ""id"": ""{Guid.NewGuid().ToString()}"",
+                ""id"": ""{Guid.NewGuid()}"",
                 ""installedAppId"": ""{installedApp.InstalledAppId}"",
                 ""sourceType"": ""DEVICE"",
                 ""device"": {deviceConfig}
@@ -293,11 +293,11 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Tests
 
             dynamic expectedResult = JObject.Parse(responseBody);
 
-            mockHttpMessageHandler.SetupRequest(HttpMethod.Post,
+            _mockHttpMessageHandler.SetupRequest(HttpMethod.Post,
                 $"{BaseUri}/installedapps/{installedApp.InstalledAppId}/subscriptions")
                 .ReturnsResponse(responseBody);
 
-            var response = await smartThingsAPIHelper.SubscribeToDeviceEventAsync(installedApp,
+            var response = await _smartThingsAPIHelper.SubscribeToDeviceEventAsync(installedApp,
                 dynDevice);
 
 
@@ -306,6 +306,68 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Tests
             dynamic result = JObject.Parse(responseText);
 
             Assert.Equal(expectedResult, result);
+        }
+
+        [Fact]
+        public void SmartThingsAPIHelper_RefreshTokensAsync_Should_Not_Throw()
+        {
+            var  installedApp = new InstalledAppInstance()
+            {
+                InstalledAppId = Guid.NewGuid().ToString(),
+                InstalledLocation = new Location()
+                {
+                    CountryCode = "US",
+                    Id = Guid.NewGuid().ToString(),
+                    Label = "Home",
+                    Latitude = 40.347054,
+                    Longitude = -74.064308,
+                    TempScale = TemperatureScale.F,
+                    TimeZoneId = "America/New_York",
+                    Locale = "en"
+                }
+            };
+
+            installedApp.SetTokens(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), -100);
+
+            _mockHttpMessageHandler.SetupRequest(HttpMethod.Post,
+                "https://auth-global.api.smartthings.com/oauth/token")
+                .ReturnsResponse(@"
+                {
+                    ""access_token"":""foo"",
+                    ""refresh_token"":""foo"",
+                    ""expires_in"":""1""
+                }");
+
+            _smartThingsAPIHelper.RefreshTokensAsync(installedApp);
+        }
+
+        [Fact]
+        public void SmartThingsAPIHelper_RefreshTokensAsync_Should_HandleError()
+        {
+            var installedApp = new InstalledAppInstance()
+            {
+                InstalledAppId = Guid.NewGuid().ToString(),
+                InstalledLocation = new Location()
+                {
+                    CountryCode = "US",
+                    Id = Guid.NewGuid().ToString(),
+                    Label = "Home",
+                    Latitude = 40.347054,
+                    Longitude = -74.064308,
+                    TempScale = TemperatureScale.F,
+                    TimeZoneId = "America/New_York",
+                    Locale = "en"
+                }
+            };
+
+            installedApp.SetTokens(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), -100);
+
+            _mockHttpMessageHandler.SetupRequest(HttpMethod.Post,
+                "https://auth-global.api.smartthings.com/oauth/token")
+                .ReturnsResponse(System.Net.HttpStatusCode.InternalServerError,
+                    "ERROR");
+
+            _smartThingsAPIHelper.RefreshTokensAsync(installedApp);
         }
     }
 }

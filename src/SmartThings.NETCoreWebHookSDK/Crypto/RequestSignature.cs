@@ -44,7 +44,8 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Crypto
 
         public static RequestSignature ParseFromHeaderVal(string headerVal)
         {
-            _ = headerVal ?? throw new ArgumentNullException(nameof(headerVal));
+            _ = headerVal ??
+                throw new ArgumentNullException(nameof(headerVal));
 
             if (!headerVal.StartsWith(SIGHEADERSTART, StringComparison.Ordinal))
             {
@@ -52,7 +53,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Crypto
                     nameof(headerVal));
             }
 
-            headerVal = headerVal.Substring(SIGHEADERSTART.Length);
+            headerVal = headerVal[SIGHEADERSTART.Length..];
 
             var sigMap = headerVal.Split(',')
                 .Select(part => part.Split('=', 2))

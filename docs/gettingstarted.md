@@ -2,13 +2,13 @@
 
 ## SmartThings SmartApps
 
-This SDK is used to build a WebHook SmartApp for SmartThings using  NET Core.  For details on how to register your SmartApp and how it runs within SmartThings, please read the [SmartApp documentation](https://smartthings.developer.samsung.com/docs/smartapps/smartapp-basics.html)
+This SDK is used to build a WebHook SmartApp for SmartThings using  NET 5.  For details on how to register your SmartApp and how it runs within SmartThings, please read the [SmartApp documentation](https://smartthings.developer.samsung.com/docs/smartapps/smartapp-basics.html)
 
 ## Samples
 
 You can find samples for ASP.NET Core and Azure functions in the samples directory:
 
-- [.NET Core 3.1](https://github.com/ianisms/SmartThings.NETCoreWebHookSDK/tree/master/samples)
+- [.NET 5](https://github.com/ianisms/SmartThings.NETCoreWebHookSDK/tree/master/samples)
 
 ## Setup Steps
 
