@@ -245,7 +245,6 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Tests
             _mockAzureStorageBackedStateConfigValidator = new Mock<AzureStorageBackedConfigValidator<AzureStorageBackedStateManager<string>>>();
             _mockAzureStorageBackedStateConfigWithClientValidator = new Mock<AzureStorageBackedConfigWithClientValidator<AzureStorageBackedStateManager<string>>>();
 
-
             _stateManager = new AzureStorageBackedStateManager<string>(_mockStateLogger.Object,
                 _mockStateOptions.Object,
                 _mockAzureStorageBackedStateConfigWithClientValidator.Object,

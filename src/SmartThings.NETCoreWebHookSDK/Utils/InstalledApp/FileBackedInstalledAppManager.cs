@@ -25,6 +25,7 @@
 // SOFTWARE.
 // </copyright>
 #endregion
+using FluentValidation;
 using ianisms.SmartThings.NETCoreWebHookSDK.Models.Config;
 using ianisms.SmartThings.NETCoreWebHookSDK.Models.SmartThings;
 using ianisms.SmartThings.NETCoreWebHookSDK.Utils.SmartThings;
@@ -43,22 +44,23 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.InstalledApp
     {
         private readonly ILogger<IInstalledAppManager> _logger;
         private readonly FileBackedConfig<FileBackedInstalledAppManager> _fileBackedConfig;
+        private readonly FileBackedConfigValidator<FileBackedInstalledAppManager> _fileBackedConfigValidator;
         private readonly IFileSystem _fileSystem;
 
         public FileBackedInstalledAppManager(ILogger<IInstalledAppManager> logger,
             ISmartThingsAPIHelper smartThingsAPIHelper,
             IOptions<FileBackedConfig<FileBackedInstalledAppManager>> options,
+            FileBackedConfigValidator<FileBackedInstalledAppManager> fileBackedConfigValidator,
             IFileSystem fileSystem)
             : base(logger, smartThingsAPIHelper)
         {
             _logger = logger ??
                 throw new ArgumentNullException(nameof(logger));
             _fileBackedConfig = options.Value ?? throw new ArgumentNullException(nameof(options));
+            _fileBackedConfigValidator = fileBackedConfigValidator ?? throw new ArgumentNullException(nameof(fileBackedConfigValidator));
             _fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
 
-            _ = _fileBackedConfig.BackingStorePath ??
-                throw new ArgumentException("fileBackedConfig.BackingStorePath is null",
-                    nameof(options));
+            _fileBackedConfigValidator.ValidateAndThrow(_fileBackedConfig);
         }
 
         public override async Task LoadCacheAsync()

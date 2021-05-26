@@ -40,19 +40,21 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Tests
 {
     public class FileBackedTests
     {
-        private readonly Mock<ILogger<IInstalledAppManager>> mockIALogger;
-        private readonly Mock<ILogger<IStateManager<string>>> mockStateLogger;
-        private readonly Mock<IOptions<FileBackedConfig<FileBackedInstalledAppManager>>> mockIAOptions;
-        private readonly Mock<IOptions<FileBackedConfig<FileBackedStateManager<string>>>> mockStateOptions;
-        private readonly Mock<ISmartThingsAPIHelper> mockSmartThingsAPIHelper;
-        private readonly IInstalledAppManager installedAppManager;
-        private readonly IStateManager<string> stateManager;
+        private readonly Mock<ILogger<IInstalledAppManager>> _mockIALogger;
+        private readonly Mock<ILogger<IStateManager<string>>> _mockStateLogger;
+        private readonly Mock<IOptions<FileBackedConfig<FileBackedInstalledAppManager>>> _mockIAOptions;
+        private readonly Mock<IOptions<FileBackedConfig<FileBackedStateManager<string>>>> _mockStateOptions;
+        private readonly Mock<FileBackedConfigValidator<FileBackedInstalledAppManager>> _mockFileBackedConfigIAValidator;
+        private readonly Mock<FileBackedConfigValidator<FileBackedStateManager<string>>> _mockFileBackedConfigStateValidator;
+        private readonly Mock<ISmartThingsAPIHelper> _mockSmartThingsAPIHelper;
+        private readonly IInstalledAppManager _installedAppManager;
+        private readonly IStateManager<string> _stateManager;
 
         public FileBackedTests(ITestOutputHelper output)
         {
-            mockIALogger = new Mock<ILogger<IInstalledAppManager>>();
-            mockStateLogger = new Mock<ILogger<IStateManager<string>>>();
-            mockIALogger.Setup(log => log.Log(It.IsAny<Microsoft.Extensions.Logging.LogLevel>(),
+            _mockIALogger = new Mock<ILogger<IInstalledAppManager>>();
+            _mockStateLogger = new Mock<ILogger<IStateManager<string>>>();
+            _mockIALogger.Setup(log => log.Log(It.IsAny<Microsoft.Extensions.Logging.LogLevel>(),
                 It.IsAny<EventId>(),
                 It.IsAny<object>(),
                 null,
@@ -65,7 +67,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Tests
                         {
                             output.WriteLine($"{logLevel} logged: \"{state}\"");
                         });
-            mockStateLogger.Setup(log => log.Log(It.IsAny<Microsoft.Extensions.Logging.LogLevel>(),
+            _mockStateLogger.Setup(log => log.Log(It.IsAny<Microsoft.Extensions.Logging.LogLevel>(),
                 It.IsAny<EventId>(),
                 It.IsAny<object>(),
                 null,
@@ -79,8 +81,8 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Tests
                         output.WriteLine($"{logLevel} logged: \"{state}\"");
                     });
 
-            mockSmartThingsAPIHelper = new Mock<ISmartThingsAPIHelper>();
-            mockSmartThingsAPIHelper.Setup(api => api.RefreshTokensAsync(It.IsAny<InstalledAppInstance>()))
+            _mockSmartThingsAPIHelper = new Mock<ISmartThingsAPIHelper>();
+            _mockSmartThingsAPIHelper.Setup(api => api.RefreshTokensAsync(It.IsAny<InstalledAppInstance>()))
                 .Returns(() =>
                 {
                     return Task.FromResult<InstalledAppInstance>(CommonUtils.GetValidInstalledAppInstance());
@@ -96,12 +98,12 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Tests
                 BackingStorePath = "data/state.store"
             };
 
-            mockIAOptions = new Mock<IOptions<FileBackedConfig<FileBackedInstalledAppManager>>>();
-            mockIAOptions.Setup(opt => opt.Value)
+            _mockIAOptions = new Mock<IOptions<FileBackedConfig<FileBackedInstalledAppManager>>>();
+            _mockIAOptions.Setup(opt => opt.Value)
                 .Returns(iaConfig);
 
-            mockStateOptions = new Mock<IOptions<FileBackedConfig<FileBackedStateManager<string>>>>();
-            mockStateOptions.Setup(opt => opt.Value)
+            _mockStateOptions = new Mock<IOptions<FileBackedConfig<FileBackedStateManager<string>>>>();
+            _mockStateOptions.Setup(opt => opt.Value)
                 .Returns(stateConfig);
 
             var mockIAFileData = new MockFileData(JsonConvert.SerializeObject(CommonUtils.GetIACache()));
@@ -114,13 +116,19 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Tests
 
             mockFileSystem.AddFile("data/state.store", mockStateFileData);
 
-            installedAppManager = new FileBackedInstalledAppManager(mockIALogger.Object,
-                mockSmartThingsAPIHelper.Object,
-                mockIAOptions.Object,
+            _mockFileBackedConfigIAValidator = new Mock<FileBackedConfigValidator<FileBackedInstalledAppManager>>();
+
+            _installedAppManager = new FileBackedInstalledAppManager(_mockIALogger.Object,
+                _mockSmartThingsAPIHelper.Object,
+                _mockIAOptions.Object,
+                _mockFileBackedConfigIAValidator.Object,
                 mockFileSystem);
 
-            stateManager = new FileBackedStateManager<string>(mockStateLogger.Object,
-                mockStateOptions.Object,
+            _mockFileBackedConfigStateValidator = new Mock<FileBackedConfigValidator<FileBackedStateManager<string>>>();
+
+            _stateManager = new FileBackedStateManager<string>(_mockStateLogger.Object,
+                _mockStateOptions.Object,
+                _mockFileBackedConfigStateValidator.Object,
                 mockFileSystem);
         }
 
@@ -138,14 +146,14 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Tests
         [MemberData(nameof(ValidInstalledAppInstance))]
         public async Task IAStoreInstalledAppAsyncc_ShouldNotError(InstalledAppInstance installedApp)
         {
-            await installedAppManager.StoreInstalledAppAsync(installedApp);
+            await _installedAppManager.StoreInstalledAppAsync(installedApp);
         }
 
         [Theory]
         [MemberData(nameof(ValidInstalledAppInstance))]
         public async Task IAGetInstalledAppAsync_ShouldReturnExpectedResult(InstalledAppInstance installedApp)
         {
-            var result = await installedAppManager.GetInstalledAppAsync(installedApp.InstalledAppId);
+            var result = await _installedAppManager.GetInstalledAppAsync(installedApp.InstalledAppId);
             Assert.NotNull(result);
             Assert.Equal(installedApp.InstalledAppId, result.InstalledAppId);
             Assert.Equal(installedApp.InstalledLocation, result.InstalledLocation);
@@ -154,35 +162,35 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Tests
         [Fact]
         public async Task IAPersistCacheAsync_ShouldNotError()
         {
-            await installedAppManager.PersistCacheAsync();
+            await _installedAppManager.PersistCacheAsync();
         }
 
         [Fact]
         public async Task IARefreshAllInstalledAppTokensAsync_ShouldNotError()
         {
-            await installedAppManager.RefreshAllInstalledAppTokensAsync();
+            await _installedAppManager.RefreshAllInstalledAppTokensAsync();
         }
 
         [Theory]
         [MemberData(nameof(ValidInstalledAppInstance))]
         public async Task IARefreshTokensAsync_ShouldNotError(InstalledAppInstance installedApp)
         {
-            await installedAppManager.RefreshTokensAsync(installedApp);
+            await _installedAppManager.RefreshTokensAsync(installedApp);
         }
 
         [Theory]
         [MemberData(nameof(ValidInstalledAppInstance))]
         public async Task IARemoveInstalledAppAsync_ShouldNotError(InstalledAppInstance installedApp)
         {
-            await installedAppManager.LoadCacheAsync();
-            await installedAppManager.RemoveInstalledAppAsync(installedApp.InstalledAppId);
+            await _installedAppManager.LoadCacheAsync();
+            await _installedAppManager.RemoveInstalledAppAsync(installedApp.InstalledAppId);
         }
 
         [Theory]
         [MemberData(nameof(ValidInstalledAppInstance))]
         public async Task StateGetStateAsync_ShouldReturnExpectedResult(InstalledAppInstance installedApp)
         {
-            var result = await stateManager.GetStateAsync(installedApp.InstalledAppId);
+            var result = await _stateManager.GetStateAsync(installedApp.InstalledAppId);
             Assert.NotNull(result);
             Assert.Equal(CommonUtils.GetStateObject(), result);
         }
@@ -191,16 +199,16 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Tests
         [MemberData(nameof(ValidInstalledAppInstance))]
         public async Task StateRemoveStateAsync_ShouldNotError(InstalledAppInstance installedApp)
         {
-            await stateManager.RemoveStateAsync(installedApp.InstalledAppId);
+            await _stateManager.RemoveStateAsync(installedApp.InstalledAppId);
         }
 
         [Theory]
         [MemberData(nameof(ValidInstalledAppInstance))]
         public async Task StateStoreStateAsync_ShouldNotErrorAndShouldNotify(InstalledAppInstance installedApp)
         {
-            var observer = new StateObserver(mockStateLogger.Object);
-            stateManager.Subscribe(observer);
-            await stateManager.StoreStateAsync(installedApp.InstalledAppId, CommonUtils.GetStateObject());
+            var observer = new StateObserver(_mockStateLogger.Object);
+            _stateManager.Subscribe(observer);
+            await _stateManager.StoreStateAsync(installedApp.InstalledAppId, CommonUtils.GetStateObject());
         }
     }
 }

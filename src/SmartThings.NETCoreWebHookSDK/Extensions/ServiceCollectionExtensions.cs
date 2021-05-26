@@ -32,6 +32,7 @@ using ianisms.SmartThings.NETCoreWebHookSDK.Utils.InstalledApp;
 using ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers;
 using Microsoft.Extensions.DependencyInjection;
 using System.IO.Abstractions;
+using ianisms.SmartThings.NETCoreWebHookSDK.Models.Config;
 
 namespace ianisms.SmartThings.NETCoreWebHookSDK.Extensions
 {
@@ -66,12 +67,14 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Extensions
         public static IServiceCollection AddFileBackedInstalledAppManager(this IServiceCollection services)
         {
             services.AddSingleton<IFileSystem, FileSystem>();
+            services.AddSingleton<FileBackedConfigValidator<FileBackedInstalledAppManager>>();
             services.AddSingleton<IInstalledAppManager, FileBackedInstalledAppManager>();
             return services;
         }
 
         public static IServiceCollection AddAzureStorageBackedInstalledAppManager(this IServiceCollection services)
         {
+            services.AddSingleton<AzureStorageBackedConfigValidator<AzureStorageBackedInstalledAppManager>>();
             services.AddSingleton<IInstalledAppManager, AzureStorageBackedInstalledAppManager>();
             return services;
         }
@@ -79,12 +82,14 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Extensions
         public static IServiceCollection AddFileBackedStateManager<T>(this IServiceCollection services)
         {
             services.AddSingleton<IFileSystem, FileSystem>();
+            services.AddSingleton<FileBackedConfigValidator<FileBackedStateManager<T>>>();
             services.AddSingleton<IStateManager<T>, FileBackedStateManager<T>>();
             return services;
         }
 
         public static IServiceCollection AddAzureStorageStateManager<T>(this IServiceCollection services)
         {
+            services.AddSingleton<AzureStorageBackedConfigValidator<AzureStorageBackedStateManager<T>>>();
             services.AddSingleton<IStateManager<T>, AzureStorageBackedStateManager<T>>();
             return services;
         }

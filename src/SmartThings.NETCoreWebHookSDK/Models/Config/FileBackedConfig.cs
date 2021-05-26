@@ -25,10 +25,21 @@
 // SOFTWARE.
 // </copyright>
 #endregion
+using FluentValidation;
+
 namespace ianisms.SmartThings.NETCoreWebHookSDK.Models.Config
 {
     public class FileBackedConfig<T>
     {
         public string BackingStorePath { get; set; }
+    }
+
+    public class FileBackedConfigValidator<T> : AbstractValidator<FileBackedConfig<T>> where T : class
+    {
+        public FileBackedConfigValidator()
+        {
+            RuleFor(context => context.BackingStorePath).Must(val => !string.IsNullOrEmpty(val))
+                .WithMessage($"BackingStorePath must not be null or empty");
+        }
     }
 }

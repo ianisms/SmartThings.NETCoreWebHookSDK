@@ -25,6 +25,7 @@
 // SOFTWARE.
 // </copyright>
 #endregion
+using FluentValidation;
 using ianisms.SmartThings.NETCoreWebHookSDK.Models.Config;
 using ianisms.SmartThings.NETCoreWebHookSDK.Models.SmartThings;
 using Microsoft.Extensions.Logging;
@@ -42,20 +43,21 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.State
     {
         private readonly ILogger<IStateManager<T>> _logger;
         private readonly FileBackedConfig<FileBackedStateManager<T>> _fileBackedConfig;
+        private readonly FileBackedConfigValidator<FileBackedStateManager<T>> _fileBackedConfigValidator;
         private readonly IFileSystem _fileSystem;
 
         public FileBackedStateManager(ILogger<IStateManager<T>> logger,
             IOptions<FileBackedConfig<FileBackedStateManager<T>>> options,
+            FileBackedConfigValidator<FileBackedStateManager<T>> fileBackedConfigValidator,
             IFileSystem fileSystem)
             : base(logger)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _fileBackedConfig = options?.Value ?? throw new ArgumentNullException(nameof(options));
+            _fileBackedConfigValidator = fileBackedConfigValidator ?? throw new ArgumentNullException(nameof(fileBackedConfigValidator));
             _fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
 
-            _ = _fileBackedConfig.BackingStorePath ??
-                throw new ArgumentException("fileBackedConfig.BackingStorePath is null",
-                nameof(options));
+            _fileBackedConfigValidator.ValidateAndThrow(_fileBackedConfig);
         }
 
         public override async Task LoadCacheAsync()
