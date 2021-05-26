@@ -1,10 +1,10 @@
 # SmartThings.NETCoreWebHookSDK
 
-![.NET Core](https://github.com/ianisms/SmartThings.NETCoreWebHookSDK/workflows/.NET%205%20CD/badge.svg)
+![.NET 5](https://github.com/ianisms/SmartThings.NETCoreWebHookSDK/workflows/.NET%205%20CD/badge.svg)
 
 ## Description
 
-SDK for building SmartThings webhook automations using .NET 5.
+SDK for building SmartThings webhook automations using .NET 5
 
 ## Details
 
