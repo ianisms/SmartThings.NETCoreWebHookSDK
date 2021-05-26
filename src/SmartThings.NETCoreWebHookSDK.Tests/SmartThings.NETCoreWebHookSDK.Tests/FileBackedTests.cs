@@ -147,7 +147,8 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Tests
         {
             var result = await installedAppManager.GetInstalledAppAsync(installedApp.InstalledAppId);
             Assert.NotNull(result);
-            Assert.Equal(installedApp, result);
+            Assert.Equal(installedApp.InstalledAppId, result.InstalledAppId);
+            Assert.Equal(installedApp.InstalledLocation, result.InstalledLocation);
         }
 
         [Fact]
