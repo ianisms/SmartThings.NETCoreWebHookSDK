@@ -52,7 +52,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Crypto
         private readonly CryptoUtilsConfig _config;
         private readonly CryptoUtilsConfigValidator _cryptoUtilsConfigValidator;
         private readonly HttpClient _httpClient;
-        private RSACryptoServiceProvider _publicKeyProvider;
+        private RSA _publicKeyProvider;
 
         public CryptoUtils(ILogger<CryptoUtils> logger,
             IOptions<CryptoUtilsConfig> options,
@@ -71,17 +71,17 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Crypto
             _cryptoUtilsConfigValidator.ValidateAndThrow(_config);
         }
 
-        private async Task<RSACryptoServiceProvider> GetRSAProviderFromCertAsync(RequestSignature reqSignature)
+        private async Task<RSA> GetRSAProviderFromCertAsync(RequestSignature reqSignature)
         {
             _ = reqSignature ?? throw new ArgumentNullException(nameof(reqSignature));
             _ = reqSignature.KeyId ?? throw new InvalidOperationException($"{nameof(reqSignature.KeyId)} is null");
 
-            var certUri = $"{_config.SmartThingsCertUriRoot}/{reqSignature.KeyId}";
+            var certUri = $"{_config.SmartThingsCertUriRoot}{reqSignature.KeyId}";
             var certBytes = await _httpClient.GetByteArrayAsync(certUri);
             if (certBytes?.Length > 0)
             {
                 var cert = new X509Certificate2(certBytes);
-                return (RSACryptoServiceProvider)cert.PublicKey.Key;
+                return cert.GetRSAPublicKey();
             }
 
             return null;
@@ -142,7 +142,8 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Crypto
 
             if (_publicKeyProvider != null)
             {
-                return _publicKeyProvider.VerifyData(hash, "SHA256", data);
+                return _publicKeyProvider.VerifyData(hash, data, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
+                //return _publicKeyProvider.VerifyData(hash, "SHA256", data);
             } else
             {
                 return false;
