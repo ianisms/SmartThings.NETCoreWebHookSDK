@@ -52,7 +52,6 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Crypto
         private readonly CryptoUtilsConfig _config;
         private readonly CryptoUtilsConfigValidator _cryptoUtilsConfigValidator;
         private readonly HttpClient _httpClient;
-        private RSA _publicKeyProvider;
 
         public CryptoUtils(ILogger<CryptoUtils> logger,
             IOptions<CryptoUtilsConfig> options,
@@ -132,19 +131,16 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Crypto
 
             var reqSignature = RequestSignature.ParseFromHeaderVal(request.Headers["Authorization"].FirstOrDefault());
 
-            if (_publicKeyProvider == null)
-            {
-                _publicKeyProvider = await GetRSAProviderFromCertAsync(reqSignature);
-            }
-
             var hash = GetHash(reqSignature, request);
             var data = Convert.FromBase64String(reqSignature.Signature);
 
-            if (_publicKeyProvider != null)
+            var publicKeyProvider = await GetRSAProviderFromCertAsync(reqSignature);
+
+            if (publicKeyProvider != null)
             {
                 return _publicKeyProvider.VerifyData(hash, data, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
-                //return _publicKeyProvider.VerifyData(hash, "SHA256", data);
-            } else
+            } 
+            else
             {
                 return false;
             }
