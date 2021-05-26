@@ -138,7 +138,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Crypto
 
             if (publicKeyProvider != null)
             {
-                return _publicKeyProvider.VerifyData(hash, data, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
+                return publicKeyProvider.VerifyData(hash, data, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
             } 
             else
             {
