@@ -2,6 +2,13 @@
 
 ## Releases
 
+### 5.0.0.0 - 26 May 2021
+
+- .NET 5
+- Move to confirmation flow, fixes issue #10
+- Move to Samsung public key as opposed to local key file
+- General cleanup
+
 ### 3.1.4.0 - 23 June 2020
 
 - Package build and deployment via Github Actions
