@@ -16,7 +16,7 @@
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <PackageTags>aspnetcore, smartthings, automation, azurefunctions</PackageTags>
-    <Version>5.0.0.1</Version>
+    <Version>5.0.1</Version>
     <AssemblyVersion>5.0.0.1</AssemblyVersion>
     <FileVersion>5.0.0.1</FileVersion>
   </PropertyGroup>
