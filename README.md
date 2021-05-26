@@ -1,16 +1,16 @@
 # SmartThings.NETCoreWebHookSDK
 
-![.NET Core](https://github.com/ianisms/SmartThings.NETCoreWebHookSDK/workflows/.NET%20Core%20CD/badge.svg)
+![.NET 5](https://github.com/ianisms/SmartThings.NETCoreWebHookSDK/workflows/.NET%205%20CD/badge.svg)
 
 ## Description
 
-SDK for building SmartThings webhook automations using .NET Core 3.1.
+SDK for building SmartThings webhook automations using .NET 5
 
 ## Details
 
 - [Release Notes](https://github.com/ianisms/SmartThings.NETCoreWebHookSDK/blob/master/docs/RELEASENOTES.md)
 - [Documentation](https://ianisms.github.io/SmartThings.NETCoreWebHookSDK/)
-- [Samples for .NET Core 3.1](https://github.com/ianisms/SmartThings.NETCoreWebHookSDK/tree/master/samples)
+- [Samples for .NET 5](https://github.com/ianisms/SmartThings.NETCoreWebHookSDK/tree/master/samples)
 
 ### NUGET
 
