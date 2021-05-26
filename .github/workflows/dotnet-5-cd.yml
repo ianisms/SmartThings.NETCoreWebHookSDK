@@ -2,7 +2,7 @@ name: .NET 5 CD
 
 on:
   push:
-    branches: [ master ]
+    branches: [ main ]
     paths:
     - 'src/**'
 jobs:
