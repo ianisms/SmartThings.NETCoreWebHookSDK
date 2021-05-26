@@ -2,6 +2,11 @@
 
 ## Releases
 
+
+### 5.0.0.1 - 27 May 2021
+
+- Fix for validators
+
 ### 5.0.0.0 - 26 May 2021
 
 - .NET 5
