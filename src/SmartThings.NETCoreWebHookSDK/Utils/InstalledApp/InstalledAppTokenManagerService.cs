@@ -40,12 +40,18 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.InstalledApp
     {
         private bool disposed = false;
         private Timer refreshTimer;
+        private readonly ILogger<IInstalledAppTokenManager> _logger;
+        private readonly InstalledAppTokenManagerConfig _installedAppTokenManagerConfig;
 
         public InstalledAppTokenManagerService(ILogger<IInstalledAppTokenManager> logger,
             IInstalledAppManager installedAppManager,
             IOptions<InstalledAppTokenManagerConfig> options)
-            : base(logger, installedAppManager, options)
+            : base(logger, installedAppManager)
         {
+            _logger = logger ??
+                throw new ArgumentNullException(nameof(logger));
+            _installedAppTokenManagerConfig = options?.Value ??
+                throw new ArgumentNullException(nameof(options));
         }
 
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
@@ -58,16 +64,16 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.InstalledApp
                 },
                 null,
                 TimeSpan.Zero,
-                InstalledAppTokenManagerConfig.RefreshInterval);
+                _installedAppTokenManagerConfig.RefreshInterval);
 
-            Logger.LogDebug("InstalledAppTokenManagerService started...");
+            _logger.LogDebug("InstalledAppTokenManagerService started...");
         }
 
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
         public async Task StopAsync(CancellationToken cancellationToken)
 #pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
         {
-            Logger.LogDebug("InstalledAppTokenManagerService stopped...");
+            _logger.LogDebug("InstalledAppTokenManagerService stopped...");
         }
 
         // Implement IDisposable.

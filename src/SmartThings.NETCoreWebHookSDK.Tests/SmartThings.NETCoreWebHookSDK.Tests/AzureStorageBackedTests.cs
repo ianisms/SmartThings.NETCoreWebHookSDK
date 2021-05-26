@@ -20,24 +20,24 @@
 // </copyright>
 #endregion
 
+using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
+using FluentAssertions;
+using FluentValidation;
 using ianisms.SmartThings.NETCoreWebHookSDK.Models.Config;
 using ianisms.SmartThings.NETCoreWebHookSDK.Models.SmartThings;
 using ianisms.SmartThings.NETCoreWebHookSDK.Utils.InstalledApp;
 using ianisms.SmartThings.NETCoreWebHookSDK.Utils.SmartThings;
 using ianisms.SmartThings.NETCoreWebHookSDK.Utils.State;
-using Microsoft.Azure.Storage;
-using Microsoft.Azure.Storage.Auth;
-using Microsoft.Azure.Storage.Blob;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
-using Moq.Contrib.HttpClient;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
+using System.IO;
+using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 using Xunit.Abstractions;
@@ -46,21 +46,26 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Tests
 {
     public class AzureStorageBackedTests
     {
-        private readonly Mock<ILogger<IInstalledAppManager>> mockIALogger;
-        private readonly Mock<ILogger<IStateManager<string>>> mockStateLogger;
-        private readonly Mock<IOptions<AzureStorageBackedConfig<AzureStorageBackedInstalledAppManager>>> mockIAOptions;
-        private readonly Mock<IOptions<AzureStorageBackedConfig<AzureStorageBackedStateManager<string>>>> mockStateOptions;
-        private readonly Mock<ISmartThingsAPIHelper> mockSmartThingsAPIHelper;
-        private readonly Mock<CloudBlobClient> mockIABlobClient;
-        private readonly Mock<CloudBlobClient> mockStateBlobClient;
-        private readonly IInstalledAppManager installedAppManager;
-        private readonly IStateManager<string> stateManager;
+        private readonly Mock<ILogger<IInstalledAppManager>> _mockIALogger;
+        private readonly Mock<ILogger<IStateManager<string>>> _mockStateLogger;
+        private readonly Mock<IOptions<AzureStorageBackedConfig<AzureStorageBackedInstalledAppManager>>> _mockIAOptions;
+        private readonly Mock<AzureStorageBackedConfigValidator<AzureStorageBackedInstalledAppManager>> _mockAzureStorageBackedIAConfigValidator;
+        private readonly Mock<AzureStorageBackedConfigWithClientValidator<AzureStorageBackedInstalledAppManager>> _mockAzureStorageBackedIAConfigWithClientValidator;
+        private readonly Mock<AzureStorageBackedConfigValidator<AzureStorageBackedStateManager<string>>> _mockAzureStorageBackedStateConfigValidator;
+        private readonly Mock<AzureStorageBackedConfigWithClientValidator<AzureStorageBackedStateManager<string>>> _mockAzureStorageBackedStateConfigWithClientValidator;
+        private readonly Mock<IOptions<AzureStorageBackedConfig<AzureStorageBackedStateManager<string>>>> _mockStateOptions;
+
+        private readonly Mock<ISmartThingsAPIHelper> _mockSmartThingsAPIHelper;
+        private readonly Mock<BlobServiceClient> _mockIABlobServiceClient;
+        private readonly Mock<BlobServiceClient> _mockStateBlobServiceClient;
+        private readonly IInstalledAppManager _installedAppManager;
+        private readonly IStateManager<string> _stateManager;
 
         public AzureStorageBackedTests(ITestOutputHelper output)
         {
-            mockIALogger = new Mock<ILogger<IInstalledAppManager>>();
-            mockStateLogger = new Mock<ILogger<IStateManager<string>>>();
-            mockIALogger.Setup(log => log.Log(It.IsAny<Microsoft.Extensions.Logging.LogLevel>(),
+            _mockIALogger = new Mock<ILogger<IInstalledAppManager>>();
+            _mockStateLogger = new Mock<ILogger<IStateManager<string>>>();
+            _mockIALogger.Setup(log => log.Log(It.IsAny<Microsoft.Extensions.Logging.LogLevel>(),
                 It.IsAny<EventId>(),
                 It.IsAny<object>(),
                 null,
@@ -73,7 +78,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Tests
                         {
                             output.WriteLine($"{logLevel} logged: \"{state}\"");
                         });
-            mockStateLogger.Setup(log => log.Log(It.IsAny<Microsoft.Extensions.Logging.LogLevel>(),
+            _mockStateLogger.Setup(log => log.Log(It.IsAny<Microsoft.Extensions.Logging.LogLevel>(),
                 It.IsAny<EventId>(),
                 It.IsAny<object>(),
                 null,
@@ -87,52 +92,122 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Tests
                         output.WriteLine($"{logLevel} logged: \"{state}\"");
                     });
 
-            mockSmartThingsAPIHelper = new Mock<ISmartThingsAPIHelper>();
-            mockSmartThingsAPIHelper.Setup(api => api.RefreshTokensAsync(It.IsAny<InstalledAppInstance>()))
+            _mockSmartThingsAPIHelper = new Mock<ISmartThingsAPIHelper>();
+            _mockSmartThingsAPIHelper.Setup(api => api.RefreshTokensAsync(It.IsAny<InstalledAppInstance>()))
                 .Returns(() =>
                 {
                     return Task.FromResult<InstalledAppInstance>(CommonUtils.GetValidInstalledAppInstance());
                 });
 
-            var mockIABlob = new Mock<CloudBlockBlob>(new Uri("http://localhost/MyBlob"));
-            mockIABlob.Setup(b => b.ExistsAsync())
-                .Returns(() =>
-                {
-                    return Task.FromResult(true);
-                });
-            mockIABlob.Setup(b => b.DownloadTextAsync())
-                .Returns(() =>
-                {
-                    return Task.FromResult(JsonConvert.SerializeObject(CommonUtils.GetIACache()));
-                });
+            var iaBlobStream = new MemoryStream(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(CommonUtils.GetIACache())));
+            iaBlobStream.Seek(0, SeekOrigin.Begin);
 
-            var mockIAContainer = new Mock<CloudBlobContainer>(new Uri("http://localhost/MyContainer"));
-            mockIAContainer.Setup(c => c.GetBlockBlobReference(It.IsAny<string>()))
-                .Returns(mockIABlob.Object);
+            var iaBlobStreamInfo = BlobsModelFactory.BlobDownloadInfo(DateTimeOffset.Now,
+                0,
+                BlobType.Block,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                CopyStatus.Success,
+                null,
+                LeaseDurationType.Infinite,
+                null,
+                LeaseState.Available,
+                null,
+                LeaseStatus.Unlocked,
+                null,
+                null,
+                default,
+                0,
+                null,
+                false,
+                null,
+                null,
+                null,
+                100,
+                null,
+                null,
+                null,
+                iaBlobStream);
 
-            mockIABlobClient = new Mock<CloudBlobClient>(new Uri("http://localhost/MyCLient"), null);
-            mockIABlobClient.Setup(cbc => cbc.GetContainerReference(It.IsAny<string>()))
-                .Returns(mockIAContainer.Object);
+            var mockTrueResponse = new Mock<Azure.Response<bool>>();
+            mockTrueResponse.Setup(m => m.Value).Returns(true);
 
-            var mockStateBlob = new Mock<CloudBlockBlob>(new Uri("http://localhost/MyBlob"));
-            mockStateBlob.Setup(b => b.ExistsAsync())
-                .Returns(() =>
-                {
-                    return Task.FromResult(true);
-                });
-            mockStateBlob.Setup(b => b.DownloadTextAsync())
-                .Returns(() =>
-                {
-                    return Task.FromResult(JsonConvert.SerializeObject(CommonUtils.GetStateCache()));
-                });
+            var mockFalseResponse = new Mock<Azure.Response<bool>>();
+            mockFalseResponse.Setup(m => m.Value).Returns(false);
 
-            var mockStateContainer = new Mock<CloudBlobContainer>(new Uri("http://localhost/MyContainer"));
-            mockStateContainer.Setup(c => c.GetBlockBlobReference(It.IsAny<string>()))
-                .Returns(mockStateBlob.Object);
+            var mockIABlobDownloadInfoResponse = new Mock<Azure.Response<BlobDownloadInfo>>();
+            mockIABlobDownloadInfoResponse.Setup(m => m.Value)
+                .Returns(iaBlobStreamInfo);
 
-            mockStateBlobClient = new Mock<CloudBlobClient>(new Uri("http://localhost/MyCLient"), null);
-            mockStateBlobClient.Setup(cbc => cbc.GetContainerReference(It.IsAny<string>()))
-                .Returns(mockStateContainer.Object);
+            var mockIABlobClient = new Mock<BlobClient>();
+            mockIABlobClient.Setup(m => m.DownloadAsync())
+                .ReturnsAsync(mockIABlobDownloadInfoResponse.Object);
+            mockIABlobClient.Setup(m => m.ExistsAsync(It.IsAny<CancellationToken>()))
+                .ReturnsAsync(mockTrueResponse.Object);
+
+            var mockIABlobContainerClient = new Mock<BlobContainerClient>();
+            mockIABlobContainerClient.Setup(m => m.GetBlobClient(It.IsAny<string>()))
+                .Returns(mockIABlobClient.Object);
+
+            _mockIABlobServiceClient = new Mock<BlobServiceClient>();
+            _mockIABlobServiceClient.Setup(m => m.GetBlobContainerClient(It.IsAny<string>()))
+                .Returns(mockIABlobContainerClient.Object);
+
+            var stateBlobStream = new MemoryStream(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(CommonUtils.GetStateCache())));
+            stateBlobStream.Seek(0, SeekOrigin.Begin);
+
+            var stateBlobStreamInfo = BlobsModelFactory.BlobDownloadInfo(DateTimeOffset.Now,
+                0,
+                BlobType.Block,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                CopyStatus.Success,
+                null,
+                LeaseDurationType.Infinite,
+                null,
+                LeaseState.Available,
+                null,
+                LeaseStatus.Unlocked,
+                null,
+                null,
+                default,
+                0,
+                null,
+                false,
+                null,
+                null,
+                null,
+                100,
+                null,
+                null,
+                null,
+                stateBlobStream);
+
+            var mockStateBlobDownloadInfoResponse = new Mock<Azure.Response<BlobDownloadInfo>>();
+            mockStateBlobDownloadInfoResponse.Setup(m => m.Value)
+                .Returns(stateBlobStreamInfo);
+
+            var mockStateBlobClient = new Mock<BlobClient>();
+            mockStateBlobClient.Setup(m => m.DownloadAsync())
+                .ReturnsAsync(mockStateBlobDownloadInfoResponse.Object);
+            mockStateBlobClient.Setup(m => m.ExistsAsync(It.IsAny<CancellationToken>()))
+                .ReturnsAsync(mockTrueResponse.Object);
+
+            var mockStateBlobContainerClient = new Mock<BlobContainerClient>();
+            mockStateBlobContainerClient.Setup(m => m.GetBlobClient(It.IsAny<string>()))
+                .Returns(mockStateBlobClient.Object);
+
+            _mockStateBlobServiceClient = new Mock<BlobServiceClient>();
+            _mockStateBlobServiceClient.Setup(m => m.GetBlobContainerClient(It.IsAny<string>()))
+                .Returns(mockStateBlobContainerClient.Object);
 
             var iaConfig = new AzureStorageBackedConfig<AzureStorageBackedInstalledAppManager>()
             {
@@ -148,26 +223,35 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Tests
                 ContainerName = "Blobs"
             };
 
-            mockIAOptions = new Mock<IOptions<AzureStorageBackedConfig<AzureStorageBackedInstalledAppManager>>>();
-            mockIAOptions.Setup(opt => opt.Value)
+            _mockIAOptions = new Mock<IOptions<AzureStorageBackedConfig<AzureStorageBackedInstalledAppManager>>>();
+            _mockIAOptions.Setup(opt => opt.Value)
                 .Returns(iaConfig);
 
-            mockStateOptions = new Mock<IOptions<AzureStorageBackedConfig<AzureStorageBackedStateManager<string>>>>();
-            mockStateOptions.Setup(opt => opt.Value)
+            _mockStateOptions = new Mock<IOptions<AzureStorageBackedConfig<AzureStorageBackedStateManager<string>>>>();
+            _mockStateOptions.Setup(opt => opt.Value)
                 .Returns(stateConfig);
 
-            installedAppManager = new AzureStorageBackedInstalledAppManager(mockIALogger.Object,
-                mockSmartThingsAPIHelper.Object,
-                mockIAOptions.Object,
-                mockIABlobClient.Object);
+            _mockAzureStorageBackedIAConfigValidator = new Mock<AzureStorageBackedConfigValidator<AzureStorageBackedInstalledAppManager>>();
+            _mockAzureStorageBackedIAConfigWithClientValidator = new Mock<AzureStorageBackedConfigWithClientValidator<AzureStorageBackedInstalledAppManager>>();
 
-            installedAppManager.LoadCacheAsync().Wait();
+            _installedAppManager = new AzureStorageBackedInstalledAppManager(_mockIALogger.Object,
+                _mockSmartThingsAPIHelper.Object,
+                _mockIAOptions.Object,
+                _mockAzureStorageBackedIAConfigWithClientValidator.Object,
+                _mockIABlobServiceClient.Object);
 
-            stateManager = new AzureStorageBackedStateManager<string>(mockStateLogger.Object,
-                mockStateOptions.Object,
-                mockStateBlobClient.Object);
+            _installedAppManager.LoadCacheAsync().Wait();
 
-            stateManager.LoadCacheAsync().Wait();
+            _mockAzureStorageBackedStateConfigValidator = new Mock<AzureStorageBackedConfigValidator<AzureStorageBackedStateManager<string>>>();
+            _mockAzureStorageBackedStateConfigWithClientValidator = new Mock<AzureStorageBackedConfigWithClientValidator<AzureStorageBackedStateManager<string>>>();
+
+
+            _stateManager = new AzureStorageBackedStateManager<string>(_mockStateLogger.Object,
+                _mockStateOptions.Object,
+                _mockAzureStorageBackedStateConfigWithClientValidator.Object,
+                _mockStateBlobServiceClient.Object);
+
+            _stateManager.LoadCacheAsync().Wait();
         }
 
         public static IEnumerable<object[]> ValidInstalledAppInstance()
@@ -184,50 +268,50 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Tests
         [MemberData(nameof(ValidInstalledAppInstance))]
         public async Task IAStoreInstalledAppAsyncc_ShouldNotError(InstalledAppInstance installedApp)
         {
-            await installedAppManager.StoreInstalledAppAsync(installedApp);
+            await _installedAppManager.StoreInstalledAppAsync(installedApp);
         }
 
         [Theory]
         [MemberData(nameof(ValidInstalledAppInstance))]
         public async Task IAGetInstalledAppAsync_ShouldReturnExpectedResult(InstalledAppInstance installedApp)
         {
-            var result = await installedAppManager.GetInstalledAppAsync(installedApp.InstalledAppId);
+            var result = await _installedAppManager.GetInstalledAppAsync(installedApp.InstalledAppId);
             Assert.NotNull(result);
-            Assert.Equal(installedApp, result);
+            Assert.Equal(installedApp.InstalledAppId, result.InstalledAppId);
         }
 
         [Fact]
         public async Task IAPersistCacheAsync_ShouldNotError()
         {
-            await installedAppManager.PersistCacheAsync();
+            await _installedAppManager.PersistCacheAsync();
         }
 
         [Fact]
         public async Task IARefreshAllInstalledAppTokensAsync_ShouldNotError()
         {
-            await installedAppManager.RefreshAllInstalledAppTokensAsync();
+            await _installedAppManager.RefreshAllInstalledAppTokensAsync();
         }
 
         [Theory]
         [MemberData(nameof(ValidInstalledAppInstance))]
         public async Task IARefreshTokensAsync_ShouldNotError(InstalledAppInstance installedApp)
         {
-            await installedAppManager.RefreshTokensAsync(installedApp);
+            await _installedAppManager.RefreshTokensAsync(installedApp);
         }
 
         [Theory]
         [MemberData(nameof(ValidInstalledAppInstance))]
         public async Task IARemoveInstalledAppAsync_ShouldNotError(InstalledAppInstance installedApp)
         {
-            await installedAppManager.LoadCacheAsync();
-            await installedAppManager.RemoveInstalledAppAsync(installedApp.InstalledAppId);
+            await _installedAppManager.LoadCacheAsync();
+            await _installedAppManager.RemoveInstalledAppAsync(installedApp.InstalledAppId);
         }
 
         [Theory]
         [MemberData(nameof(ValidInstalledAppInstance))]
         public async Task StateGetStateAsync_ShouldReturnExpectedResult(InstalledAppInstance installedApp)
         {
-            var result = await stateManager.GetStateAsync(installedApp.InstalledAppId);
+            var result = await _stateManager.GetStateAsync(installedApp.InstalledAppId);
             Assert.NotNull(result);
             Assert.Equal(CommonUtils.GetStateObject(), result);
         }
@@ -236,16 +320,59 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Tests
         [MemberData(nameof(ValidInstalledAppInstance))]
         public async Task StateRemoveStateAsync_ShouldNotError(InstalledAppInstance installedApp)
         {
-            await stateManager.RemoveStateAsync(installedApp.InstalledAppId);
+            await _stateManager.RemoveStateAsync(installedApp.InstalledAppId);
         }
 
         [Theory]
         [MemberData(nameof(ValidInstalledAppInstance))]
         public async Task StateStoreStateAsync_ShouldNotErrorAndShouldNotify(InstalledAppInstance installedApp)
         {
-            var observer = new StateObserver(mockStateLogger.Object);
-            stateManager.Subscribe(observer);
-            await stateManager.StoreStateAsync(installedApp.InstalledAppId, CommonUtils.GetStateObject());
+            var observer = new StateObserver(_mockStateLogger.Object);
+            _stateManager.Subscribe(observer);
+            await _stateManager.StoreStateAsync(installedApp.InstalledAppId, CommonUtils.GetStateObject());
+        }
+
+        [Fact]
+        public async Task AzureStorageBackedConfigValidator_Should_Not_Throw()
+        {
+            var config = new AzureStorageBackedConfig<string>()
+            {
+                CacheBlobName = "foo",
+                ConnectionString = "foo",
+                ContainerName = "foo"
+            };
+
+            var validator = new AzureStorageBackedConfigValidator<string>();
+
+            await validator.ValidateAndThrowAsync(config);
+        }
+
+        [Theory]
+        [InlineData(null, "foo", "foo", "of null CacheBlobName")]
+        [InlineData("foo", null, "foo", "of null ConnectionString")]
+        [InlineData("foo", "foo", null, "of null ContainerName")]
+        [InlineData("", "foo", "foo", "of empty CacheBlobName")]
+        [InlineData("foo", "", "foo", "of empty ConnectionString")]
+        [InlineData("foo", "foo", "", "of empty ContainerName")]
+        public void AzureStorageBackedConfigValidator_Should_Throw(string cacheBlobName,
+            string conmnectionString,
+            string containerName,
+            string description)
+        {
+            var config = new AzureStorageBackedConfig<string>()
+            {
+                CacheBlobName = cacheBlobName,
+                ConnectionString = conmnectionString,
+                ContainerName = containerName
+            };
+
+            var validator = new AzureStorageBackedConfigValidator<string>();
+
+            Func<Task> act = async () =>
+            {
+                await validator.ValidateAndThrowAsync(config);
+            };
+            act.Should().Throw<ValidationException>(description);
         }
     }
 }

@@ -43,8 +43,8 @@ namespace MyWebhookLib.WebhookHandlers
         {
             'configurationData': {
                 'initialize': {
-                    'id': 'app',
                     'name': 'My App',
+                    'id': 'app',
                     'permissions': ['r:devices:*','r:locations:*'],
                     'firstPageId': '1'
                 }

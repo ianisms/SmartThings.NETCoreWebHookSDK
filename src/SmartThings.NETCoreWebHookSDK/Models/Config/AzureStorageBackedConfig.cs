@@ -25,6 +25,8 @@
 // SOFTWARE.
 // </copyright>
 #endregion
+using FluentValidation;
+
 namespace ianisms.SmartThings.NETCoreWebHookSDK.Models.Config
 {
     public class AzureStorageBackedConfig<T>
@@ -32,5 +34,29 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Models.Config
         public string ConnectionString { get; set; }
         public string ContainerName { get; set; }
         public string CacheBlobName { get; set; }
+    }
+
+    public class AzureStorageBackedConfigValidator<T> : AbstractValidator<AzureStorageBackedConfig<T>> where T : class
+    {
+        public AzureStorageBackedConfigValidator()
+        {
+            RuleFor(context => context.ConnectionString).Must(val => !string.IsNullOrEmpty(val))
+                .WithMessage($"ConnectionString must not be null or empty");
+            RuleFor(context => context.ContainerName).Must(val => !string.IsNullOrEmpty(val))
+                .WithMessage("ContainerName must not be null or empty");
+            RuleFor(context => context.CacheBlobName).Must(val => !string.IsNullOrEmpty(val))
+                .WithMessage("CacheBlobName must not be null or empty");
+        }
+    }
+
+    public class AzureStorageBackedConfigWithClientValidator<T> : AbstractValidator<AzureStorageBackedConfig<T>> where T : class
+    {
+        public AzureStorageBackedConfigWithClientValidator()
+        {
+            RuleFor(context => context.ContainerName).Must(val => !string.IsNullOrEmpty(val))
+                .WithMessage("ContainerName must not be null or empty");
+            RuleFor(context => context.CacheBlobName).Must(val => !string.IsNullOrEmpty(val))
+                .WithMessage("CacheBlobName must not be null or empty");
+        }
     }
 }

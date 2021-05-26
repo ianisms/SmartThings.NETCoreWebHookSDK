@@ -33,6 +33,7 @@ using ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using MyWebhookLib.Models;
+using Newtonsoft.Json;
 using System;
 using System.Threading.Tasks;
 
@@ -53,11 +54,11 @@ namespace MyWebhookLib.Services
 
     public class MyService : IMyService
     {
-        private readonly ILogger<IMyService> logger;
-        private readonly IRootWebhookHandler rootHandler;
-        private readonly IStateManager<MyState> stateManager;
-        private readonly IInstalledAppManager installedAppManager;
-        private readonly ISmartThingsAPIHelper smartThingsAPIHelper;
+        private readonly ILogger<IMyService> _logger;
+        private readonly IRootWebhookHandler _rootHandler;
+        private readonly IStateManager<MyState> _stateManager;
+        private readonly IInstalledAppManager _installedAppManager;
+        private readonly ISmartThingsAPIHelper _smartThingsAPIHelper;
 
         public MyService(ILogger<IMyService> logger,
             IRootWebhookHandler rootHandler,
@@ -65,17 +66,11 @@ namespace MyWebhookLib.Services
             IInstalledAppManager installedAppManager,
             ISmartThingsAPIHelper smartThingsAPIHelper)
         {
-            _ = logger ?? throw new ArgumentNullException(nameof(logger));
-            _ = rootHandler ?? throw new ArgumentNullException(nameof(rootHandler));
-            _ = stateManager ?? throw new ArgumentNullException(nameof(stateManager));
-            _ = installedAppManager ?? throw new ArgumentNullException(nameof(installedAppManager));
-            _ = smartThingsAPIHelper ?? throw new ArgumentNullException(nameof(smartThingsAPIHelper));
-
-            this.logger = logger;
-            this.rootHandler = rootHandler;
-            this.stateManager = stateManager;
-            this.installedAppManager = installedAppManager;
-            this.smartThingsAPIHelper = smartThingsAPIHelper;
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _rootHandler = rootHandler ?? throw new ArgumentNullException(nameof(rootHandler));
+            _stateManager = stateManager ?? throw new ArgumentNullException(nameof(stateManager));
+            _installedAppManager = installedAppManager ?? throw new ArgumentNullException(nameof(installedAppManager));
+            _smartThingsAPIHelper = smartThingsAPIHelper ?? throw new ArgumentNullException(nameof(smartThingsAPIHelper));
         }
 
         public async Task<dynamic> HandleRequestAsync(HttpRequest request)
@@ -84,11 +79,12 @@ namespace MyWebhookLib.Services
 
             try
             {
-                return await rootHandler.HandleRequestAsync(request).ConfigureAwait(false);
+                var response = await _rootHandler.HandleRequestAsync(request).ConfigureAwait(false);
+                return response;
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Exception calling rootHandler.HandleRequestAsync");
+                _logger.LogError(ex, "Exception calling rootHandler.HandleRequestAsync");
                 throw;
             }
         }
@@ -99,11 +95,11 @@ namespace MyWebhookLib.Services
 
             try
             {
-                return await stateManager.GetStateAsync(installedAppId).ConfigureAwait(false);
+                return await _stateManager.GetStateAsync(installedAppId).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Exception calling stateManager.GetStateAsync");
+                _logger.LogError(ex, "Exception calling stateManager.GetStateAsync");
                 throw;
             }
         }
@@ -114,11 +110,11 @@ namespace MyWebhookLib.Services
 
             try
             {
-                await stateManager.RemoveStateAsync(installedAppId).ConfigureAwait(false);
+                await _stateManager.RemoveStateAsync(installedAppId).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Exception calling stateManager.GetStateAsync");
+                _logger.LogError(ex, "Exception calling stateManager.GetStateAsync");
                 throw;
             }
         }
@@ -133,12 +129,12 @@ namespace MyWebhookLib.Services
 
             try
             {
-                var installedApp = await installedAppManager.GetInstalledAppAsync(installedAppId).ConfigureAwait(false);
-                await smartThingsAPIHelper.DeviceCommandAsync(installedApp, deviceId, command);
+                var installedApp = await _installedAppManager.GetInstalledAppAsync(installedAppId).ConfigureAwait(false);
+                await _smartThingsAPIHelper.DeviceCommandAsync(installedApp, deviceId, command);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Exception calling smartThingsAPIHelper.DeviceCommandAsync");
+                _logger.LogError(ex, "Exception calling smartThingsAPIHelper.DeviceCommandAsync");
                 throw;
             }
         }
@@ -152,13 +148,13 @@ namespace MyWebhookLib.Services
 
             try
             {
-                var installedApp = await installedAppManager.GetInstalledAppAsync(installedAppId).ConfigureAwait(false);
+                var installedApp = await _installedAppManager.GetInstalledAppAsync(installedAppId).ConfigureAwait(false);
                 var command = LightSwitch.GetDeviceCommand(toggle);
-                await smartThingsAPIHelper.DeviceCommandAsync(installedApp, deviceId, command);
+                await _smartThingsAPIHelper.DeviceCommandAsync(installedApp, deviceId, command);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Exception calling smartThingsAPIHelper.DeviceCommandAsync");
+                _logger.LogError(ex, "Exception calling smartThingsAPIHelper.DeviceCommandAsync");
                 throw;
             }
         }

@@ -37,9 +37,7 @@ namespace MyWebhookLib.Models
     {
         public string InstalledAppId { get; set; }
         public bool IsAppEnabled { get; set; }
-#pragma warning disable CA2227 // Collection properties should be read only
         public IList<LightSwitch> LightSwitches { get; set; }
-#pragma warning restore CA2227 // Collection properties should be read only
 
         public string ToJson()
         {

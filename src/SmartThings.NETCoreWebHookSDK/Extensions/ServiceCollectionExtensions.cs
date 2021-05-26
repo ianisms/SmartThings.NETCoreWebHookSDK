@@ -39,58 +39,53 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Extensions
     {
         public static IServiceCollection AddWebhookHandlers(this IServiceCollection services)
         {
-            services
-                .AddSingleton<IPingWebhookHandler, PingWebhookHandler>()
-                .AddSingleton<IConfirmationWebhookHandler, ConfirmationWebhookHandler>()
-                .AddSingleton<IOAuthWebhookHandler, OAuthWebhookHandler>()
-                .AddSingleton<ICryptoUtils, CryptoUtils>()
-                .AddSingleton<ISmartThingsAPIHelper, SmartThingsAPIHelper>()
-                .AddSingleton<IRootWebhookHandler, RootWebhookHandler>()
-                .AddHttpClient();
+            services.AddSingleton<IPingWebhookHandler, PingWebhookHandler>();
+            services.AddSingleton<IConfirmationWebhookHandler, ConfirmationWebhookHandler>();
+            services.AddSingleton<IOAuthWebhookHandler, OAuthWebhookHandler>();
+            services.AddSingleton<CryptoUtilsConfigValidator>();
+            services.AddHttpClient<ICryptoUtils, CryptoUtils>();
+            services.AddSingleton<ICryptoUtils, CryptoUtils>();
+            services.AddHttpClient<ISmartThingsAPIHelper, SmartThingsAPIHelper>();
+            services.AddSingleton<ISmartThingsAPIHelper, SmartThingsAPIHelper>();
+            services.AddSingleton<IRootWebhookHandler, RootWebhookHandler>();
             return services;
         }
 
         public static IServiceCollection AddInstalledAppTokenManager(this IServiceCollection services)
         {
-            services
-                .AddSingleton<IInstalledAppTokenManager, InstalledAppTokenManager>();
+            services.AddSingleton<IInstalledAppTokenManager, InstalledAppTokenManager>();
             return services;
         }
 
         public static IServiceCollection AddInstalledAppTokenManagerService(this IServiceCollection services)
         {
-            services
-                .AddHostedService<InstalledAppTokenManagerService>();
+            services.AddHostedService<InstalledAppTokenManagerService>();
             return services;
         }
 
         public static IServiceCollection AddFileBackedInstalledAppManager(this IServiceCollection services)
         {
-            services
-                .AddSingleton<IFileSystem, FileSystem>()
-                .AddSingleton<IInstalledAppManager, FileBackedInstalledAppManager>();
+            services.AddSingleton<IFileSystem, FileSystem>();
+            services.AddSingleton<IInstalledAppManager, FileBackedInstalledAppManager>();
             return services;
         }
 
         public static IServiceCollection AddAzureStorageBackedInstalledAppManager(this IServiceCollection services)
         {
-            services
-                .AddSingleton<IInstalledAppManager, AzureStorageBackedInstalledAppManager>();
+            services.AddSingleton<IInstalledAppManager, AzureStorageBackedInstalledAppManager>();
             return services;
         }
 
         public static IServiceCollection AddFileBackedStateManager<T>(this IServiceCollection services)
         {
-            services
-                .AddSingleton<IFileSystem, FileSystem>()
-                .AddSingleton<IStateManager<T>, FileBackedStateManager<T>>();
+            services.AddSingleton<IFileSystem, FileSystem>();
+            services.AddSingleton<IStateManager<T>, FileBackedStateManager<T>>();
             return services;
         }
 
         public static IServiceCollection AddAzureStorageStateManager<T>(this IServiceCollection services)
         {
-            services
-                .AddSingleton<IStateManager<T>, AzureStorageBackedStateManager<T>>();
+            services.AddSingleton<IStateManager<T>, AzureStorageBackedStateManager<T>>();
             return services;
         }
     }

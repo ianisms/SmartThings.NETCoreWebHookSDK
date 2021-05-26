@@ -165,7 +165,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Tests
                     throw new InvalidOperationException("subscriptionResp.id is null!");
             }
 
-            private async Task LoadLightSwitchesAsync(InstalledAppInstance installedApp,
+            private void LoadLightSwitches(InstalledAppInstance installedApp,
                 MockState state,
                 dynamic data,
                 bool shouldSubscribeToEvents = true)
@@ -223,28 +223,28 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Tests
                 Logger.LogInformation($"Loaded {state.LightSwitches.Count} lightSwitches...");
             }
 
-            public async Task HandleInstallUpdateDataAsync(InstalledAppInstance installedApp,
-                dynamic data,
-                bool shouldSubscribeToEvents = true)
+            public static void HandleInstallUpdateData(InstalledAppInstance installedApp)
             {
                 _ = installedApp ??
                     throw new ArgumentNullException(nameof(installedApp));
             }
 
-            public override async Task HandleUpdateDataAsync(InstalledAppInstance installedApp,
+            public override Task HandleUpdateDataAsync(InstalledAppInstance installedApp,
             dynamic data,
                 bool shouldSubscribeToEvents = true)
             {
                 _ = installedApp ?? throw new ArgumentNullException(nameof(installedApp));
                 _ = data ?? throw new ArgumentNullException(nameof(data));
+                return Task.CompletedTask;
             }
 
-            public override async Task HandleInstallDataAsync(InstalledAppInstance installedApp,
+            public override Task HandleInstallDataAsync(InstalledAppInstance installedApp,
                 dynamic data,
                 bool shouldSubscribeToEvents = true)
             {
                 _ = installedApp ?? throw new ArgumentNullException(nameof(installedApp));
                 _ = data ?? throw new ArgumentNullException(nameof(data));
+                return Task.CompletedTask;
             }
         }
 
@@ -268,16 +268,17 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Tests
                 base.ValidateRequest((JObject)request);
             }
 
-            public override async Task HandleEventDataAsync(InstalledAppInstance installedApp,
+            public override Task HandleEventDataAsync(InstalledAppInstance installedApp,
                 dynamic eventData)
             {
                 _ = installedApp ??
                     throw new ArgumentNullException(nameof(installedApp));
                 _ = eventData ??
                     throw new ArgumentNullException(nameof(eventData));
+                return Task.CompletedTask;
             }
 
-            private async Task HandleDeviceEventAsync(MockState state, dynamic deviceEvent)
+            private static Task HandleDeviceEventAsync(MockState state, dynamic deviceEvent)
             {
                 _ = state ??
                     throw new ArgumentNullException(nameof(state));
@@ -286,6 +287,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Tests
                 _ = deviceEvent.subscriptionName ??
                     throw new ArgumentException($"deviceEvent.subscriptionName is null!",
                     nameof(deviceEvent));
+                return Task.CompletedTask;
             }
         }
 
@@ -1250,12 +1252,12 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Tests
         [Fact]
         public async Task OAuthWebhookHandler_HandleRequestAsync_ShouldNotReturnNull()
         {
-            dynamic response = oAuthWebhookHandler.HandleRequestAsync(JObject.Parse("{}"));
+            dynamic response = await oAuthWebhookHandler.HandleRequestAsync(JObject.Parse("{}"));
             Assert.NotNull(response);
         }
 
         [Fact]
-        public async Task RootWebhookHandler_HandleRequestAsync_ShouldNotReturnNull()
+        public void RootWebhookHandler_HandleRequestAsync_ShouldNotReturnNull()
         {
             // PING
             var mockRequest = GetMockRequest(@"
@@ -1631,7 +1633,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Tests
             Assert.NotNull(response);
         }
 
-        private HttpRequest GetMockRequest(string json)
+        private static HttpRequest GetMockRequest(string json)
         {
             var ms = new MemoryStream();
             var sw = new StreamWriter(ms);

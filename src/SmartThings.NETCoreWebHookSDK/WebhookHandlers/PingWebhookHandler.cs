@@ -33,29 +33,29 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers
 {
     public interface IPingWebhookHandler
     {
-        ILogger<IPingWebhookHandler> logger { get; }
+        ILogger<IPingWebhookHandler> Logger { get; }
         dynamic HandleRequest(dynamic request);
     }
 
     public class PingWebhookHandler : IPingWebhookHandler
     {
-        public ILogger<IPingWebhookHandler> logger { get; private set; }
+        public ILogger<IPingWebhookHandler> Logger { get; private set; }
 
         public PingWebhookHandler(ILogger<IPingWebhookHandler> logger)
         {
-            this.logger = logger;
+            this.Logger = logger;
         }
 
         public dynamic HandleRequest(dynamic request)
         {
             _ = request ?? throw new ArgumentNullException(nameof(request));
 
-            logger.LogDebug($"handling request: {request}");
+            Logger.LogDebug($"handling request: {request}");
 
             dynamic response = new JObject();
             response.pingData = request.pingData;
 
-            logger.LogDebug($"response: {response}");
+            Logger.LogDebug($"response: {response}");
             return response;
         }
     }

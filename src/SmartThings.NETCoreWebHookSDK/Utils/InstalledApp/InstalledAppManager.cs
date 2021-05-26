@@ -36,9 +36,6 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.InstalledApp
 {
     public interface IInstalledAppManager
     {
-        ILogger<IInstalledAppManager> Logger { get; }
-        ISmartThingsAPIHelper SmartThingsAPIHelper { get; }
-        IDictionary<string, InstalledAppInstance> InstalledAppCache { get; }
         Task<InstalledAppInstance> GetInstalledAppAsync(string installedAppId);
         Task StoreInstalledAppAsync(InstalledAppInstance installedApp);
         Task RemoveInstalledAppAsync(string installedAppId);
@@ -48,28 +45,20 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.InstalledApp
         Task RefreshAllInstalledAppTokensAsync();
     }
 
-#pragma warning disable CA1012 // Abstract types should not have constructors
     public abstract class InstalledAppManager : IInstalledAppManager
-#pragma warning restore CA1012 // Abstract types should not have constructors
     {
-        public ILogger<IInstalledAppManager> Logger { get; private set; }
-        public ISmartThingsAPIHelper SmartThingsAPIHelper { get; private set; }
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "InstalledAppCache needs to mutable")]
         public IDictionary<string, InstalledAppInstance> InstalledAppCache { get; set; }
-        public IList<IObserver<string>> Observers { get; private set; }
+
+        private readonly ILogger<IInstalledAppManager> _logger;
+        private readonly ISmartThingsAPIHelper _smartThingsAPIHelper;
 
         public InstalledAppManager(ILogger<IInstalledAppManager> logger,
             ISmartThingsAPIHelper smartThingsAPIHelper)
         {
-            _ = logger ??
+            _logger = logger ??
                 throw new ArgumentNullException(nameof(logger));
-            _ = smartThingsAPIHelper ??
+            _smartThingsAPIHelper = smartThingsAPIHelper ??
                 throw new ArgumentNullException(nameof(smartThingsAPIHelper));
-
-            this.Logger = logger;
-            this.SmartThingsAPIHelper = smartThingsAPIHelper;
-            this.Observers = new List<IObserver<string>>();
         }
 
         public virtual async Task<InstalledAppInstance> GetInstalledAppAsync(string installedAppId)
@@ -78,15 +67,15 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.InstalledApp
 
             await LoadCacheAsync().ConfigureAwait(false);
 
-            Logger.LogDebug($"Getting installedApp from cache: {installedAppId}...");
+            _logger.LogDebug($"Getting installedApp from cache: {installedAppId}...");
 
             if (InstalledAppCache.TryGetValue(installedAppId, out InstalledAppInstance installedApp))
             {
-                Logger.LogDebug($"Got installedApp from cache: {installedAppId}...");
+                _logger.LogDebug($"Got installedApp from cache: {installedAppId}...");
             }
             else
             {
-                Logger.LogDebug($"Unable to find installedApp in cache: {installedAppId}...");
+                _logger.LogDebug($"Unable to find installedApp in cache: {installedAppId}...");
             }
 
             return installedApp;
@@ -104,7 +93,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.InstalledApp
 
             await LoadCacheAsync().ConfigureAwait(false);
 
-            Logger.LogDebug($"Adding installedApp to cache: {installedApp.InstalledAppId}...");
+            _logger.LogDebug($"Adding installedApp to cache: {installedApp.InstalledAppId}...");
 
             InstalledAppCache.Remove(installedApp.InstalledAppId);
             InstalledAppCache.Add(installedApp.InstalledAppId, installedApp);
@@ -116,7 +105,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.InstalledApp
         {
             _ = installedAppId ?? throw new ArgumentNullException(nameof(installedAppId));
 
-            Logger.LogDebug($"Removing installedApp from cache: {installedAppId}...");
+            _logger.LogDebug($"Removing installedApp from cache: {installedAppId}...");
 
             InstalledAppCache.Remove(installedAppId);
 
@@ -147,12 +136,12 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.InstalledApp
                     nameof(installedApp));
             }
 
-            Logger.LogDebug($"Refreshing tokens for installedApp: {installedApp.InstalledAppId}...");
+            _logger.LogDebug($"Refreshing tokens for installedApp: {installedApp.InstalledAppId}...");
 
             if (installedApp.AccessToken.IsExpired)
             {
-                Logger.LogDebug($"installedApp: {installedApp.InstalledAppId} has an expired token, attempting to refresh...");
-                installedApp = await SmartThingsAPIHelper.RefreshTokensAsync(installedApp).ConfigureAwait(false);
+                _logger.LogDebug($"installedApp: {installedApp.InstalledAppId} has an expired token, attempting to refresh...");
+                installedApp = await _smartThingsAPIHelper.RefreshTokensAsync(installedApp).ConfigureAwait(false);
                 await StoreInstalledAppAsync(installedApp).ConfigureAwait(false);
             }
 

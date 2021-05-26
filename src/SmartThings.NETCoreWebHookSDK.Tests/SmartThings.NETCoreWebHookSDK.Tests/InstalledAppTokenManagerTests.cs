@@ -62,8 +62,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Tests
                 });
 
             installedAppTokenManager = new InstalledAppTokenManager(mockIALogger.Object,
-                mockIAManager.Object,
-                mockIAOptions.Object);
+                mockIAManager.Object);
 
             installedAppTokenManagerService = new InstalledAppTokenManagerService(mockIALogger.Object,
                 mockIAManager.Object,

@@ -25,18 +25,17 @@
 // SOFTWARE.
 // </copyright>
 #endregion
+using FluentValidation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
-using Org.BouncyCastle.Crypto.Parameters;
-using Org.BouncyCastle.OpenSsl;
-using Org.BouncyCastle.Security;
 using System;
 using System.Globalization;
-using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Security.Cryptography;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -49,44 +48,52 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Crypto
 
     public class CryptoUtils : ICryptoUtils
     {
-        private readonly ILogger<CryptoUtils> logger;
-        private readonly CryptoUtilsConfig config;
-        private RSACryptoServiceProvider publicKeyProvider;
+        private readonly ILogger<CryptoUtils> _logger;
+        private readonly CryptoUtilsConfig _config;
+        private readonly CryptoUtilsConfigValidator _cryptoUtilsConfigValidator;
+        private readonly HttpClient _httpClient;
+        private RSACryptoServiceProvider _publicKeyProvider;
 
         public CryptoUtils(ILogger<CryptoUtils> logger,
-            IOptions<CryptoUtilsConfig> options)
+            IOptions<CryptoUtilsConfig> options,
+            CryptoUtilsConfigValidator cryptoUtilsConfigValidator,
+            HttpClient httpClient)
         {
-            _ = logger ?? throw new ArgumentNullException(nameof(logger));
-            _ = options ?? throw new ArgumentNullException(nameof(options));
+            _logger = logger ??
+                throw new ArgumentNullException(nameof(logger));
+            _config = options?.Value ??
+                throw new ArgumentNullException(nameof(options));
+            _cryptoUtilsConfigValidator = cryptoUtilsConfigValidator ??
+                throw new ArgumentNullException(nameof(cryptoUtilsConfigValidator));
+            _httpClient = httpClient ??
+                throw new ArgumentNullException(nameof(httpClient));
 
-            this.logger = logger;
-            this.config = options.Value;
+            _cryptoUtilsConfigValidator.ValidateAndThrow(_config);
         }
 
-        private static RSACryptoServiceProvider GetRSAProviderFromPem(String key)
+        private async Task<RSACryptoServiceProvider> GetRSAProviderFromCertAsync(RequestSignature reqSignature)
         {
-            CspParameters csp = new CspParameters();
-            csp.KeyContainerName = "MyKeyContainer";
-            csp.Flags = CspProviderFlags.CreateEphemeralKey;
-            RSACryptoServiceProvider rsaKey = new RSACryptoServiceProvider(csp);
+            _ = reqSignature ?? throw new ArgumentNullException(nameof(reqSignature));
+            _ = reqSignature.KeyId ?? throw new InvalidOperationException($"{nameof(reqSignature.KeyId)} is null");
 
-            var reader = new StringReader(key);
-            var pem = new PemReader(reader);
-            var kp = pem.ReadObject();
+            var certUri = $"{_config.SmartThingsCertUriRoot}/{reqSignature.KeyId}";
+            var certBytes = await _httpClient.GetByteArrayAsync(certUri);
+            if (certBytes?.Length > 0)
+            {
+                var cert = new X509Certificate2(certBytes);
+                return (RSACryptoServiceProvider)cert.PublicKey.Key;
+            }
 
-            RSAParameters rsaParameters = DotNetUtilities.ToRSAParameters((RsaKeyParameters)kp);
-            rsaKey.ImportParameters(rsaParameters);
-            return rsaKey;
+            return null;
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1308:Normalize strings to uppercase", Justification = "Sig headers need to be lowercase")]
-        private static byte[] GetSignVal(RequestSignature sig, HttpRequest request)
+        private static byte[] GetHash(RequestSignature reqSignature, HttpRequest request)
         {
             var siginingString = new StringBuilder();
-            int headerCount = sig.Headers.Count();
+            int headerCount = reqSignature.Headers.Count();
             for (int i = 0; i < headerCount; i++)
             {
-                var h = sig.Headers.ElementAt(i);
+                var h = reqSignature.Headers.ElementAt(i);
 
                 if (h == "(request-target)")
                 {
@@ -97,8 +104,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Crypto
                 }
                 else
                 {
-                    StringValues vals;
-                    if (!request.Headers.TryGetValue(h, out vals))
+                    if (!request.Headers.TryGetValue(h, out StringValues vals))
                     {
                         throw new InvalidOperationException($"Missing {h} header per the auth header!");
                     }
@@ -109,7 +115,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Crypto
                 }
                 if (i < (headerCount - 1))
                 {
-                    siginingString.Append("\n");
+                    siginingString.Append('\n');
                 }
             }
 
@@ -118,27 +124,29 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Crypto
             return encoding.GetBytes(val);
         }
 
-        private async Task InitializeRSAProviderAsync()
-        {
-            var pubKeyContent = await this.config.GetPublicKeyContentAsync().ConfigureAwait(false);
-            this.publicKeyProvider = GetRSAProviderFromPem(pubKeyContent);
-        }
-
         public async Task<bool> VerifySignedRequestAsync(HttpRequest request)
         {
             _ = request ?? throw new ArgumentNullException(nameof(request));
 
-            if (publicKeyProvider == null)
+            _logger.LogDebug($"Verifying sign request: {request.Path}");
+
+            var reqSignature = RequestSignature.ParseFromHeaderVal(request.Headers["Authorization"].FirstOrDefault());
+
+            if (_publicKeyProvider == null)
             {
-                await InitializeRSAProviderAsync().ConfigureAwait(false);
+                _publicKeyProvider = await GetRSAProviderFromCertAsync(reqSignature);
             }
 
-            var sig = RequestSignature.ParseFromHeaderVal(request.Headers["Authorization"].FirstOrDefault());
+            var hash = GetHash(reqSignature, request);
+            var data = Convert.FromBase64String(reqSignature.Signature);
 
-            var encoding = UTF8Encoding.UTF8;
-            var sigBytes = Convert.FromBase64String(sig.Signature);
-            var signVal = GetSignVal(sig, request);
-            return publicKeyProvider.VerifyData(signVal, "SHA256", sigBytes);
+            if (_publicKeyProvider != null)
+            {
+                return _publicKeyProvider.VerifyData(hash, "SHA256", data);
+            } else
+            {
+                return false;
+            }
         }
     }
 }

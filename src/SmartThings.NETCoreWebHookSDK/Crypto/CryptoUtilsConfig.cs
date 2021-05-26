@@ -25,6 +25,7 @@
 // SOFTWARE.
 // </copyright>
 #endregion
+using FluentValidation;
 using Newtonsoft.Json;
 using System;
 using System.IO;
@@ -35,15 +36,15 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Crypto
     public class CryptoUtilsConfig
     {
         [JsonProperty(Required = Required.Always)]
-        public string PublicKeyFilePath { get; set; }
+        public string SmartThingsCertUriRoot { get; set; } = "https://key.smartthings.com";
+    }
 
-        internal async Task<string> GetPublicKeyContentAsync()
+    public class CryptoUtilsConfigValidator : AbstractValidator<CryptoUtilsConfig>
+    {
+        public CryptoUtilsConfigValidator()
         {
-            _ = PublicKeyFilePath ?? throw new InvalidOperationException($"{nameof(PublicKeyFilePath)} is null!");
-
-            using var reader = File.OpenText(PublicKeyFilePath);
-
-            return await reader.ReadToEndAsync().ConfigureAwait(false);
+            RuleFor(context => context.SmartThingsCertUriRoot).Must(val => !string.IsNullOrEmpty(val))
+                .WithMessage("SmartThingsCertUriRoot must not be null or empty");
         }
     }
 }

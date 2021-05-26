@@ -39,17 +39,17 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers
 {
     public interface IConfirmationWebhookHandler
     {
-        ILogger<IConfirmationWebhookHandler> logger { get; }
-        SmartAppConfig appConfig { get; }
-        IHttpClientFactory httpClientFactory { get; }
+        ILogger<IConfirmationWebhookHandler> Logger { get; }
+        SmartAppConfig AppConfig { get; }
+        IHttpClientFactory HttpClientFactory { get; }
         Task <dynamic> HandleRequestAsync(dynamic request);
     }
 
     public class ConfirmationWebhookHandler : IConfirmationWebhookHandler
     {
-        public ILogger<IConfirmationWebhookHandler> logger { get; private set; }
-        public SmartAppConfig appConfig { get; private set; }
-        public IHttpClientFactory httpClientFactory { get; private set; }
+        public ILogger<IConfirmationWebhookHandler> Logger { get; private set; }
+        public SmartAppConfig AppConfig { get; private set; }
+        public IHttpClientFactory HttpClientFactory { get; private set; }
 
         public ConfirmationWebhookHandler(ILogger<IConfirmationWebhookHandler> logger,
             IOptions<SmartAppConfig> options,
@@ -58,9 +58,9 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers
             _ = options ?? throw new ArgumentNullException(nameof(options));
             _ = httpClientFactory ?? throw new ArgumentNullException(nameof(httpClientFactory));
 
-            this.logger = logger;
-            this.appConfig = options.Value;
-            this.httpClientFactory = httpClientFactory;
+            this.Logger = logger;
+            this.AppConfig = options.Value;
+            this.HttpClientFactory = httpClientFactory;
         }
 
         public async Task<dynamic> HandleRequestAsync(dynamic request)
@@ -69,20 +69,13 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers
             _ = request.confirmationData ?? throw new ArgumentException("request.confirmationData is null", nameof(request));
             _ = request.confirmationData.confirmationUrl ?? throw new ArgumentException("request.confirmationUrl is null", nameof(request));
             
-            logger.LogDebug($"handling request: {request}");
+            Logger.LogDebug($"handling request: {request}");
 
             var uri = new Uri((string)request.confirmationData.confirmationUrl);
-            dynamic payload = new JObject();
-            using var jsonContent = ((JObject)payload).ToStringContent();
 
-            using var confirmRequest = new HttpRequestMessage(HttpMethod.Put, uri);
+            using var confirmRequest = new HttpRequestMessage(HttpMethod.Get, uri);
 
-            confirmRequest.Content = jsonContent;
-
-            confirmRequest.Headers.Authorization =
-                new AuthenticationHeaderValue("Bearer", appConfig.PAT);
-
-            using var httpClient = httpClientFactory.CreateClient();
+            using var httpClient = HttpClientFactory.CreateClient();
 
             var confirmResponse = await httpClient.SendAsync(confirmRequest).ConfigureAwait(false);
             confirmResponse.EnsureSuccessStatusCode();
@@ -90,7 +83,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers
             dynamic response = new JObject();
             response.targetUrl = request.confirmationData.confirmationUrl;
 
-            logger.LogDebug($"response: {response}");
+            Logger.LogDebug($"response: {response}");
             return response;
         }
     }
