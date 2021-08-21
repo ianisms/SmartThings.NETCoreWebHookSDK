@@ -16,9 +16,9 @@
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <PackageTags>aspnetcore, smartthings, automation, azurefunctions</PackageTags>
-    <Version>5.0.3</Version>
-    <AssemblyVersion>5.0.0.3</AssemblyVersion>
-    <FileVersion>5.0.0.3</FileVersion>
+    <Version>5.0.4</Version>
+    <AssemblyVersion>5.0.0.4</AssemblyVersion>
+    <FileVersion>5.0.0.4</FileVersion>
   </PropertyGroup>
   
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

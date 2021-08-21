@@ -137,6 +137,8 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.InstalledApp
 
             var blobClient = containerClient.GetBlobClient(_storageBackedConfig.CacheBlobName);
 
+            await blobClient.DeleteIfExistsAsync();
+
             var json = JsonConvert.SerializeObject(InstalledAppCache,
                 STCommon.JsonSerializerSettings);
 
