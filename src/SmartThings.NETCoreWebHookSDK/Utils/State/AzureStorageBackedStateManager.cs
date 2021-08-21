@@ -137,8 +137,6 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.State
 
             var blobClient = containerClient.GetBlobClient(_storageBackedConfig.CacheBlobName);
 
-            await blobClient.DeleteIfExistsAsync();
-
             var json = JsonConvert.SerializeObject(StateCache,
                 STCommon.JsonSerializerSettings);
 
@@ -148,7 +146,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.State
             writer.Flush();
             stream.Position = 0;
 
-            await blobClient.UploadAsync(stream).ConfigureAwait(false);
+            await blobClient.UploadAsync(stream, true).ConfigureAwait(false);
 
             _logger.LogDebug("Saved state cache...");
         }

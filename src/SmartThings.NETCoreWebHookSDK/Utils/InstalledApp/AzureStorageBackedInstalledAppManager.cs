@@ -137,13 +137,11 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.InstalledApp
 
             var blobClient = containerClient.GetBlobClient(_storageBackedConfig.CacheBlobName);
 
-            await blobClient.DeleteIfExistsAsync();
-
             var json = JsonConvert.SerializeObject(InstalledAppCache,
                 STCommon.JsonSerializerSettings);
 
             using var stream = new MemoryStream();
-            using var writer = new StreamWriter(stream);
+            using var writer = new StreamWriter(stream, true);
             await writer.WriteAsync(json);
             writer.Flush();
             stream.Position = 0;
