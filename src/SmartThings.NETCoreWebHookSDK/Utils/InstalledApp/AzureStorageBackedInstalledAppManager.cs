@@ -141,12 +141,12 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.InstalledApp
                 STCommon.JsonSerializerSettings);
 
             using var stream = new MemoryStream();
-            using var writer = new StreamWriter(stream, true);
+            using var writer = new StreamWriter(stream);
             await writer.WriteAsync(json);
             writer.Flush();
             stream.Position = 0;
 
-            await blobClient.UploadAsync(stream).ConfigureAwait(false);
+            await blobClient.UploadAsync(stream, true).ConfigureAwait(false);
 
             _logger.LogDebug("Saved installed app cache...");
         }
