@@ -13,7 +13,7 @@ on:
     
 jobs:
   build:
-    name: Build and Test
+    name: Build, Test, Analyze, and Deploy
     runs-on: ubuntu-latest  
     
     permissions:
