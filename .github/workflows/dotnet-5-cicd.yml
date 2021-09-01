@@ -1,4 +1,4 @@
-name: .NET 5 CI
+name: .NET 5 CI / CD
 
 on:    
   workflow_dispatch:
