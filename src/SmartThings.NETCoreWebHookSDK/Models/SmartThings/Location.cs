@@ -26,6 +26,7 @@
 // </copyright>
 #endregion
 using CoordinateSharp;
+using Newtonsoft.Json;
 using System;
 using TimeZoneConverter;
 
@@ -118,6 +119,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Models.SmartThings
                 RegionRadius = (int)val.regionRadius,
                 TempScale = TemperatureScaleFromDynamic(val.temperatureScale),
                 TimeZoneId = val.timeZoneId,
+                CountryCode = val.countryCode,
                 Locale = val.locale
             };
 

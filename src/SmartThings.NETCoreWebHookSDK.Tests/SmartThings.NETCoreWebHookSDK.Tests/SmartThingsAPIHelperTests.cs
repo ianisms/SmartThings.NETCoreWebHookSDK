@@ -29,6 +29,7 @@ using Moq;
 using Moq.Contrib.HttpClient;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
@@ -49,6 +50,13 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Tests
 
         public SmartThingsAPIHelperTests(ITestOutputHelper output)
         {
+            JsonConvert.DefaultSettings = () => new JsonSerializerSettings
+            {
+                Formatting = Formatting.Indented,
+                TypeNameHandling = TypeNameHandling.Objects,
+                ContractResolver = new CamelCasePropertyNamesContractResolver()
+            };
+
             _mockLogger = new Mock<ILogger<ISmartThingsAPIHelper>>();
             _mockLogger.Setup(log => log.Log(It.IsAny<LogLevel>(),
                 It.IsAny<EventId>(),
@@ -217,7 +225,17 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Tests
         {
             _mockHttpMessageHandler.SetupRequest(HttpMethod.Get,
                 $"{BaseUri}/locations/{installedApp.InstalledLocation.Id}")
-                .ReturnsResponse(JsonConvert.SerializeObject(installedApp.InstalledLocation));
+                .ReturnsResponse($@"{{
+                    ""locationId"": ""{installedApp.InstalledLocation.Id}"",
+                    ""name"": ""{installedApp.InstalledLocation.Label}"",
+                    ""latitude"": ""{installedApp.InstalledLocation.Latitude}"",
+                    ""longitude"": ""{installedApp.InstalledLocation.Longitude}"",
+                    ""regionRadius"": ""{installedApp.InstalledLocation.RegionRadius}"",
+                    ""temperatureScale"": ""{installedApp.InstalledLocation.TempScale}"",
+                    ""timeZoneId"": ""{installedApp.InstalledLocation.TimeZoneId}"",
+                    ""countryCode"": ""{installedApp.InstalledLocation.CountryCode}"",
+                    ""locale"": ""{installedApp.InstalledLocation.Locale}""
+                }}");
 
             var result = await _smartThingsAPIHelper.GetLocationAsync(installedApp,
                 installedApp.InstalledLocation.Id);
