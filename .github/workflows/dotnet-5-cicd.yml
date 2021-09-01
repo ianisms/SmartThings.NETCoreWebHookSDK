@@ -13,7 +13,7 @@ on:
     
 jobs:
   build:
-    name: Build, Test, and Deploy
+    name: Build and Test
     runs-on: ubuntu-latest  
     
     steps:
@@ -65,7 +65,9 @@ jobs:
         # Prefix the list here with "+" to use these queries and those in the config file.
         # queries: ./path/to/local/query, your-org/your-repo/queries@main        
     
-    - uses: actions/checkout@v2
+    - name: Checkout Code
+      uses: actions/checkout@v2
+      
     - name: Setup .NET 5
       uses: actions/setup-dotnet@v1
       with:
@@ -96,6 +98,25 @@ jobs:
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v1
+        
+  analyze:
+    name: Deploy
+    runs-on: ubuntu-latest
+    steps: 
+    - name: Checkout Code
+      uses: actions/checkout@v2
+
+    - name: Setup .NET 5
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 5.0.x
+    - name: Install dependencies
+      run: dotnet restore src/SmartThings.NETCoreWebHookSDK.sln
+      
+    - name: Build
+      run: dotnet build src/SmartThings.NETCoreWebHookSDK.sln
+        --configuration Release
+        --no-restore
       
     - name: Publish Nuget Package to Nuget
       run: dotnet nuget push src/SmartThings.NETCoreWebHookSDK/bin/Release/*.nupkg
