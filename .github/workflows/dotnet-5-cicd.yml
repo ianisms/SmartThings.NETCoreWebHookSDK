@@ -6,13 +6,13 @@ on:
     branches: [ main ]
     paths:
     - 'src/**'
-    - '.github/workflows/dotnet-core-cicd.yml'
+    - '.github/workflows/dotnet-5-cicd.yml'
     
   pull_request:
     branches: [ main ]
     paths:
     - 'src/**'
-    - '.github/workflows/dotnet-core-cicd.yml'
+    - '.github/workflows/dotnet-5-cicd.yml'
     
 jobs:
   build:
