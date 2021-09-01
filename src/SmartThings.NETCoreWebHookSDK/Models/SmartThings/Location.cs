@@ -109,17 +109,19 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Models.SmartThings
 
         public static Location LocationFromDynamic(dynamic val)
         {
-            return new Location()
+            var loc = new Location()
             {
-                Id = val.locationId.Value,
-                Label = val.name.Value,
-                Latitude = double.Parse(val.latitude.Value),
-                Longitude = double.Parse(val.longitude.Value),
-                RegionRadius = int.Parse(val.regionRadius.Value),
+                Id = val.locationId,
+                Label = val.name,
+                Latitude = val.latitude,
+                Longitude = val.longitude,
+                RegionRadius = (int)val.regionRadius,
                 TempScale = TemperatureScaleFromDynamic(val.temperatureScale),
-                TimeZoneId = val.timeZoneId.Value,
-                Locale = val.locale.Value
+                TimeZoneId = val.timeZoneId,
+                Locale = val.locale
             };
+
+            return loc;
         }
 
         public override bool Equals(object obj)

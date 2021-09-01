@@ -55,6 +55,9 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.SmartThings
             dynamic command);
         Task<Location> GetLocationAsync(InstalledAppInstance installedApp,
             string locationId);
+        Task SendNotificationAsync(InstalledAppInstance installedApp,
+            string msg,
+            string title);
     }
 
     public class SmartThingsAPIHelper : ISmartThingsAPIHelper
@@ -314,8 +317,52 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.SmartThings
             response.EnsureSuccessStatusCode();
 
             var body = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-            return JsonConvert.DeserializeObject<Location>(body,
-                STCommon.JsonSerializerSettings);
+
+            if(string.IsNullOrWhiteSpace(body))
+            {
+                throw new InvalidOperationException("ST locations api returned an empty response");
+            }
+
+            return Location.LocationFromDynamic(JObject.Parse(body));
+        }
+
+        public async virtual Task SendNotificationAsync(InstalledAppInstance installedApp,
+            string msg,
+            string title = "Automation Message")
+        {
+            _ = installedApp ?? throw new ArgumentNullException(nameof(installedApp));
+            _ = msg ?? throw new ArgumentNullException(nameof(msg));
+
+            await RefreshTokensAsync(installedApp).ConfigureAwait(false);
+
+            _logger.LogDebug($"Sending notification: {msg}...");
+
+            var uri = new Uri($"https://api.smartthings.com/notification");
+
+            using var request = new HttpRequestMessage(HttpMethod.Post, uri);
+
+            request.SetBearerAuthHeader(installedApp.AccessToken.TokenValue); 
+            
+            var json = $@"{{
+                ""type"": ""AUTOMATION_INFO"",
+                ""locationId"": ""{installedApp.InstalledLocation.Id}"",
+                ""title"": ""{title}"",
+			    ""message"": ""{msg}""
+            }}";
+
+            dynamic notification = JObject.Parse(json);
+
+            request.Content = ((JObject)notification).ToStringContent();
+
+            var response = await _httpClient.SendAsync(request).ConfigureAwait(false);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var errorBody = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                _logger.LogError($"Error trying to send notification...  Response body: {errorBody}");
+            }
+
+            response.EnsureSuccessStatusCode();
         }
     }
 }
