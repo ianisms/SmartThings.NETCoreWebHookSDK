@@ -4,12 +4,15 @@ on:
   workflow_dispatch:
   push:
     branches: [ main ]
+    paths:
+    - 'src/**'
+    - '.github/workflows/dotnet-core-cicd.yml'
     
   pull_request:
     branches: [ main ]
     paths:
     - 'src/**'
-    - '.github/workflows/dotnet-core-ci.yml'
+    - '.github/workflows/dotnet-core-cicd.yml'
     
 jobs:
   build:
