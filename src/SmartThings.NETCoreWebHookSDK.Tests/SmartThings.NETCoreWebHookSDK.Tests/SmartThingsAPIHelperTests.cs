@@ -50,13 +50,6 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Tests
 
         public SmartThingsAPIHelperTests(ITestOutputHelper output)
         {
-            JsonConvert.DefaultSettings = () => new JsonSerializerSettings
-            {
-                Formatting = Formatting.Indented,
-                TypeNameHandling = TypeNameHandling.Objects,
-                ContractResolver = new CamelCasePropertyNamesContractResolver()
-            };
-
             _mockLogger = new Mock<ILogger<ISmartThingsAPIHelper>>();
             _mockLogger.Setup(log => log.Log(It.IsAny<LogLevel>(),
                 It.IsAny<EventId>(),
