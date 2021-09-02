@@ -1,6 +1,10 @@
 # SmartThings.NETCoreWebHookSDK
 
-[![.NET 5 CI / CD](https://github.com/ianisms/SmartThings.NETCoreWebHookSDK/actions/workflows/dotnet-5-cicd.yml/badge.svg)](https://github.com/ianisms/SmartThings.NETCoreWebHookSDK/actions/workflows/dotnet-5-cicd.yml)
+[![.NET 5 CI](https://github.com/ianisms/SmartThings.NETCoreWebHookSDK/actions/workflows/dotnet-5-ci.yml/badge.svg)](https://github.com/ianisms/SmartThings.NETCoreWebHookSDK/actions/workflows/dotnet-5-ci.yml)
+
+[![.NET 5 CD](https://github.com/ianisms/SmartThings.NETCoreWebHookSDK/actions/workflows/dotnet-5-cd.yml/badge.svg)](https://github.com/ianisms/SmartThings.NETCoreWebHookSDK/actions/workflows/dotnet-5-cd.yml)
+
+[![.NET 5 Samples](https://github.com/ianisms/SmartThings.NETCoreWebHookSDK/actions/workflows/dotnet-5-samples.yml/badge.svg)](https://github.com/ianisms/SmartThings.NETCoreWebHookSDK/actions/workflows/dotnet-5-samples.yml)
 
 ## Description
 
