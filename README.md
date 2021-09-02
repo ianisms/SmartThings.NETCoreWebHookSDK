@@ -1,8 +1,6 @@
 # SmartThings.NETCoreWebHookSDK
 
-![.NET 5 CI](https://github.com/ianisms/SmartThings.NETCoreWebHookSDK/workflows/.NET%205%20CI/badge.svg)
-
-![.NET 5 CD](https://github.com/ianisms/SmartThings.NETCoreWebHookSDK/workflows/.NET%205%20CD/badge.svg)
+[![.NET 5 CI / CD](https://github.com/ianisms/SmartThings.NETCoreWebHookSDK/actions/workflows/dotnet-5-cicd.yml/badge.svg)](https://github.com/ianisms/SmartThings.NETCoreWebHookSDK/actions/workflows/dotnet-5-cicd.yml)
 
 ## Description
 

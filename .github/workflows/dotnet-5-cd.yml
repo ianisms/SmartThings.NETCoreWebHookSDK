@@ -4,6 +4,9 @@ on:
   workflow_dispatch:
   push:
     branches: [ main ]
+    paths:
+    - 'src/**'
+    - '.github/workflows/dotnet-5-cd.yml'
     
 jobs:
   build:
