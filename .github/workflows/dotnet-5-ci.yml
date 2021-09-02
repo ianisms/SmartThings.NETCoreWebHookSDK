@@ -7,7 +7,7 @@ on:
     branches: [ main ]
     paths:
     - 'src/**'
-    - '.github/workflows/dotnet-core-ci.yml'
+    - '.github/workflows/dotnet-5-ci.yml'
     
 jobs:
   build:

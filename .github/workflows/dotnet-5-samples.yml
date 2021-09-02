@@ -5,11 +5,13 @@ on:
   push:
     branches: [ main ]
     - 'samples/**'
+    - '.github/workflows/dotnet-5-samples.yml'
     
   pull_request:
     branches: [ main ]
     paths:
     - 'samples/**'
+    - '.github/workflows/dotnet-5-samples.yml'
     
 jobs:
   build:
