@@ -2,6 +2,11 @@ name: .NET 5 CI
 
 on:    
   workflow_dispatch:
+  
+  push:
+    branches: [ main ]
+    paths:
+    - '.github/workflows/dotnet-5-ci.yml'
     
   pull_request:
     branches: [ main ]
