@@ -1,15 +1,9 @@
-name: .NET 5 CI / CD
+name: .NET 5 CD
 
 on:    
   workflow_dispatch:
   push:
     branches: [ main ]
-    
-  pull_request:
-    branches: [ main ]
-    paths:
-    - 'src/**'
-    - '.github/workflows/dotnet-core-ci.yml'
     
 jobs:
   build:

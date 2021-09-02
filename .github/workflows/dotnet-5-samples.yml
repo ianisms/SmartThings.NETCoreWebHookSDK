@@ -1,0 +1,31 @@
+name: .NET 5 Samples
+
+on:    
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+    - 'samples/**'
+    
+  pull_request:
+    branches: [ main ]
+    paths:
+    - 'samples/**'
+    
+jobs:
+  build:
+    name: Build and Test
+    runs-on: ubuntu-latest  
+    
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup .NET 5
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 5.0.x
+    - name: Install dependencies
+      run: dotnet restore samples/SmartThings.NETCoreWebHookSDK.Samples.sln
+      
+    - name: Build
+      run: dotnet build samples/SmartThings.NETCoreWebHookSDK.Samples.sln
+        --configuration Debug
+        --no-restore
