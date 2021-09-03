@@ -2,7 +2,7 @@
 
 ## SmartThings SmartApps
 
-This SDK is used to build a WebHook SmartApp for SmartThings using  NET 5.  For details on how to register your SmartApp and how it runs within SmartThings, please read the [SmartApp documentation](https://smartthings.developer.samsung.com/docs/smartapps/smartapp-basics.html)
+This SDK is used to build a WebHook SmartApp for SmartThings using  NET 5.  For details on how to register your SmartApp and how it runs within SmartThings, please read the [SmartApp documentation](https://developer-preview.smartthings.com/docs/connected-services/smartapp-basics)
 
 ## Samples
 
@@ -80,7 +80,7 @@ public async Task<dynamic> HandleRequestAsync(HttpRequest request)
 
 ### SmartApp Registration
 
-The details on how to test your app with SmartThings can be found in the [SmartApp documentation](https://smartthings.developer.samsung.com/docs/testing/how-to-test.html).
+The details on how to test your app with SmartThings can be found in the [SmartApp documentation](https://developer-preview.smartthings.com/docs/connected-services/test-your-connected-service).
 
 ### ngrok
 
