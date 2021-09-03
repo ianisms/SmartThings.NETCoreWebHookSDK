@@ -2,7 +2,7 @@
 
 ## SmartThings SmartApps
 
-This SDK is used to build a WebHook SmartApp for SmartThings using  NET 5.  For details on how to register your SmartApp and how it runs within SmartThings, please read the [SmartApp documentation](https://developer-preview.smartthings.com/docs/connected-services/smartapp-basics)
+This SDK is used to build a WebHook SmartApp for SmartThings using  NET 5.  For details on how to register your SmartApp and how it runs within SmartThings, please read the [SmartApp Basics](https://developer-preview.smartthings.com/docs/connected-services/smartapp-basics), [Hosting a Webhook SmartApp](https://developer-preview.smartthings.com/docs/connected-services/hosting/webhook-smartapp), and [SmartApp Registration](https://developer-preview.smartthings.com/docs/connected-services/app-registration) documentation.
 
 ## Samples
 
@@ -12,7 +12,7 @@ You can find samples for ASP.NET Core and Azure functions in the samples directo
 
 ## Setup Steps
 
-1. Add an instance of ```CryptoUtilsConfig``` via ```Services.Configure``` like so: ```.Configure<CryptoUtilsConfig>(config.GetSection(nameof(CryptoUtilsConfig)))```.  The details on the properties of ```CryptoUtilsConfig``` can be found [below](CryptoUtilsConfig.md).
+1. Add an instance of ```CryptoUtilsConfig``` via ```Services.Configure``` like so: ```.Configure<CryptoUtilsConfig>(config.GetSection(nameof(CryptoUtilsConfig)))```.  The details on the properties of ```CryptoUtilsConfig``` can be found [below](CryptoUtilsConfig.md).  The SDK uses the SmartThings x.509 cert method of request verification described in the [HTTP signature verification spec](https://developer-preview.smartthings.com/docs/connected-services/hosting/webhook-smartapp#authorizing-calls-from-smartthings).  
 2. Add an instance of ```SmartAppConfig``` via ```.Configure<SmartAppConfig>(config.GetSection(nameof(SmartAppConfig)))```.    The details on the properties of ```SmartAppConfig``` can be found [below](SmartAppConfig.md).
 3. Add an instance of your implementation of ```ConfigWebhookHandler```, ```InstallUpdateWebhookHandler```, ```UninstallWebhookHandler``` and ```EventWebhookHandler``` via ```Services.Configure``` like in the example below.  Details on the implementation classes can be found as follows:
    - [```ConfigWebhookHandler```](ConfigWebhookHandler.md)
@@ -80,7 +80,9 @@ public async Task<dynamic> HandleRequestAsync(HttpRequest request)
 
 ### SmartApp Registration
 
-The details on how to test your app with SmartThings can be found in the [SmartApp documentation](https://developer-preview.smartthings.com/docs/connected-services/test-your-connected-service).
+The details on how to test your app with SmartThings can be found in [SmartApp Registration](https://developer-preview.smartthings.com/docs/connected-services/app-registration).
+
+>**NOTE** At the time of this writing, you will need to opt your SmartApp in for SmartHings x.509 cert request verification.  See [Opt in your SmartApp](https://developer-preview.smartthings.com/docs/connected-services/hosting/webhook-smartapp#opt-in-your-smartapp) for more details.
 
 ### ngrok
 
@@ -92,7 +94,7 @@ To use ngrok, run the command like so:
 ngrok http 5000 --host-header=localhost
 ```
 
-This tells ngrok to tunnel requests via http to port 5000 on your local machine use localhost as the host header.  If your app is not running on localhost, yo can ommit the ```--host-header=localhost``` argument.
+This tells ngrok to tunnel requests via http to port 5000 on your local machine use localhost as the host header.  If your app is not running on localhost, you can ommit the ```--host-header=localhost``` argument.
 
 The output will look something like:
 

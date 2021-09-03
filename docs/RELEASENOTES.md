@@ -8,6 +8,7 @@
 - Added support for undocumented notification API to ISmartThingsAPIHelper.
   > **_NOTE:_** UNDOCUMENTED!  MIGHT BE BUGGY!
 - Added docs for SmartThingsAPIHelper
+- Detailed the required [opt in process]((https://developer-preview.smartthings.com/docs/connected-services/hosting/webhook-smartapp#opt-in-your-smartapp)) for SmartThings x.509 cert request verification.
 
 ### 5.0.0.5 - 21 August 2021
 
