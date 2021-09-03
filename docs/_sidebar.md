@@ -9,3 +9,4 @@
 - [Installed App Token Management](InstalledAppTokenManagement.md)
 - [State Management](StateManagement.md)
 - [Device Models](DeviceModels.md)
+- [SmartThingsAPIHelper](SmartThingsAPIHelper.md)
