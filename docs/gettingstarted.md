@@ -24,6 +24,9 @@ You can find samples for ASP.NET Core and Azure functions in the samples directo
 6. Optionally add a [```StateManager```](StateManagement.md)
 7. Add the remaining handlers via the ```ianisms.SmartThings.NETCoreWebHookSDK.Extensions.AddWebhookHandlers``` extension method using ```.AddWebhookHandlers()```.
 8. Pass the ```HttpRequest``` from your ASP.NET Core or FunctionsApp to the ```RootWebhookHandler```.
+9. After deploying or running your SmartApp for the first time, [register your app](https://developer-preview.smartthings.com/docs/connected-services/app-registration) via the SmartThings developer workspace.  The URI will be the endpoint of your ASP.NET Core or FunctionApp.  For details on running locally, see [](/#/?id=ngrok)
+
+>**NOTE** At the time of this writing, you will need to opt your SmartApp in for SmartHings x.509 cert request verification.  See [Opt in your SmartApp](https://developer-preview.smartthings.com/docs/connected-services/hosting/webhook-smartapp#opt-in-your-smartapp) for more details.
 
 ### Example
 
@@ -78,12 +81,6 @@ public async Task<dynamic> HandleRequestAsync(HttpRequest request)
 
 ## Running Locally
 
-### SmartApp Registration
-
-The details on how to test your app with SmartThings can be found in [SmartApp Registration](https://developer-preview.smartthings.com/docs/connected-services/app-registration).
-
->**NOTE** At the time of this writing, you will need to opt your SmartApp in for SmartHings x.509 cert request verification.  See [Opt in your SmartApp](https://developer-preview.smartthings.com/docs/connected-services/hosting/webhook-smartapp#opt-in-your-smartapp) for more details.
-
 ### ngrok
 
 To test your app with SmartThings while running the app in your environment, I recommend using [ngrok](https://ngrok.com/product) to tunnel http / https requests to your app.
@@ -113,3 +110,5 @@ Connections         ttl     opn     rt1     rt5     p50     p90
 ```
 
 You can then hit the provided public ngrok endpoint, ```https://36f32ad6.ngrok.io``` in this case, and it will tunnel the requests to your app.  This means that you would set / change your SmartApp registration details to use ```https://36f32ad6.ngrok.io```  in the uri.  In the case of the samples, the uri would be ```https://36f32ad6.ngrok.io/api/FirstWH```.
+
+You will need to change your SmartApp registration to point to the ngrok endpoint.
