@@ -82,4 +82,4 @@ Task SendNotificationAsync(InstalledAppInstance installedApp,
 
 Given ```InstalledAppInstance installedApp```, ```string msg```, and optional ```string title```, will send a notification via the SmartThings app.
 
->**NOTE**: ```SendNotificationAsync``` uses an undocumented API and therefore might not function as expected.
+>**NOTE** ```SendNotificationAsync``` uses an undocumented API and therefore might not function as expected.
