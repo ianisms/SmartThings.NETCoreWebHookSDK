@@ -26,6 +26,7 @@
 // </copyright>
 #endregion
 using CoordinateSharp;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
 using TimeZoneConverter;
@@ -79,16 +80,33 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Models.SmartThings
             return celestial.SunSet.Value;
         }
 
-        public bool IsAfterSunrise()
+        public bool IsAfterSunrise(ILogger logger = null)
         {
             InitTimeZone();
-            return (GetDateTimeInLocation() > GetSunrise());
+            var dtil = GetDateTimeInLocation();
+            var sunrise = GetSunrise();
+            var isAfterSunrise = (dtil > sunrise);
+
+            if(logger != null) {
+                logger.LogDebug($"IsAfterSunrise {{ dtil: {dtil}, sunrise: {sunrise}, isAfterSunrise: {isAfterSunrise} }}");
+            }
+
+            return isAfterSunrise;
         }
 
-        public bool IsAfterSunset()
+        public bool IsAfterSunset(ILogger logger = null)
         {
             InitTimeZone();
-            return (GetDateTimeInLocation() > GetSunset());
+            var dtil = GetDateTimeInLocation();
+            var sunset = GetSunrise();
+            var isAfterSunset = (dtil > sunset);
+
+            if (logger != null)
+            {
+                logger.LogDebug($"IsAfterSunset {{ dtil: {dtil}, sunset: {sunset}, isAfterSunrise: {isAfterSunset} }}");
+            }
+
+            return isAfterSunset;
         }
 
         public static TemperatureScale TemperatureScaleFromDynamic(dynamic val)

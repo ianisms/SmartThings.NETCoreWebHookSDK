@@ -24,7 +24,7 @@ You can find samples for ASP.NET Core and Azure functions in the samples directo
 6. Optionally add a [```StateManager```](StateManagement.md)
 7. Add the remaining handlers via the ```ianisms.SmartThings.NETCoreWebHookSDK.Extensions.AddWebhookHandlers``` extension method using ```.AddWebhookHandlers()```.
 8. Pass the ```HttpRequest``` from your ASP.NET Core or FunctionsApp to the ```RootWebhookHandler```.
-9. After deploying or running your SmartApp for the first time, [register your app](https://developer-preview.smartthings.com/docs/connected-services/app-registration) via the SmartThings developer workspace.  The URI will be the endpoint of your ASP.NET Core or FunctionApp.  For details on running locally, see [Running Locally](#/?id=running-locally)
+9. After deploying or running your SmartApp for the first time, [register your app](https://developer-preview.smartthings.com/docs/connected-services/app-registration) via the SmartThings developer workspace.  The URI will be the endpoint of your ASP.NET Core or FunctionApp.  See [Running Locally](README?id=running-locally) for details on running locally for debugging.
 
 >**NOTE** At the time of this writing, you will need to opt your SmartApp in for SmartHings x.509 cert request verification.  See [Opt in your SmartApp](https://developer-preview.smartthings.com/docs/connected-services/hosting/webhook-smartapp#opt-in-your-smartapp) for more details.
 
