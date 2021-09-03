@@ -110,5 +110,3 @@ Connections         ttl     opn     rt1     rt5     p50     p90
 ```
 
 You can then hit the provided public ngrok endpoint, ```https://36f32ad6.ngrok.io``` in this case, and it will tunnel the requests to your app.  This means that you would set / change your SmartApp registration details to use ```https://36f32ad6.ngrok.io```  in the uri.  In the case of the samples, the uri would be ```https://36f32ad6.ngrok.io/api/FirstWH```.
-
-You will need to change your SmartApp registration to point to the ngrok endpoint.
