@@ -2,18 +2,16 @@
 
 ## Releases
 
-
 ### 5.0.0.6 - 1 September 2021
 
 - Fix for Location initialization
-- Added support for undocumented notification API.
+- Added support for undocumented notification API to ISmartThingsAPIHelper.
   > **_NOTE:_** UNDOCUMENTED!  MIGHT BE BUGGY!
-
+- Added docs for SmartThingsAPIHelper
 
 ### 5.0.0.5 - 21 August 2021
 
-- Fix blob collision issue in Azure storage backed managers 
-
+- Fix blob collision issue in Azure storage backed managers.
 
 ### 5.0.0.1 - 27 May 2021
 
