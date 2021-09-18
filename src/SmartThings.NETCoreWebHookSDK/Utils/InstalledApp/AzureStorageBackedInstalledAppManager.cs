@@ -105,7 +105,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.InstalledApp
                 {
                     _logger.LogDebug("Backing blob exists, loading installed app cache from blob...");
 
-                    var blobInfo = await blobClient.DownloadAsync();
+                    var blobInfo = await blobClient.DownloadAsync().ConfigureAwait(false);
 
                     if (blobInfo != null &&
                         blobInfo.Value != null &&
@@ -142,7 +142,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.InstalledApp
 
             using var stream = new MemoryStream();
             using var writer = new StreamWriter(stream);
-            await writer.WriteAsync(json);
+            await writer.WriteAsync(json).ConfigureAwait(false);
             writer.Flush();
             stream.Position = 0;
 

@@ -47,12 +47,13 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.InstalledApp
 
     public abstract class InstalledAppManager : IInstalledAppManager
     {
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "ack")]
         public IDictionary<string, InstalledAppInstance> InstalledAppCache { get; set; }
 
         private readonly ILogger<IInstalledAppManager> _logger;
         private readonly ISmartThingsAPIHelper _smartThingsAPIHelper;
 
-        public InstalledAppManager(ILogger<IInstalledAppManager> logger,
+        protected InstalledAppManager(ILogger<IInstalledAppManager> logger,
             ISmartThingsAPIHelper smartThingsAPIHelper)
         {
             _logger = logger ??

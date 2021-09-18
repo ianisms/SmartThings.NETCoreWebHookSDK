@@ -38,7 +38,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.InstalledApp
 {
     public class InstalledAppTokenManagerService : InstalledAppTokenManager, IHostedService, IDisposable
     {
-        private bool disposed = false;
+        private bool disposed;
         private Timer refreshTimer;
         private readonly ILogger<IInstalledAppTokenManager> _logger;
         private readonly InstalledAppTokenManagerConfig _installedAppTokenManagerConfig;

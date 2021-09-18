@@ -42,7 +42,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers
     {
         public ILogger<IConfigWebhookHandler> Logger { get; private set; }
 
-        public ConfigWebhookHandler(ILogger<IConfigWebhookHandler> logger)
+        protected ConfigWebhookHandler(ILogger<IConfigWebhookHandler> logger)
         {
             this.Logger = logger;
         }

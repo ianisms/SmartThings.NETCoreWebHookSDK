@@ -33,12 +33,12 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Models.SmartThings
 {
     public class InstalledAppInstance
     {
-        public string InstalledAppId { get; set; } = null;
+        public string InstalledAppId { get; set; }
         [JsonProperty(PropertyName = "accessToken")]
-        public Token AccessToken { get; private set; } = null;
+        public Token AccessToken { get; private set; }
         [JsonProperty(PropertyName = "refreshToken")]
-        public Token RefreshToken { get; private set; } = null;
-        public Location InstalledLocation { get; set; } = null;
+        public Token RefreshToken { get; private set; }
+        public Location InstalledLocation { get; set; }
 
         public void SetTokens(string authToken,
             string refreshToken = null,

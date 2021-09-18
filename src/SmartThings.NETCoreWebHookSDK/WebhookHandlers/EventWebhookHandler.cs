@@ -48,7 +48,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers
         public ILogger<IEventWebhookHandler> Logger { get; private set; }
         public IInstalledAppManager InstalledAppManager { get; private set; }
 
-        public EventWebhookHandler(ILogger<IEventWebhookHandler> logger,
+        protected EventWebhookHandler(ILogger<IEventWebhookHandler> logger,
             IInstalledAppManager installedAppManager)
         {
             _ = logger ??

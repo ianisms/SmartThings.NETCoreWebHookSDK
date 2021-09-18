@@ -60,7 +60,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers
         public IInstalledAppManager InstalledAppManager { get; private set; }
         public ISmartThingsAPIHelper SmartThingsAPIHelper { get; private set; }
 
-        public InstallUpdateWebhookHandler(ILogger<IInstallUpdateWebhookHandler> logger,
+        protected InstallUpdateWebhookHandler(ILogger<IInstallUpdateWebhookHandler> logger,
             IOptions<SmartAppConfig> options,
             IInstalledAppManager installedAppManager,
             ISmartThingsAPIHelper smartThingsAPIHelper)

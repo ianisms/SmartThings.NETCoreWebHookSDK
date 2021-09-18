@@ -56,7 +56,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.InstalledApp
         {
             _logger = logger ??
                 throw new ArgumentNullException(nameof(logger));
-            _fileBackedConfig = options.Value ?? throw new ArgumentNullException(nameof(options));
+            _fileBackedConfig = options?.Value ?? throw new ArgumentNullException(nameof(options));
             _fileBackedConfigValidator = fileBackedConfigValidator ?? throw new ArgumentNullException(nameof(fileBackedConfigValidator));
             _fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
 

@@ -75,17 +75,18 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Crypto
             _ = reqSignature ?? throw new ArgumentNullException(nameof(reqSignature));
             _ = reqSignature.KeyId ?? throw new InvalidOperationException($"{nameof(reqSignature.KeyId)} is null");
 
-            var certUri = $"{_config.SmartThingsCertUriRoot}{reqSignature.KeyId}";
-            var certBytes = await _httpClient.GetByteArrayAsync(certUri);
+            var certUri = new Uri($"{_config.SmartThingsCertUriRoot}{reqSignature.KeyId}");
+            var certBytes = await _httpClient.GetByteArrayAsync(certUri).ConfigureAwait(false);
             if (certBytes?.Length > 0)
             {
-                var cert = new X509Certificate2(certBytes);
+                using X509Certificate2 cert = new(certBytes);
                 return cert.GetRSAPublicKey();
             }
 
             return null;
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1308:Normalize strings to uppercase", Justification = "required")]
         private static byte[] GetHash(RequestSignature reqSignature, HttpRequest request)
         {
             var siginingString = new StringBuilder();
@@ -134,7 +135,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Crypto
             var hash = GetHash(reqSignature, request);
             var data = Convert.FromBase64String(reqSignature.Signature);
 
-            var publicKeyProvider = await GetRSAProviderFromCertAsync(reqSignature);
+            var publicKeyProvider = await GetRSAProviderFromCertAsync(reqSignature).ConfigureAwait(false);
 
             if (publicKeyProvider != null)
             {

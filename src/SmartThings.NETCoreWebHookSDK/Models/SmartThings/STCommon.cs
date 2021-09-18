@@ -34,16 +34,10 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Models.SmartThings
 
     public static class STCommon
     {
-        public static JsonSerializerSettings JsonSerializerSettings
+        public static JsonSerializerSettings JsonSerializerSettings => new()
         {
-            get
-            {
-                return new JsonSerializerSettings()
-                {
-                    TypeNameHandling = TypeNameHandling.All,
-                    ContractResolver = new CamelCasePropertyNamesContractResolver()
-                };
-            }
-        }
+            TypeNameHandling = TypeNameHandling.None,
+            ContractResolver = new CamelCasePropertyNamesContractResolver()
+        };
     }
 }

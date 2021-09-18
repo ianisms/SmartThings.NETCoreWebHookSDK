@@ -47,7 +47,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.State
         private readonly AzureStorageBackedConfigWithClientValidator<AzureStorageBackedStateManager<T>> _storageBackedConfigWithClientValidator;
         private readonly BlobServiceClient _blobServiceClient;
 
-        public bool LoadedCacheFromStorage { get; set; } = false;
+        public bool LoadedCacheFromStorage { get; set; }
 
         public AzureStorageBackedStateManager(ILogger<IStateManager<T>> logger,
             IOptions<AzureStorageBackedConfig<AzureStorageBackedStateManager<T>>> options,
@@ -90,7 +90,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.State
             if (StateCache == null)
             {
                 var containerClient = _blobServiceClient.GetBlobContainerClient(_storageBackedConfig.ContainerName);
-                await containerClient.CreateIfNotExistsAsync();
+                await containerClient.CreateIfNotExistsAsync().ConfigureAwait(false);
 
                 var blobClient = containerClient.GetBlobClient(_storageBackedConfig.CacheBlobName);
 
@@ -103,7 +103,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.State
                 {
                     _logger.LogDebug("Backing blob exists, loading cache from blob...");
 
-                    var blobInfo = await blobClient.DownloadAsync();
+                    var blobInfo = await blobClient.DownloadAsync().ConfigureAwait(false);
 
                     if (blobInfo != null &&
                         blobInfo.Value != null &&
@@ -142,7 +142,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.State
 
             using var stream = new MemoryStream();
             using var writer = new StreamWriter(stream);
-            await writer.WriteAsync(json);
+            await writer.WriteAsync(json).ConfigureAwait(false);
             writer.Flush();
             stream.Position = 0;
 

@@ -26,9 +26,11 @@
 // </copyright>
 #endregion
 using Newtonsoft.Json.Linq;
+using System;
 
 namespace ianisms.SmartThings.NETCoreWebHookSDK.Models.SmartThings
 {
+    [Obsolete("No longer supported by SmartThings", false)]
     public class SpeechDevice : BaseModel
     {
         public static SpeechDevice SpeechDeviceFromDynamic(dynamic val)

@@ -47,7 +47,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.WebhookHandlers
         public ILogger<IUninstallWebhookHandler> Logger { get; private set; }
         public IInstalledAppManager InstalledAppManager { get; private set; }
 
-        public UninstallWebhookHandler(ILogger<IUninstallWebhookHandler> logger,
+        protected UninstallWebhookHandler(ILogger<IUninstallWebhookHandler> logger,
             IInstalledAppManager installedAppManager)
         {
             _ = logger ?? throw new ArgumentNullException(nameof(logger));

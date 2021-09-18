@@ -36,6 +36,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Crypto
     public class CryptoUtilsConfig
     {
         [JsonProperty(Required = Required.Always)]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1056:URI-like properties should not be strings", Justification = "required")]
         public string SmartThingsCertUriRoot { get; set; } = "https://key.smartthings.com";
     }
 
@@ -43,8 +44,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Crypto
     {
         public CryptoUtilsConfigValidator()
         {
-            RuleFor(context => context.SmartThingsCertUriRoot).Must(val => !string.IsNullOrEmpty(val))
-                .WithMessage("SmartThingsCertUriRoot must not be null or empty");
+            RuleFor(context => context.SmartThingsCertUriRoot).NotEmpty();
         }
     }
 }

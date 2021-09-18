@@ -36,18 +36,19 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.State
     {
         Task LoadCacheAsync();
         Task<T> GetStateAsync(string installedAppId);
-        Task StoreStateAsync(string installedAppId, T state);
+        Task StoreStateAsync(string installedAppId, T state, bool suppressNotification = false);
         Task RemoveStateAsync(string installedAppId);
     }
 
     public abstract class StateManager<T> : IStateManager<T>
     {
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "ack")]
         public IDictionary<string, T> StateCache { get; set; }
 
         private readonly ILogger<IStateManager<T>> _logger;
         private readonly IList<IObserver<string>> _observers;
 
-        public StateManager(ILogger<IStateManager<T>> logger)
+        protected  StateManager(ILogger<IStateManager<T>> logger)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _observers = new List<IObserver<string>>();
@@ -73,7 +74,7 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.State
             return state;
         }
 
-        public virtual async Task StoreStateAsync(string installedAppId, T state)
+        public virtual async Task StoreStateAsync(string installedAppId, T state, bool suppressNotification = false)
         {
             _ = installedAppId ?? throw new ArgumentNullException(nameof(installedAppId));
 
@@ -84,7 +85,10 @@ namespace ianisms.SmartThings.NETCoreWebHookSDK.Utils.State
             StateCache.Remove(installedAppId);
             StateCache.Add(installedAppId, state);
 
-            NotifyObservers(installedAppId);
+            if (!suppressNotification)
+            {
+                NotifyObservers(installedAppId);
+            }
 
             await PersistCacheAsync().ConfigureAwait(false);
         }
