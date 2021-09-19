@@ -2,6 +2,11 @@
 
 ## Releases
 
+### 5.0.0.7 - 18 September 2021
+
+- Marked SpeechDevice as ```Obsolete``` as it is no longer supported by SmartThings.
+- general code cleanliness.
+
 ### 5.0.0.6 - 1 September 2021
 
 - Fix for Location initialization
