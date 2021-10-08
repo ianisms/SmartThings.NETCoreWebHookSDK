@@ -1,5 +1,12 @@
 # SmartThings.NETCoreWebHookSDK
 
+> :warning: 8 October 2021 - **Moving focus to Home Assistant**
+> 
+> After somewhat stagnant innovation from Samsung WRT SmartThings and its exit from the hub market, I've decided to jump ship and plunge deep into using Home Assistant for my home automation needs.  As such, I will shift my IoT passion project focus there and will no longer be maintaining this project.  More than open to someone else picking this up.  Until that happens, I’ll be moving this repo to archive.
+> 
+> It’s been a fun ride SmartThings!  You enabled me to make some of my dreams of devices and humans working in harmony to make for a better life real.  For that, I am eternally grateful.
+> 
+
 [![.NET 5 CI](https://github.com/ianisms/SmartThings.NETCoreWebHookSDK/actions/workflows/dotnet-5-ci.yml/badge.svg)](https://github.com/ianisms/SmartThings.NETCoreWebHookSDK/actions/workflows/dotnet-5-ci.yml)
 
 [![.NET 5 CD](https://github.com/ianisms/SmartThings.NETCoreWebHookSDK/actions/workflows/dotnet-5-cd.yml/badge.svg)](https://github.com/ianisms/SmartThings.NETCoreWebHookSDK/actions/workflows/dotnet-5-cd.yml)
